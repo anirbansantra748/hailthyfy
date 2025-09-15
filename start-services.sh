@@ -2,33 +2,31 @@
 
 echo "🚀 Starting Healthfy Services..."
 
-# Set environment variables
 export NODE_ENV=${NODE_ENV:-production}
 export PORT=${PORT:-3000}
 
-# Start Python ML service in background
+# Start Python ML service
 echo "🐍 Starting Python ML Service..."
 cd ml_service
+pip install -r requirements.txt
 python3 simple_main.py &
 ML_PID=$!
+cd ..
 
-# Wait a few seconds to ensure ML service starts
-sleep 2
+# Wait a bit for ML service to boot
+sleep 5
 
-# Start Node.js application
+# Start Node.js
 echo "⚡ Starting Node.js Application on port $PORT..."
 node app.js &
 NODE_PID=$!
 
-# Function to handle graceful shutdown
+# Graceful shutdown
 cleanup() {
     echo "🔄 Shutting down services..."
     kill $ML_PID $NODE_PID
     exit
 }
-
-# Set trap to handle termination signals
 trap cleanup SIGINT SIGTERM
 
-# Wait for both processes
 wait $NODE_PID $ML_PID
