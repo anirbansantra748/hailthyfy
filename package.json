@@ -34,6 +34,9 @@
   },
   "scripts": {
     "start": "node app.js",
+    "start:combined": "./start-services.sh",
+    "build": "npm install",
+    "build:render": "./render-build.sh",
     "dev": "nodemon app.js",
     "test:ml": "node tests/test_ml_integration.js",
     "test:upload": "node tests/test_upload_flow.js"
