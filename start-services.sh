@@ -8,7 +8,8 @@ export PORT=${PORT:-3000}
 
 # Start Python ML service in background
 echo "🐍 Starting Python ML Service..."
-python3 ml_service/SimpleMain.py &
+cd ml_service
+python3 simple_main.py &
 ML_PID=$!
 
 # Wait a few seconds to ensure ML service starts
