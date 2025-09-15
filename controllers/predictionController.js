@@ -856,35 +856,21 @@ exports.renderXrayList = async (req, res) => {
 // Render X-ray view
 exports.renderXrayView = async (req, res) => {
   try {
-    console.log(`Rendering X-ray view for ID: ${req.params.id}`);
-
     const xray = await Xray.findById(req.params.id);
-    console.log(`Found X-ray:`, xray ? "Yes" : "No");
 
     if (!xray) {
-      console.log("X-ray not found, redirecting to list");
       req.flash("error", "X-ray not found");
       return res.redirect("/prediction/xray");
     }
 
     // Check permissions
-    console.log(
-      `Checking permissions: user ${req.user._id} vs xray user ${xray.user}`
-    );
     if (
       xray.user.toString() !== req.user._id.toString() &&
       req.user.role !== "admin"
     ) {
-      console.log("Access denied, redirecting to list");
       req.flash("error", "Access denied");
       return res.redirect("/prediction/xray");
     }
-
-    console.log(`Rendering view template with xray data:`, {
-      id: xray._id,
-      status: xray.status,
-      hasPredictions: !!xray.predictions,
-    });
 
     // Ensure predictions is properly formatted for the template
     let safePredictions = {};
@@ -928,27 +914,9 @@ exports.renderXrayView = async (req, res) => {
       predictions: safePredictions,
     };
 
-    // Add some debugging
-    console.log("About to render template with data:", {
-      userId: req.user._id,
-      xrayId: safeXray._id,
-      xrayStatus: safeXray.status,
-      hasPredictions: !!safeXray.predictions,
-      predictionsKeys: safeXray.predictions
-        ? Object.keys(safeXray.predictions)
-        : [],
-    });
-
     try {
       // Prepare predictionsKeys array for template
       const predictionsKeys = Object.keys(safePredictions);
-
-      console.log("Rendering template with final data:", {
-        hasPredictions: !!safePredictions,
-        predictionsCount: Object.keys(safePredictions).length,
-        predictionsKeys: predictionsKeys.slice(0, 3), // Show first 3 for debugging
-        xrayStatus: safeXray.status,
-      });
 
       res.render("predictions/view-fixed", {
         user: req.user,
@@ -958,20 +926,13 @@ exports.renderXrayView = async (req, res) => {
         predictionsKeys: predictionsKeys,
       });
     } catch (renderError) {
-      console.error("Template rendering error:", renderError);
-      console.error("Render error stack:", renderError.stack);
-
       // Try to provide a fallback error page
       req.flash("error", "Error rendering results page. Please try again.");
       return res.redirect("/prediction/xray");
     }
   } catch (error) {
-    console.error("Render X-ray view error:", error);
-    console.error("Error stack:", error.stack);
-
     // Check if it's a template rendering error
     if (error.message && error.message.includes("template")) {
-      console.error("Template rendering error detected");
       req.flash("error", "Error rendering results page. Please try again.");
     } else {
       req.flash("error", "Failed to load X-ray");

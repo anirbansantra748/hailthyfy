@@ -2,13 +2,13 @@
 
 <style>
   body {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     min-height: 100vh;
   }
 
   .hero-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     color: white;
     padding: 2rem 0;
     margin-bottom: 2rem;
@@ -38,14 +38,14 @@
   }
 
   .xray-container {
-    background: #000;
     border-radius: 15px;
-    padding: 1rem;
+    padding: 3rem;
     position: relative;
-    min-height: 400px;
+    min-height: 300px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 2px dashed rgba(34, 197, 94, 0.3);
   }
 
   .xray-image {
@@ -61,35 +61,9 @@
     filter: contrast(1.2) brightness(1.1);
   }
 
-  .controls-overlay {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    display: flex;
-    gap: 5px;
-  }
-
-  .control-btn {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(255,255,255,0.9);
-    color: #333;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .control-btn:hover {
-    background: white;
-    transform: scale(1.1);
-  }
 
   .action-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
     border: none;
     border-radius: 25px;
     color: white;
@@ -111,10 +85,10 @@
     text-decoration: none;
   }
 
-  .action-button.success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-  .action-button.warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-  .action-button.info { background: linear-gradient(135deg, #48dbfb 0%, #0abde3 100%); }
-  .action-button.secondary { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); }
+  .action-button.success { background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); }
+  .action-button.warning { background: linear-gradient(135deg, #eab308 0%, #facc15 100%); }
+  .action-button.info { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+  .action-button.secondary { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
 
   .prediction-item {
     background: white;
@@ -139,45 +113,6 @@
     position: relative;
   }
 
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-  }
-
-  .modal-content-custom {
-    max-width: 90vw;
-    max-height: 90vh;
-    position: relative;
-  }
-
-  .modal-content-custom img {
-    max-width: 100%;
-    max-height: 90vh;
-    border-radius: 10px;
-  }
-
-  .close-modal {
-    position: absolute;
-    top: -40px;
-    right: 0;
-    background: white;
-    border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
 
   .notification {
     position: fixed;
@@ -332,39 +267,22 @@
     <!-- X-ray Image -->
     <div class="col-lg-7 mb-4">
       <div class="card">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-success text-white">
           <h5 class="mb-0">
-            <i class="fas fa-image me-2"></i>X-ray Image
+            <i class="fas fa-image me-2"></i>X-ray Overview
             <small class="opacity-75 ms-2">(<%= xray.scanType || 'Unknown' %> Scan)</small>
           </h5>
         </div>
         <div class="card-body p-3">
-          <div class="xray-container">
-            <% if (xray.image) { %>
-            <img 
-              src="<%= xray.image.startsWith('/uploads/') ? xray.image : (xray.image.startsWith('xrays/') ? '/uploads/' + xray.image : '/uploads/xrays/' + xray.image.replace(/^xrays\//, '').replace(/^\/+/, '')) %>" 
-              alt="X-ray Image" 
-              class="xray-image"
-              id="mainXrayImage"
-              onclick="openImageModal('<%= xray.image.startsWith('/uploads/') ? xray.image : (xray.image.startsWith('xrays/') ? '/uploads/' + xray.image : '/uploads/xrays/' + xray.image.replace(/^xrays\//, '').replace(/^\/+/, '')) %>')"
-              onerror="handleImageError(this)"
-            >
-            <div class="controls-overlay">
-              <button class="control-btn" onclick="openImageModal('<%= xray.image.startsWith('/uploads/') ? xray.image : (xray.image.startsWith('xrays/') ? '/uploads/' + xray.image : '/uploads/xrays/' + xray.image.replace(/^xrays\//, '').replace(/^\/+/, '')) %>')" title="Fullscreen">
-                <i class="fas fa-expand"></i>
-              </button>
+          <div class="xray-container" style="background: linear-gradient(135deg, #f0fff4, #dcfce7);">
+            <div class="text-center">
+              <div style="font-size: 5rem; line-height: 1; filter: drop-shadow(0 8px 20px rgba(34,197,94,0.25));">🩻</div>
+              <h4 class="mt-3 mb-1 text-success">X-ray Analysis Ready</h4>
+              <p class="text-muted mb-0">Your scan has been processed. View AI insights on the right.</p>
             </div>
-            <% } else { %>
-            <div class="text-center text-white-50">
-              <i class="fas fa-image fa-4x mb-3"></i>
-              <h5>No Image Available</h5>
-              <p>The X-ray image could not be loaded</p>
-              <p>Debug - Image path: <%= xray.image ? (xray.image.startsWith('/uploads/') ? xray.image : (xray.image.startsWith('xrays/') ? '/uploads/' + xray.image : '/uploads/xrays/' + xray.image.replace(/^xrays\//, '').replace(/^\/+/, ''))) : 'No path' %></p>
-            </div>
-            <% } %>
           </div>
           
-          <!-- Image Info -->
+          <!-- Scan Info -->
           <% if (xray.file_name) { %>
           <div class="row mt-3 text-center">
             <div class="col-md-6">
@@ -484,32 +402,13 @@
     </div>
   </div>
 
-  <!-- Debug Section (Remove in production) -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="card border-warning">
-        <div class="card-header bg-warning text-dark">
-          <h6 class="mb-0"><i class="fas fa-bug me-2"></i>Debug Information</h6>
-        </div>
-        <div class="card-body">
-          <small>
-            <strong>Status:</strong> <%= xray.status %><br>
-            <strong>Image:</strong> <%= xray.image %><br>
-            <strong>Predictions Type:</strong> <%= typeof xray.predictions %><br>
-            <strong>Predictions:</strong> <%= JSON.stringify(xray.predictions) %><br>
-            <strong>Predictions Keys:</strong> <%= xray.predictions ? Object.keys(xray.predictions) : 'None' %><br>
-          </small>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Chart Section -->
   <% if (xray.status === 'completed' && xray.predictions && Object.keys(xray.predictions).length > 0) { %>
   <div class="row mb-4">
     <div class="col-12">
       <div class="card">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-success text-white">
           <h5 class="mb-0">
             <i class="fas fa-chart-bar me-2"></i>Prediction Distribution
           </h5>
@@ -565,6 +464,25 @@
     </button>
     <% } %>
   </div>
+
+  <!-- Medical Disclaimer -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card border-0" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0);">
+        <div class="card-body text-center py-4">
+          <div class="mb-3">
+            <i class="fas fa-shield-alt text-success" style="font-size: 2.5rem;"></i>
+          </div>
+          <h5 class="text-success fw-bold mb-2">⚕️ Medical Disclaimer</h5>
+          <p class="text-muted mb-0">
+            This AI analysis is for informational purposes only and should not be used as a substitute 
+            for professional medical diagnosis, advice, or treatment. Always consult with a qualified 
+            healthcare provider for medical concerns and before making any healthcare decisions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Chart.js -->
@@ -604,13 +522,8 @@ if (xray.status === 'completed' && xray.predictions) {
 document.addEventListener('DOMContentLoaded', function() {
   const chartData = <%- JSON.stringify(chartData) %>;
   
-  console.log('Chart data received:', chartData);
-  console.log('Chart data keys:', Object.keys(chartData));
-  console.log('Chart data values:', Object.values(chartData));
-  
   if (Object.keys(chartData).length > 0) {
     const ctx = document.getElementById('predictionChart');
-    console.log('Chart canvas element:', ctx);
     
     if (ctx) {
       try {
@@ -670,9 +583,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           }
         });
-        console.log('Chart initialized successfully');
       } catch (error) {
-        console.error('Error initializing chart:', error);
         // Show a fallback message
         ctx.parentElement.innerHTML = `
           <div class="text-center text-muted p-4">
@@ -683,11 +594,8 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
         `;
       }
-    } else {
-      console.warn('Chart canvas element not found');
     }
   } else {
-    console.log('No chart data available');
     const chartContainer = document.querySelector('.chart-wrapper');
     if (chartContainer) {
       chartContainer.innerHTML = `
@@ -700,41 +608,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 });
-
-// Image modal functionality
-function openImageModal(imageSrc) {
-  const modal = document.createElement('div');
-  modal.className = 'modal-overlay';
-  modal.onclick = function(e) {
-    if (e.target === modal) {
-      document.body.removeChild(modal);
-    }
-  };
-  
-  modal.innerHTML = `
-    <div class="modal-content-custom">
-      <button class="close-modal" onclick="this.closest('.modal-overlay').remove()">
-        <i class="fas fa-times"></i>
-      </button>
-      <img src="${imageSrc}" alt="X-ray Fullscreen">
-    </div>
-  `;
-  
-  document.body.appendChild(modal);
-}
-
-// Handle image errors
-function handleImageError(img) {
-  img.style.display = 'none';
-  const container = img.parentElement;
-  container.innerHTML = `
-    <div class="text-center text-white-50">
-      <i class="fas fa-exclamation-triangle fa-4x mb-3"></i>
-      <h5>Image Not Available</h5>
-      <p>Could not load the X-ray image</p>
-    </div>
-  `;
-}
 
 // Show notification
 function showNotification(message, type = 'info') {

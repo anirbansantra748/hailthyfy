@@ -4,16 +4,18 @@
   <!-- Header Section -->
   <div class="row mb-4">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h1 class="h2 mb-2">
-            <i class="fas fa-user-md me-3 text-primary"></i>Find Doctors
-          </h1>
-          <p class="text-muted mb-0">Connect with verified healthcare professionals</p>
-        </div>
-        <div class="text-end">
-          <p class="text-muted mb-1">Total Doctors: <span class="fw-bold text-primary"><%= pagination.totalDoctors %></span></p>
-          <p class="text-muted mb-0">Showing <%= doctors.length %> of <%= pagination.totalDoctors %></p>
+      <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <div>
+            <h1 class="mb-2">
+              <i class="fas fa-user-md me-3"></i>Find Doctors
+            </h1>
+            <p class="mb-0">Connect with verified healthcare professionals</p>
+          </div>
+          <div class="text-end">
+            <p class="mb-1 opacity-75">Total Doctors: <span class="fw-bold"><%= pagination.totalDoctors %></span></p>
+            <p class="mb-0 opacity-75">Showing <%= doctors.length %> of <%= pagination.totalDoctors %></p>
+          </div>
         </div>
       </div>
     </div>
@@ -22,7 +24,7 @@
   <!-- Search and Filters Section -->
   <div class="row mb-4">
     <div class="col-12">
-      <div class="card border-0 shadow-sm">
+      <div class="card search-card">
         <div class="card-body p-4">
           <form method="GET" action="/doctors" id="searchForm">
             <div class="row g-3">
@@ -122,50 +124,93 @@
   <div class="row" id="doctorsGrid">
     <% if (doctors && doctors.length > 0) { %>
       <% doctors.forEach(function(doctor) { %>
-        <div class="col-lg-4 col-md-6 mb-4">
-          <div class="card h-100 border-0 shadow-sm doctor-card">
+        <div class="col-lg-4 col-md-6 mb-4 fade-in-up">
+          <div class="card h-100 doctor-card">
             <div class="card-body p-4">
               <!-- Doctor Header -->
               <div class="d-flex align-items-start mb-3">
                 <div class="flex-shrink-0 me-3">
-                  <% if (doctor.user && doctor.user.profileImage) { %>
-                    <img 
-                      src="<%= doctor.user.profileImage %>" 
-                      alt="<%= doctor.fullName %>" 
-                      class="rounded-circle"
-                      style="width: 60px; height: 60px; object-fit: cover;"
-                    >
-                  <% } else { %>
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
-                         style="width: 60px; height: 60px;">
-                      <i class="fas fa-user-md fa-lg"></i>
-                    </div>
-                  <% } %>
+                  <%
+                    // Medical specialization icons and emojis
+                    let specialtyIcon = 'fa-user-md';
+                    let specialtyEmoji = '👩‍⚕️';
+                    
+                    switch(doctor.specialization.toLowerCase()) {
+                      case 'cardiology':
+                        specialtyIcon = 'fa-heartbeat';
+                        specialtyEmoji = '❤️';
+                        break;
+                      case 'neurology':
+                        specialtyIcon = 'fa-brain';
+                        specialtyEmoji = '🧠';
+                        break;
+                      case 'pediatrics':
+                        specialtyIcon = 'fa-baby';
+                        specialtyEmoji = '👶';
+                        break;
+                      case 'orthopedic surgery':
+                        specialtyIcon = 'fa-bone';
+                        specialtyEmoji = '🦴';
+                        break;
+                      case 'dermatology':
+                        specialtyIcon = 'fa-hand-paper';
+                        specialtyEmoji = '🧴';
+                        break;
+                      case 'internal medicine':
+                        specialtyIcon = 'fa-stethoscope';
+                        specialtyEmoji = '🩺';
+                        break;
+                      case 'obstetrics and gynecology':
+                        specialtyIcon = 'fa-venus';
+                        specialtyEmoji = '🤱';
+                        break;
+                      case 'psychiatry':
+                        specialtyIcon = 'fa-head-side-virus';
+                        specialtyEmoji = '🧘';
+                        break;
+                      case 'emergency medicine':
+                        specialtyIcon = 'fa-ambulance';
+                        specialtyEmoji = '🚑';
+                        break;
+                      case 'oncology':
+                        specialtyIcon = 'fa-ribbon';
+                        specialtyEmoji = '🎗️';
+                        break;
+                      default:
+                        specialtyIcon = 'fa-user-md';
+                        specialtyEmoji = '👩‍⚕️';
+                    }
+                  %>
+                  <div class="doctor-avatar bg-success d-flex align-items-center justify-content-center text-white position-relative">
+                    <i class="fas <%= specialtyIcon %> fa-lg"></i>
+                    <span class="specialty-emoji position-absolute" style="bottom: -5px; right: -5px; font-size: 1.2rem; background: white; border-radius: 50%; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center;"><%= specialtyEmoji %></span>
+                  </div>
                 </div>
                                  <div class="flex-grow-1">
                    <div class="d-flex align-items-center gap-2 mb-1">
-                     <h5 class="card-title mb-0">
-                       <a href="/doctors/profile/<%= doctor._id %>" class="text-decoration-none text-dark">
+                     <h5 class="doctor-name mb-0">
+                       <a href="/doctors/profile/<%= doctor._id %>" class="text-decoration-none doctor-name">
                          <%= doctor.fullName %>
                        </a>
+                     </h5>
                      <!-- Verification Status Badge -->
                      <% if (doctor.licenseVerificationStatus === 'verified') { %>
-                       <span class="badge bg-success small">
+                       <span class="badge bg-success custom-badge small ms-2">
                          <i class="fas fa-check-circle me-1"></i>Verified
                        </span>
                      <% } else if (doctor.licenseVerificationStatus === 'pending') { %>
-                       <span class="badge bg-warning small">
+                       <span class="badge bg-warning custom-badge small ms-2">
                          <i class="fas fa-clock me-1"></i>Pending
                        </span>
                      <% } else { %>
-                       <span class="badge bg-secondary small">
+                       <span class="badge bg-secondary custom-badge small ms-2">
                          <i class="fas fa-question-circle me-1"></i>Unverified
                        </span>
                      <% } %>
                    </div>
-                   <p class="text-primary mb-1 fw-bold"><%= doctor.specialization %></p>
+                   <p class="specialization mb-1"><%= doctor.specialization %></p>
                   <div class="d-flex align-items-center">
-                    <div class="text-warning me-2">
+                    <div class="rating-stars me-2">
                       <% for (let i = 0; i < 5; i++) { %>
                         <% if (i < Math.floor(doctor.averageRating)) { %>
                           <i class="fas fa-star"></i>
@@ -176,7 +221,7 @@
                         <% } %>
                       <% } %>
                     </div>
-                    <span class="text-muted">(<%= doctor.averageRating %>)</span>
+                    <span class="text-muted fw-bold">(<%= doctor.averageRating %>)</span>
                   </div>
                 </div>
               </div>
@@ -185,12 +230,16 @@
               <div class="mb-3">
                 <div class="row g-2">
                   <div class="col-6">
-                    <small class="text-muted d-block">Experience</small>
-                    <span class="fw-bold"><%= doctor.experienceYears %>+ years</span>
+                    <div class="stat-item">
+                      <div class="stat-value"><%= doctor.experienceYears %>+</div>
+                      <div class="stat-label">Years Experience</div>
+                    </div>
                   </div>
                   <div class="col-6">
-                    <small class="text-muted d-block">Patients</small>
-                    <span class="fw-bold"><%= doctor.totalPatientsTreated.toLocaleString() %></span>
+                    <div class="stat-item">
+                      <div class="stat-value"><%= doctor.totalPatientsTreated.toLocaleString() %></div>
+                      <div class="stat-label">Patients</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -227,14 +276,16 @@
               <div class="mb-3">
                 <div class="row g-2">
                   <div class="col-6">
-                    <small class="text-muted d-block">Consultation</small>
-                    <span class="fw-bold text-success">$<%= doctor.consultationFee %></span>
+                    <div class="stat-item">
+                      <div class="stat-value text-success">$<%= doctor.consultationFee %></div>
+                      <div class="stat-label">Consultation Fee</div>
+                    </div>
                   </div>
                   <div class="col-6">
-                    <small class="text-muted d-block">Mode</small>
+                    <small class="text-muted d-block mb-2">Consultation Modes</small>
                     <div class="d-flex flex-wrap gap-1">
                       <% doctor.consultationMode.forEach(function(mode) { %>
-                        <span class="badge bg-info text-white small"><%= mode.replace('_', ' ') %></span>
+                        <span class="badge bg-info custom-badge small"><%= mode.replace('_', ' ') %></span>
                       <% }); %>
                     </div>
                   </div>
@@ -270,12 +321,12 @@
       <% }); %>
     <% } else { %>
       <div class="col-12">
-        <div class="text-center py-5">
-          <i class="fas fa-user-md fa-3x text-muted mb-3"></i>
-          <h4 class="text-muted">No doctors found</h4>
-          <p class="text-muted mb-3">Try adjusting your search criteria or filters</p>
+        <div class="no-results">
+          <i class="fas fa-user-md fa-4x mb-3"></i>
+          <h4 class="text-muted mb-3">No doctors found</h4>
+          <p class="text-muted mb-4">Try adjusting your search criteria or filters to find the perfect healthcare provider for your needs.</p>
           <a href="/doctors" class="btn btn-primary">
-            <i class="fas fa-refresh me-2"></i>Clear Filters
+            <i class="fas fa-refresh me-2"></i>Clear All Filters
           </a>
         </div>
       </div>
@@ -490,34 +541,347 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* ======= MODERN MEDICAL THEME STYLING ======= */
+
+/* Background and Base Styling */
+body {
+  background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+  min-height: 100vh;
+}
+
+.container-fluid {
+  background: transparent;
+}
+
+/* Header Styling */
+.page-header {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border-radius: 15px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+}
+
+.page-header h1 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 2.5rem;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+/* Search Card Styling */
+.search-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.search-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.search-card .card-body {
+  padding: 2rem;
+}
+
+.form-control, .form-select {
+  border-radius: 12px;
+  border: 2px solid #e9ecef;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 0.2rem rgba(34, 197, 94, 0.25);
+  transform: translateY(-1px);
+}
+
+.input-group-text {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border: none;
+  border-radius: 12px 0 0 12px;
+}
+
+/* Doctor Cards - Premium Design */
 .doctor-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  position: relative;
+}
+
+.doctor-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.doctor-card:hover::before {
+  transform: scaleX(1);
 }
 
 .doctor-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+  transform: translateY(-8px);
+  box-shadow: 0 20px 50px rgba(34, 197, 94, 0.15);
 }
 
-.badge.bg-outline-secondary {
-  background-color: transparent !important;
-  color: #6c757d !important;
-  border: 1px solid #6c757d;
+.doctor-card .card-body {
+  padding: 1.75rem;
+}
+
+/* Profile Images */
+.doctor-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.doctor-card:hover .doctor-avatar {
+  transform: scale(1.1);
+  box-shadow: 0 10px 30px rgba(34, 197, 94, 0.3);
+}
+
+/* Typography Enhancements */
+.doctor-name {
+  font-weight: 700;
+  color: #2d3748;
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+  transition: color 0.3s ease;
+}
+
+.doctor-card:hover .doctor-name {
+  color: #22c55e;
+}
+
+.specialization {
+  color: #22c55e;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Badge Styling */
+.custom-badge {
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, #48bb78, #38a169) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ed8936, #dd6b20) !important;
+}
+
+.badge.bg-info {
+  background: linear-gradient(135deg, #4299e1, #3182ce) !important;
+}
+
+.badge.bg-light {
+  background: #f7fafc !important;
+  color: #4a5568 !important;
+  border: 1px solid #e2e8f0;
+}
+
+/* Star Rating */
+.rating-stars {
+  color: #ffd700;
+  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+}
+
+/* Stats Display */
+.stat-item {
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: 12px;
+  padding: 0.75rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: rgba(34, 197, 94, 0.1);
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  font-weight: 700;
+  color: #22c55e;
+  font-size: 1.1rem;
+}
+
+.stat-label {
+  color: #718096;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Button Styling */
+.btn {
+  border-radius: 12px;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.9rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: none;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.5);
+}
+
+.btn-outline-success {
+  border: 2px solid #48bb78;
+  color: #48bb78;
+  background: transparent;
+}
+
+.btn-outline-success:hover {
+  background: #48bb78;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(72, 187, 120, 0.3);
+}
+
+.btn-outline-secondary {
+  border: 2px solid #a0aec0;
+  color: #4a5568;
+}
+
+.btn-outline-secondary:hover {
+  background: #4a5568;
+  border-color: #4a5568;
+  color: white;
+}
+
+/* Pagination Styling */
+.pagination {
+  gap: 0.5rem;
 }
 
 .pagination .page-link {
-  color: #007bff;
-  border-color: #dee2e6;
+  color: #22c55e;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
 }
 
 .pagination .page-item.active .page-link {
-  background-color: #007bff;
-  border-color: #007bff;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border-color: transparent;
+  box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
 }
 
 .pagination .page-link:hover {
-  color: #0056b3;
-  background-color: #e9ecef;
-  border-color: #dee2e6;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  border-color: #22c55e;
+  transform: translateY(-2px);
 }
+
+/* No Results Styling */
+.no-results {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.no-results i {
+  color: #a0aec0;
+  margin-bottom: 1rem;
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1.5rem;
+    text-align: center;
+  }
+  
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .search-card .card-body {
+    padding: 1.5rem;
+  }
+  
+  .doctor-card .card-body {
+    padding: 1.25rem;
+  }
+  
+  .doctor-avatar {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.fade-in-up:nth-child(2) { animation-delay: 0.1s; }
+.fade-in-up:nth-child(3) { animation-delay: 0.2s; }
+.fade-in-up:nth-child(4) { animation-delay: 0.3s; }
 </style>

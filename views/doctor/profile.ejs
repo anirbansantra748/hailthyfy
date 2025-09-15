@@ -2,83 +2,122 @@
 
 <div class="container-fluid py-4">
   <!-- Doctor Header Section -->
-  <div class="row mb-4">
+  <div class="row mb-4 fade-in-up">
     <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
+      <div class="card profile-header-card">
+        <div class="card-body">
           <div class="row align-items-center">
             <!-- Profile Image -->
             <div class="col-md-3 text-center mb-3 mb-md-0">
-              <% if (doctor.user && doctor.user.profileImage) { %>
-              <img
-                src="<%= doctor.user.profileImage %>"
-                alt="<%= doctor.fullName %>"
-                class="rounded-circle shadow-lg"
-                style="width: 150px; height: 150px; object-fit: cover"
-              />
-              <% } else { %>
-              <div
-                class="bg-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center text-white mx-auto"
-                style="width: 150px; height: 150px"
-              >
-                <i class="fas fa-user-md fa-4x"></i>
+              <%
+                // Medical specialization icons and emojis for profile
+                let profileIcon = 'fa-user-md';
+                let profileEmoji = '👩‍⚕️';
+                
+                switch(doctor.specialization.toLowerCase()) {
+                  case 'cardiology':
+                    profileIcon = 'fa-heartbeat';
+                    profileEmoji = '❤️';
+                    break;
+                  case 'neurology':
+                    profileIcon = 'fa-brain';
+                    profileEmoji = '🧠';
+                    break;
+                  case 'pediatrics':
+                    profileIcon = 'fa-baby';
+                    profileEmoji = '👶';
+                    break;
+                  case 'orthopedic surgery':
+                    profileIcon = 'fa-bone';
+                    profileEmoji = '🦴';
+                    break;
+                  case 'dermatology':
+                    profileIcon = 'fa-hand-paper';
+                    profileEmoji = '🧴';
+                    break;
+                  case 'internal medicine':
+                    profileIcon = 'fa-stethoscope';
+                    profileEmoji = '🩺';
+                    break;
+                  case 'obstetrics and gynecology':
+                    profileIcon = 'fa-venus';
+                    profileEmoji = '🤱';
+                    break;
+                  case 'psychiatry':
+                    profileIcon = 'fa-head-side-virus';
+                    profileEmoji = '🧘';
+                    break;
+                  case 'emergency medicine':
+                    profileIcon = 'fa-ambulance';
+                    profileEmoji = '🚑';
+                    break;
+                  case 'oncology':
+                    profileIcon = 'fa-ribbon';
+                    profileEmoji = '🎗️';
+                    break;
+                  default:
+                    profileIcon = 'fa-user-md';
+                    profileEmoji = '👩‍⚕️';
+                }
+              %>
+              <div class="profile-avatar-placeholder mx-auto position-relative">
+                <i class="fas <%= profileIcon %> fa-5x"></i>
+                <span class="specialty-emoji position-absolute" style="bottom: 10px; right: 10px; font-size: 2.5rem; background: white; border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.2);"><%= profileEmoji %></span>
               </div>
-              <% } %>
             </div>
 
             <!-- Basic Info -->
             <div class="col-md-6 mb-3 mb-md-0">
-              <h1 class="h2 mb-2"><%= doctor.fullName %></h1>
-              <p class="text-primary mb-2 fs-5 fw-bold">
+              <h1 class="doctor-name"><%= doctor.fullName %></h1>
+              <p class="doctor-specialization">
                 <%= doctor.specialization %>
               </p>
 
               <!-- Rating -->
-              <div class="d-flex align-items-center mb-3">
-                <div class="text-warning me-2">
-                  <% for (let i = 0; i < 5; i++) { %> <% if (i <
-                  Math.floor(doctor.averageRating)) { %>
-                  <i class="fas fa-star fa-lg"></i>
-                  <% } else if (i === Math.floor(doctor.averageRating) &&
-                  doctor.averageRating % 1 > 0) { %>
-                  <i class="fas fa-star-half-alt fa-lg"></i>
-                  <% } else { %>
-                  <i class="far fa-star fa-lg"></i>
-                  <% } %> <% } %>
+              <div class="rating-section">
+                <div class="d-flex align-items-center">
+                  <div class="rating-stars">
+                    <% for (let i = 0; i < 5; i++) { %>
+                      <% if (i < Math.floor(doctor.averageRating)) { %>
+                        <i class="fas fa-star"></i>
+                      <% } else if (i === Math.floor(doctor.averageRating) && doctor.averageRating % 1 > 0) { %>
+                        <i class="fas fa-star-half-alt"></i>
+                      <% } else { %>
+                        <i class="far fa-star"></i>
+                      <% } %>
+                    <% } %>
+                  </div>
+                  <span class="rating-value">(<%= doctor.averageRating %>)</span>
+                  <span class="rating-count ms-3">
+                    • <%= doctor.reviews ? doctor.reviews.length : 0 %> reviews
+                  </span>
                 </div>
-                <span class="fs-5 fw-bold text-muted"
-                  >(<%= doctor.averageRating %>)</span
-                >
-                <span class="ms-3 text-muted"
-                  >• <%= doctor.reviews ? doctor.reviews.length : 0 %>
-                  reviews</span
-                >
               </div>
 
               <!-- Quick Stats -->
               <div class="row g-3">
                 <div class="col-4">
-                  <div class="text-center">
-                    <div class="h4 text-primary mb-1">
+                  <div class="stat-card">
+                    <div class="stat-number primary">
                       <%= doctor.experienceYears %>+
                     </div>
-                    <small class="text-muted">Years Experience</small>
+                    <div class="stat-label">Years Experience</div>
                   </div>
                 </div>
                 <div class="col-4">
-                  <div class="text-center">
-                    <div class="h4 text-success mb-1">
+                  <div class="stat-card">
+                    <div class="stat-number success">
                       <%= doctor.totalPatientsTreated.toLocaleString() %>
                     </div>
-                    <small class="text-muted">Patients Treated</small>
+                    <div class="stat-label">Patients Treated</div>
                   </div>
                 </div>
                 <div class="col-4">
-                  <div class="text-center">
-                    <div class="h4 text-info mb-1">
+                  <div class="stat-card">
+                    <div class="stat-number info">
                       $<%= doctor.consultationFee %>
                     </div>
-                    <small class="text-muted">Consultation Fee</small>
+                    <div class="stat-label">Consultation Fee</div>
                   </div>
                 </div>
               </div>
@@ -107,8 +146,8 @@
     <!-- Left Column - Doctor Details -->
     <div class="col-lg-8">
       <!-- About Section -->
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-gradient-primary text-white">
+      <div class="card content-card fade-in-up">
+        <div class="card-header">
           <h5 class="mb-0">
             <i class="fas fa-info-circle me-2"></i>About Doctor
           </h5>
@@ -122,7 +161,7 @@
               <h6 class="text-muted mb-2">Sub-specializations</h6>
               <div class="d-flex flex-wrap gap-2">
                 <% doctor.subSpecializations.forEach(function(subSpec) { %>
-                <span class="badge bg-primary"><%= subSpec %></span>
+                <span class="badge bg-primary custom-badge"><%= subSpec %></span>
                 <% }); %>
               </div>
             </div>
@@ -134,7 +173,7 @@
               <h6 class="text-muted mb-2">Languages Spoken</h6>
               <div class="d-flex flex-wrap gap-2">
                 <% doctor.languages.forEach(function(lang) { %>
-                <span class="badge bg-info"><%= lang %></span>
+                <span class="badge bg-info custom-badge"><%= lang %></span>
                 <% }); %>
               </div>
             </div>
@@ -145,9 +184,7 @@
               <h6 class="text-muted mb-2">Consultation Modes</h6>
               <div class="d-flex flex-wrap gap-2">
                 <% doctor.consultationMode.forEach(function(mode) { %>
-                <span class="badge bg-success"
-                  ><%= mode.replace('_', ' ') %></span
-                >
+                <span class="badge bg-success custom-badge"><%= mode.replace('_', ' ') %></span>
                 <% }); %>
               </div>
             </div>
@@ -175,8 +212,8 @@
 
       <!-- Qualifications Section -->
       <% if (doctor.qualifications && doctor.qualifications.length > 0) { %>
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-gradient-primary text-white">
+      <div class="card content-card fade-in-up">
+        <div class="card-header">
           <h5 class="mb-0">
             <i class="fas fa-graduation-cap me-2"></i>Qualifications
           </h5>
@@ -185,10 +222,10 @@
           <div class="row g-3">
             <% doctor.qualifications.forEach(function(qual) { %>
             <div class="col-md-6">
-              <div class="border rounded p-3">
-                <h6 class="fw-bold text-primary mb-1"><%= qual.degree %></h6>
-                <p class="mb-1"><%= qual.university %></p>
-                <small class="text-muted">Graduated: <%= qual.year %></small>
+              <div class="qualification-item">
+                <div class="qualification-degree"><%= qual.degree %></div>
+                <div class="qualification-university"><%= qual.university %></div>
+                <div class="qualification-year">Graduated: <%= qual.year %></div>
               </div>
             </div>
             <% }); %>
@@ -198,10 +235,9 @@
       <% } %>
 
       <!-- Hospital Affiliations -->
-      <% if (doctor.hospitalAffiliations && doctor.hospitalAffiliations.length >
-      0) { %>
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-gradient-primary text-white">
+      <% if (doctor.hospitalAffiliations && doctor.hospitalAffiliations.length > 0) { %>
+      <div class="card content-card fade-in-up">
+        <div class="card-header">
           <h5 class="mb-0">
             <i class="fas fa-hospital me-2"></i>Hospital Affiliations
           </h5>
@@ -210,8 +246,8 @@
           <div class="row g-3">
             <% doctor.hospitalAffiliations.forEach(function(hospital) { %>
             <div class="col-md-6">
-              <div class="d-flex align-items-center">
-                <i class="fas fa-hospital text-primary me-3 fa-lg"></i>
+              <div class="hospital-item">
+                <i class="fas fa-hospital hospital-icon"></i>
                 <span class="fw-bold"><%= hospital %></span>
               </div>
             </div>
@@ -223,8 +259,8 @@
 
       <!-- Availability Section -->
       <% if (doctor.availability && doctor.availability.length > 0) { %>
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-gradient-primary text-white">
+      <div class="card content-card fade-in-up">
+        <div class="card-header">
           <h5 class="mb-0">
             <i class="fas fa-calendar-alt me-2"></i>Availability
           </h5>
@@ -233,15 +269,16 @@
           <div class="row g-3">
             <% doctor.availability.forEach(function(day) { %>
             <div class="col-md-6">
-              <div class="border rounded p-3">
-                <h6 class="fw-bold text-primary mb-2"><%= day.day %></h6>
-                <% if (day.slots && day.slots.length > 0) { %> <%
-                day.slots.forEach(function(slot) { %>
-                <span class="badge bg-success me-2">
-                  <%= slot.start %> - <%= slot.end %>
-                </span>
-                <% }); %> <% } else { %>
-                <span class="text-muted">No slots available</span>
+              <div class="schedule-item">
+                <div class="schedule-day"><%= day.day %></div>
+                <% if (day.slots && day.slots.length > 0) { %>
+                  <% day.slots.forEach(function(slot) { %>
+                    <span class="time-slot">
+                      <%= slot.start %> - <%= slot.end %>
+                    </span>
+                  <% }); %>
+                <% } else { %>
+                  <span class="text-muted">No slots available</span>
                 <% } %>
               </div>
             </div>
@@ -320,21 +357,9 @@
           <div class="border-bottom pb-3 mb-3">
             <div class="d-flex justify-content-between align-items-start mb-2">
               <div class="d-flex align-items-center">
-                <% if (review.patient && review.patient.profileImage) { %>
-                <img
-                  src="<%= review.patient.profileImage %>"
-                  alt="Patient"
-                  class="rounded-circle me-2"
-                  style="width: 40px; height: 40px; object-fit: cover"
-                />
-                <% } else { %>
-                <div
-                  class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center text-white"
-                  style="width: 40px; height: 40px"
-                >
+                <div class="bg-success rounded-circle me-2 d-flex align-items-center justify-content-center text-white review-avatar">
                   <i class="fas fa-user"></i>
                 </div>
-                <% } %>
                 <div>
                   <h6 class="mb-0">
                     <%= review.patient ? review.patient.name : 'Anonymous' %>
@@ -372,8 +397,8 @@
     <!-- Right Column - Sidebar -->
     <div class="col-lg-4">
       <!-- Quick Contact Card -->
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-success text-white">
+      <div class="card sidebar-card contact-card fade-in-up">
+        <div class="card-header">
           <h5 class="mb-0"><i class="fas fa-phone me-2"></i>Quick Contact</h5>
         </div>
         <div class="card-body p-4">
@@ -384,10 +409,9 @@
             </a>
             <% } %>
 
-            <div class="text-center">
-              <p class="text-muted mb-2">Consultation Fee</p>
-              <h3 class="text-success mb-0">$<%= doctor.consultationFee %></h3>
-              <small class="text-muted">per session</small>
+            <div class="fee-display">
+              <div class="fee-amount">$<%= doctor.consultationFee %></div>
+              <div class="fee-label">per session</div>
             </div>
           </div>
         </div>
@@ -395,30 +419,36 @@
 
       <!-- Similar Doctors -->
       <% if (similarDoctors && similarDoctors.length > 0) { %>
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-info text-white">
+      <div class="card sidebar-card similar-card fade-in-up">
+        <div class="card-header">
           <h5 class="mb-0"><i class="fas fa-users me-2"></i>Similar Doctors</h5>
         </div>
         <div class="card-body p-4">
           <% similarDoctors.forEach(function(similarDoctor) { %>
-          <div class="d-flex align-items-center mb-3">
-            <div class="flex-shrink-0 me-3">
-              <% if (similarDoctor.user && similarDoctor.user.profileImage) { %>
-              <img
-                src="<%= similarDoctor.user.profileImage %>"
-                alt="<%= similarDoctor.fullName %>"
-                class="rounded-circle"
-                style="width: 50px; height: 50px; object-fit: cover"
-              />
-              <% } else { %>
-              <div
-                class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
-                style="width: 50px; height: 50px"
-              >
-                <i class="fas fa-user-md"></i>
+          <div class="similar-doctor-item">
+            <div class="d-flex align-items-center">
+              <div class="flex-shrink-0 me-3">
+                <%
+                  // Similar doctor specialization icons
+                  let similarIcon = 'fa-user-md';
+                  switch(similarDoctor.specialization.toLowerCase()) {
+                    case 'cardiology': similarIcon = 'fa-heartbeat'; break;
+                    case 'neurology': similarIcon = 'fa-brain'; break;
+                    case 'pediatrics': similarIcon = 'fa-baby'; break;
+                    case 'orthopedic surgery': similarIcon = 'fa-bone'; break;
+                    case 'dermatology': similarIcon = 'fa-hand-paper'; break;
+                    case 'internal medicine': similarIcon = 'fa-stethoscope'; break;
+                    case 'obstetrics and gynecology': similarIcon = 'fa-venus'; break;
+                    case 'psychiatry': similarIcon = 'fa-head-side-virus'; break;
+                    case 'emergency medicine': similarIcon = 'fa-ambulance'; break;
+                    case 'oncology': similarIcon = 'fa-ribbon'; break;
+                    default: similarIcon = 'fa-user-md';
+                  }
+                %>
+                <div class="similar-doctor-avatar bg-success d-flex align-items-center justify-content-center text-white">
+                  <i class="fas <%= similarIcon %>"></i>
+                </div>
               </div>
-              <% } %>
-            </div>
             <div class="flex-grow-1">
               <h6 class="mb-1">
                 <a
@@ -453,13 +483,13 @@
       <% } %>
 
       <!-- Verification Badge -->
-      <div class="card border-0 shadow-sm">
-        <div class="card-body p-4 text-center">
-          <div class="mb-3">
-            <i class="fas fa-shield-alt fa-3x text-success"></i>
+      <div class="card sidebar-card verification-card fade-in-up">
+        <div class="card-body p-4">
+          <div class="verification-icon">
+            <i class="fas fa-shield-alt"></i>
           </div>
-          <h6 class="fw-bold">Verified Doctor</h6>
-          <p class="text-muted small mb-0">
+          <h6 class="fw-bold mb-3">Verified Doctor</h6>
+          <p class="text-muted mb-0">
             This doctor's credentials have been verified by our team
           </p>
         </div>
@@ -613,28 +643,578 @@
 
 
 <style>
-  .bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  }
+/* ======= MODERN MEDICAL PROFILE THEME ======= */
 
-  .card {
-    transition: transform 0.2s ease-in-out;
-  }
+/* Background and Base */
+body {
+  background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+  min-height: 100vh;
+}
 
-  .card:hover {
-    transform: translateY(-2px);
-  }
+.container-fluid {
+  background: transparent;
+}
 
-  .badge {
-    font-size: 0.875rem;
-  }
+/* Header Profile Card */
+.profile-header-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  border: none;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+}
 
-  .text-warning .fas.fa-star,
-  .text-warning .fas.fa-star-half-alt {
-    color: #ffc107 !important;
-  }
+.profile-header-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+}
 
-  .text-warning .far.fa-star {
-    color: #dee2e6 !important;
+.profile-header-card .card-body {
+  padding: 3rem;
+}
+
+/* Profile Avatar */
+.profile-avatar {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.profile-avatar::after {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  right: -6px;
+  bottom: -6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-header-card:hover .profile-avatar::after {
+  opacity: 1;
+}
+
+.profile-avatar-placeholder {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 15px 40px rgba(34, 197, 94, 0.4);
+}
+
+/* Typography */
+.doctor-name {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.doctor-specialization {
+  font-size: 1.5rem;
+  color: #22c55e;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Rating Section */
+.rating-section {
+  background: rgba(34, 197, 94, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.rating-stars {
+  color: #ffd700;
+  font-size: 1.5rem;
+  filter: drop-shadow(0 3px 6px rgba(255, 215, 0, 0.3));
+  margin-right: 1rem;
+}
+
+.rating-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.rating-count {
+  color: #718096;
+  font-size: 1.1rem;
+}
+
+/* Stats Cards */
+.stat-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  border: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover::before {
+  transform: scaleX(1);
+}
+
+.stat-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.stat-number {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.stat-number.primary { color: #22c55e; }
+.stat-number.success { color: #16a34a; }
+.stat-number.info { color: #22c55e; }
+
+.stat-label {
+  color: #718096;
+  font-size: 1rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Action Buttons */
+.btn {
+  border-radius: 15px;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: none;
+  box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(34, 197, 94, 0.5);
+}
+
+.btn-outline-secondary {
+  border: 2px solid #a0aec0;
+  color: #4a5568;
+  background: transparent;
+}
+
+.btn-outline-secondary:hover {
+  background: #4a5568;
+  border-color: #4a5568;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(74, 85, 104, 0.3);
+}
+
+/* Content Cards */
+.content-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.content-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.content-card .card-header {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border: none;
+  padding: 1.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.content-card .card-body {
+  padding: 2rem;
+}
+
+/* Badges and Labels */
+.custom-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0.25rem;
+  transition: all 0.3s ease;
+}
+
+.custom-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.badge.bg-primary {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+}
+
+.badge.bg-info {
+  background: linear-gradient(135deg, #4299e1, #3182ce) !important;
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, #48bb78, #38a169) !important;
+}
+
+.badge.bg-warning {
+  background: linear-gradient(135deg, #ed8936, #dd6b20) !important;
+}
+
+/* Qualification Cards */
+.qualification-item {
+  background: rgba(34, 197, 94, 0.05);
+  border: 2px solid rgba(34, 197, 94, 0.1);
+  border-radius: 15px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.qualification-item:hover {
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.2);
+  transform: translateY(-3px);
+}
+
+.qualification-degree {
+  font-weight: 700;
+  color: #22c55e;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.qualification-university {
+  color: #4a5568;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.qualification-year {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+/* Hospital Affiliations */
+.hospital-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: rgba(72, 187, 120, 0.05);
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+}
+
+.hospital-item:hover {
+  background: rgba(72, 187, 120, 0.1);
+  transform: translateX(10px);
+}
+
+.hospital-icon {
+  color: #48bb78;
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+/* Availability Schedule */
+.schedule-item {
+  background: rgba(66, 153, 225, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.schedule-item:hover {
+  background: rgba(66, 153, 225, 0.1);
+  transform: translateY(-2px);
+}
+
+.schedule-day {
+  font-weight: 700;
+  color: #22c55e;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.time-slot {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  margin: 0.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.time-slot:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+}
+
+/* Research Papers */
+.research-item {
+  background: rgba(128, 90, 213, 0.05);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid rgba(128, 90, 213, 0.1);
+}
+
+.research-item:hover {
+  background: rgba(128, 90, 213, 0.1);
+  border-color: rgba(128, 90, 213, 0.2);
+  transform: translateY(-3px);
+}
+
+.research-title {
+  font-weight: 700;
+  color: #22c55e;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.research-journal {
+  color: #4a5568;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+/* Reviews Section */
+.review-item {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 2px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.review-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.review-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.review-stars {
+  color: #ffd700;
+  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
+}
+
+/* Sidebar Cards */
+.sidebar-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+}
+
+.sidebar-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-card .card-header {
+  border: none;
+  padding: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+
+.sidebar-card.contact-card .card-header {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+}
+
+.sidebar-card.similar-card .card-header {
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+}
+
+.sidebar-card.verification-card {
+  text-align: center;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+}
+
+.verification-icon {
+  color: #48bb78;
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 5px 15px rgba(72, 187, 120, 0.3));
+}
+
+.fee-display {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.fee-amount {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #22c55e;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.fee-label {
+  color: #718096;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Similar Doctor Items */
+.similar-doctor-item {
+  padding: 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.similar-doctor-item:hover {
+  background: rgba(66, 153, 225, 0.05);
+  transform: translateX(10px);
+}
+
+.similar-doctor-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.similar-doctor-item:hover .similar-doctor-avatar {
+  transform: scale(1.1);
+  border-color: #4299e1;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .profile-header-card .card-body {
+    padding: 2rem;
+    text-align: center;
   }
+  
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profile-avatar-placeholder {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .doctor-name {
+    font-size: 2rem;
+  }
+  
+  .doctor-specialization {
+    font-size: 1.2rem;
+  }
+  
+  .stat-card {
+    margin-bottom: 1rem;
+  }
+  
+  .content-card .card-body {
+    padding: 1.5rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.fade-in-up:nth-child(1) { animation-delay: 0s; }
+.fade-in-up:nth-child(2) { animation-delay: 0.1s; }
+.fade-in-up:nth-child(3) { animation-delay: 0.2s; }
+.fade-in-up:nth-child(4) { animation-delay: 0.3s; }
+.fade-in-up:nth-child(5) { animation-delay: 0.4s; }
 </style>
