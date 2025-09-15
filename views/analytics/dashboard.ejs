@@ -1,0 +1,1022 @@
+<%- include('../partials/header') %>
+
+<!-- Enhanced Analytics Dashboard Styles -->
+<link href="/css/analytics-dashboard.css" rel="stylesheet">
+
+<style>
+  /* Dashboard-specific overrides */
+  .chart-container.small {
+    height: 300px;
+  }
+  
+  .chart-container.large {
+    height: 500px;
+  }
+    height: 300px;
+  }
+
+  .chart-container.large {
+    height: 500px;
+  }
+
+  /* Patient Journey Styles */
+  .journey-node {
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .journey-node:hover {
+    transform: scale(1.1);
+  }
+
+  .journey-link {
+    stroke: var(--primary-green);
+    stroke-width: 2px;
+    fill: none;
+    marker-end: url(#arrowhead);
+  }
+
+  .journey-text {
+    font-size: 12px;
+    fill: var(--text-primary);
+    text-anchor: middle;
+  }
+
+  /* Performance Metrics */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .metric-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    border: 1px solid var(--border-light);
+  }
+
+  .metric-score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .metric-score.excellent {
+    color: var(--success-green);
+  }
+
+  .metric-score.good {
+    color: var(--info-blue);
+  }
+
+  .metric-score.average {
+    color: var(--warning-orange);
+  }
+
+  .metric-score.poor {
+    color: var(--danger-red);
+  }
+
+  /* Trend Analysis */
+  .trend-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+  }
+
+  .trend-up {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success-green);
+  }
+
+  .trend-down {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-red);
+  }
+
+  .trend-stable {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--text-secondary);
+  }
+
+  /* Loading States */
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--primary-light);
+    border-top: 4px solid var(--primary-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .analytics-header {
+      padding: 2rem 0;
+    }
+
+    .analytics-title {
+      font-size: 2rem;
+    }
+
+    .chart-container {
+      height: 300px;
+    }
+
+    .chart-container.large {
+      height: 400px;
+    }
+
+    .metric-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-tabs .nav-link {
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .dashboard-card {
+      border-radius: 12px;
+    }
+
+    .card-header,
+    .card-body {
+      padding: 1rem;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Custom Tooltips */
+  .d3-tooltip {
+    position: absolute;
+    background: rgba(31, 41, 55, 0.9);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .d3-tooltip.show {
+    opacity: 1;
+  }
+
+  /* Filter Panel */
+  .filter-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+  }
+
+  .filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .filter-group label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .filter-group select,
+  .filter-group input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-gray);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .filter-group select:focus,
+  .filter-group input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+  }
+
+  .btn-filter {
+    background: var(--primary-green);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-filter:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+  }
+</style>
+
+<!-- Include Chart.js and D3.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+
+<!-- Analytics Header -->
+<div class="analytics-header">
+  <div class="container">
+    <div class="text-center">
+      <h1 class="analytics-title">
+        <i class="fas fa-chart-line me-3"></i>
+        Healthcare Analytics Dashboard
+      </h1>
+      <p class="analytics-subtitle">
+        Comprehensive insights into patient care, medical trends, and performance metrics
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <!-- Navigation Tabs -->
+  <div class="analytics-nav">
+    <ul class="nav nav-tabs" id="analyticsTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+          <i class="fas fa-tachometer-alt me-2"></i>Overview
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="patient-journey-tab" data-bs-toggle="tab" data-bs-target="#patient-journey" type="button" role="tab">
+          <i class="fas fa-route me-2"></i>Patient Journey
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="medical-trends-tab" data-bs-toggle="tab" data-bs-target="#medical-trends" type="button" role="tab">
+          <i class="fas fa-chart-area me-2"></i>Medical Trends
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="doctor-performance-tab" data-bs-toggle="tab" data-bs-target="#doctor-performance" type="button" role="tab">
+          <i class="fas fa-user-md me-2"></i>Doctor Performance
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Tab Content -->
+  <div class="tab-content" id="analyticsTabContent">
+    
+    <!-- Overview Tab -->
+    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+      <!-- Key Metrics Row -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value" id="totalPatientsCount">0</div>
+            <div class="stat-label">Total Patients</div>
+            <div class="stat-change positive" id="patientsChange">+0% this month</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value" id="activeConsultationsCount">0</div>
+            <div class="stat-label">Active Consultations</div>
+            <div class="stat-change positive" id="consultationsChange">+0% this week</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value" id="avgSatisfactionScore">0.0</div>
+            <div class="stat-label">Avg Satisfaction</div>
+            <div class="stat-change positive" id="satisfactionChange">+0% this month</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value" id="criticalAlertsCount">0</div>
+            <div class="stat-label">Critical Alerts</div>
+            <div class="stat-change neutral" id="alertsChange">0 this week</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-chart-line text-primary"></i>
+                Patient Flow Analytics
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="patientFlowChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-heartbeat text-danger"></i>
+                Health Conditions
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container small">
+                <canvas id="conditionsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Analytics -->
+      <div class="row g-4 mt-2">
+        <div class="col-lg-6">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-clock text-warning"></i>
+                Treatment Response Times
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container small">
+                <canvas id="responseTimeChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-pills text-info"></i>
+                Medication Adherence
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container small">
+                <canvas id="adherenceChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Journey Tab -->
+    <div class="tab-pane fade" id="patient-journey" role="tabpanel">
+      <!-- Filter Panel -->
+      <div class="filter-panel">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="patientSelect">Select Patient</label>
+            <select id="patientSelect">
+              <option value="">All Patients</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="journeyTimeRange">Time Range</label>
+            <select id="journeyTimeRange">
+              <option value="30">Last 30 Days</option>
+              <option value="90" selected>Last 3 Months</option>
+              <option value="365">Last Year</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="conditionFilter">Condition</label>
+            <select id="conditionFilter">
+              <option value="">All Conditions</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <button class="btn-filter" onclick="updatePatientJourney()">
+              <i class="fas fa-search me-1"></i>Update
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Journey Visualization -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <h5 class="card-title">
+            <i class="fas fa-route text-success"></i>
+            Patient Care Journey Mapping
+          </h5>
+        </div>
+        <div class="card-body">
+          <div id="patientJourneyViz" class="chart-container large"></div>
+        </div>
+      </div>
+
+      <!-- Journey Statistics -->
+      <div class="row g-4 mt-2">
+        <div class="col-md-4">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h6 class="card-title">Journey Metrics</h6>
+            </div>
+            <div class="card-body">
+              <div class="metric-grid">
+                <div class="metric-item">
+                  <div class="metric-score excellent" id="avgJourneyTime">0</div>
+                  <div class="metric-label">Avg Journey Time</div>
+                </div>
+                <div class="metric-item">
+                  <div class="metric-score good" id="completionRate">0%</div>
+                  <div class="metric-label">Completion Rate</div>
+                </div>
+                <div class="metric-item">
+                  <div class="metric-score average" id="dropoffRate">0%</div>
+                  <div class="metric-label">Dropoff Rate</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h6 class="card-title">Journey Stage Analysis</h6>
+            </div>
+            <div class="card-body">
+              <div class="chart-container small">
+                <canvas id="journeyStageChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical Trends Tab -->
+    <div class="tab-pane fade" id="medical-trends" role="tabpanel">
+      <!-- Trend Filters -->
+      <div class="filter-panel">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label for="trendTimeRange">Time Range</label>
+            <select id="trendTimeRange">
+              <option value="7">Last 7 Days</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90" selected>Last 3 Months</option>
+              <option value="365">Last Year</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="trendMetric">Primary Metric</label>
+            <select id="trendMetric">
+              <option value="consultations">Consultations</option>
+              <option value="conditions">Health Conditions</option>
+              <option value="medications">Medications</option>
+              <option value="outcomes">Treatment Outcomes</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="departmentFilter">Department</label>
+            <select id="departmentFilter">
+              <option value="">All Departments</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <button class="btn-filter" onclick="updateMedicalTrends()">
+              <i class="fas fa-sync-alt me-1"></i>Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trends Analysis -->
+      <div class="row g-4">
+        <div class="col-lg-12">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-chart-area text-primary"></i>
+                Medical Trends Analysis
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container large">
+                <canvas id="medicalTrendsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Condition Trends -->
+      <div class="row g-4 mt-2">
+        <div class="col-lg-6">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h6 class="card-title">Top Trending Conditions</h6>
+            </div>
+            <div class="card-body">
+              <div class="chart-container small">
+                <canvas id="topConditionsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h6 class="card-title">Treatment Effectiveness</h6>
+            </div>
+            <div class="card-body">
+              <div class="chart-container small">
+                <canvas id="treatmentEffectivenessChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medication Analysis -->
+      <div class="row g-4 mt-2">
+        <div class="col-lg-12">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-pills text-info"></i>
+                Medication Trends & Interactions
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="medicationTrendsChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Doctor Performance Tab -->
+    <div class="tab-pane fade" id="doctor-performance" role="tabpanel">
+      <!-- Performance Overview -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-value" id="totalDoctorsCount">0</div>
+            <div class="stat-label">Total Doctors</div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-value" id="avgPatientSatisfaction">0.0</div>
+            <div class="stat-label">Patient Satisfaction</div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="stat-card">
+            <div class="stat-value" id="avgResponseTime">0</div>
+            <div class="stat-label">Avg Response Time</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value" id="treatmentSuccessRate">0%</div>
+            <div class="stat-label">Treatment Success</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-card">
+            <div class="stat-value" id="consultationsThisMonth">0</div>
+            <div class="stat-label">Consultations This Month</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor Performance Charts -->
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-user-md text-success"></i>
+                Doctor Performance Comparison
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="chart-container">
+                <canvas id="doctorPerformanceChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h6 class="card-title">Performance Distribution</h6>
+            </div>
+            <div class="card-body">
+              <div class="chart-container small">
+                <canvas id="performanceDistributionChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Performance Metrics -->
+      <div class="row g-4 mt-2">
+        <div class="col-lg-12">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-chart-bar text-warning"></i>
+                Individual Doctor Analytics
+              </h5>
+            </div>
+            <div class="card-body">
+              <!-- Doctor Selection -->
+              <div class="mb-3">
+                <select id="doctorSelect" class="form-select">
+                  <option value="">Select Doctor for Detailed Analysis</option>
+                </select>
+              </div>
+              
+              <!-- Doctor Details -->
+              <div id="doctorDetailsContainer">
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <div class="chart-container small">
+                      <canvas id="doctorSatisfactionTrend"></canvas>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="chart-container small">
+                      <canvas id="doctorWorkloadChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance Rankings -->
+      <div class="row g-4 mt-2">
+        <div class="col-lg-12">
+          <div class="dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-trophy text-warning"></i>
+                Doctor Performance Rankings
+              </h5>
+            </div>
+            <div class="card-body">
+              <div id="doctorRankingsTable">
+                <!-- Rankings table will be populated here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Tooltip for D3 visualizations -->
+<div id="d3-tooltip" class="d3-tooltip"></div>
+
+<script src="/js/advanced-patient-journey.js"></script>
+<script src="/js/advanced-medical-trends.js"></script>
+<script src="/js/advanced-doctor-performance.js"></script>
+<script src="/js/analytics-dashboard.js"></script>
+
+<style>
+/* Enhanced Tooltip Styles */
+.patient-journey-tooltip {
+  font-family: 'Inter', sans-serif;
+}
+
+.tooltip-header {
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 8px;
+}
+
+.tooltip-content .tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.tooltip-label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+}
+
+.tooltip-value {
+  font-weight: 600;
+  color: white;
+}
+
+.tooltip-section {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tooltip-list {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0 0;
+}
+
+.tooltip-list li {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2px;
+}
+
+/* AI Insights Panel Styles */
+.ai-insights-panel {
+  font-family: 'Inter', sans-serif;
+}
+
+.ai-insights-panel .insight-item {
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s ease;
+}
+
+.ai-insights-panel .insight-item:hover {
+  background-color: #f9fafb;
+}
+
+.ai-insights-panel .insight-title {
+  font-weight: 600;
+  font-size: 14px;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.ai-insights-panel .insight-description {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.ai-insights-panel .insight-recommendations {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ai-insights-panel .insight-recommendations li {
+  font-size: 11px;
+  color: #059669;
+  margin-bottom: 2px;
+}
+
+.ai-insights-panel .insight-recommendations li:before {
+  content: '→ ';
+  font-weight: bold;
+}
+
+/* Enhanced Card Animations */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.dashboard-card {
+  animation: slideInUp 0.6s ease-out;
+  animation-fill-mode: both;
+}
+
+.dashboard-card:nth-child(1) { animation-delay: 0.1s; }
+.dashboard-card:nth-child(2) { animation-delay: 0.2s; }
+.dashboard-card:nth-child(3) { animation-delay: 0.3s; }
+.dashboard-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Enhanced Hover Effects */
+.dashboard-card {
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+}
+
+/* Real-time Indicators */
+.real-time-indicator {
+  position: relative;
+  display: inline-block;
+}
+
+.real-time-indicator:before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background: #10b981;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+  }
+  
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+/* Enhanced Loading States */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Enhanced Tab Navigation */
+.nav-tabs .nav-link {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 3px;
+  background: var(--primary-green);
+  transition: width 0.3s ease;
+}
+
+.nav-tabs .nav-link.active:before,
+.nav-tabs .nav-link:hover:before {
+  width: 100%;
+}
+
+/* Enhanced Filter Panel */
+.filter-panel {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Enhanced Performance Indicators */
+.performance-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.performance-badge.excellent {
+  background: rgba(34, 197, 94, 0.1);
+  color: #059669;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.performance-badge.good {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.performance-badge.warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.performance-badge.critical {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* Enhanced Responsive Design */
+@media (max-width: 1200px) {
+  .patient-journey-svg {
+    width: 100%;
+    height: auto;
+  }
+  
+  .ai-insights-panel {
+    width: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ai-insights-panel {
+    width: 280px;
+    top: 60px;
+  }
+  
+  .dashboard-card {
+    margin-bottom: 1rem;
+  }
+  
+  .chart-container.large {
+    height: 350px;
+  }
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+  .dashboard-card {
+    background: #1f2937;
+    border: 1px solid #374151;
+  }
+  
+  .filter-panel {
+    background: rgba(31, 41, 55, 0.95);
+  }
+  
+  .ai-insights-panel {
+    background: #1f2937;
+    border: 1px solid #374151;
+  }
+}
+</style>
+
+<%- include('../partials/footer') %>

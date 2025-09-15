@@ -1,0 +1,1044 @@
+<%- include('../partials/header') %>
+
+<style>
+/* 🚀 REVOLUTIONARY DOCTOR REGISTRATION FORM */
+:root {
+    --medical-primary: #0d6efd;
+    --medical-success: #198754;
+    --medical-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --medical-light: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+    --shadow-soft: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 20px 40px -5px rgba(0, 0, 0, 0.15);
+    --border-radius: 20px;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.registration-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.registration-card {
+    background: var(--medical-light);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.registration-header {
+    background: var(--medical-gradient);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.registration-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(180deg); }
+}
+
+.registration-title {
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.registration-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+.registration-logo {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: pulse 2s ease-in-out infinite;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.3));
+}
+
+.form-container {
+    padding: 3rem;
+}
+
+.form-step {
+    display: none;
+    animation: slideIn 0.5s ease-out;
+}
+
+.form-step.active {
+    display: block;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.step {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #6c757d;
+    margin: 0 1rem;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.step.active {
+    background: var(--medical-gradient);
+    color: white;
+    transform: scale(1.2);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.step.completed {
+    background: var(--medical-success);
+    color: white;
+}
+
+.step::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    width: 2rem;
+    height: 2px;
+    background: #e9ecef;
+    transform: translateY(-50%);
+}
+
+.step:last-child::after {
+    display: none;
+}
+
+.step.completed::after {
+    background: var(--medical-success);
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--medical-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    outline: none;
+    transform: translateY(-2px);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.btn-modern {
+    background: var(--medical-gradient);
+    border: none;
+    border-radius: 25px;
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-soft);
+}
+
+.btn-modern:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    color: white;
+}
+
+.btn-outline-modern {
+    background: transparent;
+    border: 2px solid var(--medical-primary);
+    border-radius: 25px;
+    padding: 1rem 2.5rem;
+    font-weight: 600;
+    color: var(--medical-primary);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-modern:hover {
+    background: var(--medical-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.qualification-item {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.qualification-item:hover {
+    border-color: var(--medical-primary);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.remove-qualification {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+}
+
+.remove-qualification:hover {
+    background: #c82333;
+    transform: scale(1.1);
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.checkbox-item:hover {
+    border-color: var(--medical-primary);
+    transform: translateY(-2px);
+}
+
+.checkbox-item input[type="checkbox"]:checked + .checkbox-label {
+    color: var(--medical-primary);
+    font-weight: 600;
+}
+
+.availability-grid {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.day-availability {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.day-availability:hover {
+    border-color: var(--medical-primary);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.step-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    gap: 1rem;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--medical-gradient);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.alert-modern {
+    border: none;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-soft);
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+    border-left: 5px solid #28a745;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+    border-left: 5px solid #dc3545;
+}
+
+.file-upload-area {
+    border: 3px dashed #e9ecef;
+    border-radius: 15px;
+    padding: 3rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    background: #f8f9fa;
+}
+
+.file-upload-area:hover {
+    border-color: var(--medical-primary);
+    background: white;
+}
+
+.file-upload-area.dragover {
+    border-color: var(--medical-primary);
+    background: rgba(13, 110, 253, 0.05);
+}
+
+@media (max-width: 768px) {
+    .registration-container {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+    
+    .form-container {
+        padding: 2rem 1.5rem;
+    }
+    
+    .registration-title {
+        font-size: 2rem;
+    }
+    
+    .step-buttons {
+        flex-direction: column;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<div class="registration-container">
+    <div class="registration-card">
+        <div class="registration-header">
+            <div class="registration-logo">👩‍⚕️</div>
+            <h1 class="registration-title">Doctor Registration</h1>
+            <p class="registration-subtitle">Join Healthfy's network of verified medical professionals</p>
+        </div>
+        
+        <div class="form-container">
+            <!-- Flash Messages -->
+            <% if (error && error.length > 0) { %>
+                <div class="alert-modern alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Error!</strong> <%= error[0] %>
+                </div>
+            <% } %>
+            <% if (success && success.length > 0) { %>
+                <div class="alert-modern alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <strong>Success!</strong> <%= success[0] %>
+                </div>
+            <% } %>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 25%"></div>
+            </div>
+            
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="step" data-step="2">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="step" data-step="3">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="step" data-step="4">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+
+            <form action="/doctors/register" method="POST" enctype="multipart/form-data" id="doctorRegistrationForm">
+                <!-- Step 1: Personal Information -->
+                <div class="form-step active" data-step="1">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-user text-primary me-2"></i>
+                        Personal Information
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-id-card text-primary"></i>
+                                Full Name *
+                            </label>
+                            <input type="text" name="fullName" class="form-control" required 
+                                   value="<%= user ? user.name : '' %>" placeholder="Dr. John Smith">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-venus-mars text-primary"></i>
+                                Gender *
+                            </label>
+                            <select name="gender" class="form-select" required>
+                                <option value="">Select Gender</option>
+                                <option value="male" <%= user && user.gender === 'male' ? 'selected' : '' %>>Male</option>
+                                <option value="female" <%= user && user.gender === 'female' ? 'selected' : '' %>>Female</option>
+                                <option value="other" <%= user && user.gender === 'other' ? 'selected' : '' %>>Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-alt text-primary"></i>
+                                Date of Birth *
+                            </label>
+                            <input type="date" name="dob" class="form-control" required
+                                   value="<%= user && user.dob ? user.dob.toISOString().split('T')[0] : '' %>">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-camera text-primary"></i>
+                                Profile Picture
+                            </label>
+                            <div class="file-upload-area" onclick="document.getElementById('profilePicture').click()">
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-3 text-primary"></i>
+                                <h5>Click to upload profile picture</h5>
+                                <p class="text-muted">JPG, PNG, GIF up to 10MB</p>
+                                <input type="file" name="profilePicture" id="profilePicture" 
+                                       accept="image/*" style="display: none;" onchange="updateFileName(this)">
+                                <div id="selectedFileName" class="mt-2 text-success"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <!-- Step 2: Professional Information -->
+                <div class="form-step" data-step="2">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-user-md text-primary me-2"></i>
+                        Professional Information
+                    </h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-stethoscope text-primary"></i>
+                                Specialization *
+                            </label>
+                            <input type="text" name="specialization" class="form-control" required 
+                                   placeholder="e.g., Cardiologist, Dermatologist">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-microscope text-primary"></i>
+                                Sub-Specializations
+                            </label>
+                            <input type="text" name="subSpecializations" class="form-control" 
+                                   placeholder="e.g., Pediatric Cardiology, Interventional">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock text-primary"></i>
+                                Experience (Years) *
+                            </label>
+                            <input type="number" name="experienceYears" class="form-control" 
+                                   min="0" max="50" value="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-certificate text-primary"></i>
+                                Medical License Number *
+                            </label>
+                            <input type="text" name="licenseNumber" class="form-control" required 
+                                   placeholder="e.g., MD12345">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hospital text-primary"></i>
+                                Hospital Affiliations
+                            </label>
+                            <input type="text" name="hospitalAffiliations" class="form-control" 
+                                   placeholder="e.g., City Hospital, Medical Center">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-language text-primary"></i>
+                                Languages Spoken
+                            </label>
+                            <input type="text" name="languages" class="form-control" 
+                                   placeholder="e.g., English, Hindi, Spanish">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-comments text-primary"></i>
+                            Consultation Modes *
+                        </label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="consultationMode" value="online" checked>
+                                <span class="checkbox-label">💻 Online Consultation</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="consultationMode" value="offline">
+                                <span class="checkbox-label">🏥 Clinic Visit</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="consultationMode" value="home_visit">
+                                <span class="checkbox-label">🏠 Home Visit</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-money-bill text-primary"></i>
+                                Consultation Fee *
+                            </label>
+                            <input type="number" name="consultationFee" class="form-control" 
+                                   min="0" value="500" required placeholder="500">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-coins text-primary"></i>
+                                Currency
+                            </label>
+                            <select name="currency" class="form-select">
+                                <option value="INR" selected>₹ Indian Rupee (INR)</option>
+                                <option value="USD">$ US Dollar (USD)</option>
+                                <option value="EUR">€ Euro (EUR)</option>
+                                <option value="GBP">£ British Pound (GBP)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Availability Schedule -->
+                <div class="form-step" data-step="3">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-calendar text-primary me-2"></i>
+                        Availability Schedule
+                    </h3>
+                    
+                    <div class="availability-grid">
+                        <% const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]; %>
+                        <% const dayEmojis = {
+                            "Monday": "📅", "Tuesday": "📅", "Wednesday": "📅", 
+                            "Thursday": "📅", "Friday": "📅", "Saturday": "🎯", "Sunday": "🌙"
+                        }; %>
+                        <% days.forEach(day => { %>
+                        <div class="day-availability">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-calendar-day text-primary me-2"></i>
+                                    <%= dayEmojis[day] %> <%= day %>
+                                </h5>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="enable<%= day %>" checked 
+                                           onchange="toggleDay('<%= day %>')">
+                                    <label class="form-check-label" for="enable<%= day %>">Available</label>
+                                </div>
+                            </div>
+                            <div class="form-row" id="<%= day %>Times">
+                                <div class="form-group">
+                                    <label class="form-label">🌅 Start Time</label>
+                                    <input type="time" name="availability[<%= day %>][start]" 
+                                           class="form-control" value="09:00">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">🌆 End Time</label>
+                                    <input type="time" name="availability[<%= day %>][end]" 
+                                           class="form-control" value="17:00">
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+
+                <!-- Step 4: Qualifications & Experience -->
+                <div class="form-step" data-step="4">
+                    <h3 class="text-center mb-4">
+                        <i class="fas fa-graduation-cap text-primary me-2"></i>
+                        Qualifications & Experience
+                    </h3>
+                    
+                    <div class="form-group">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-certificate text-primary"></i>
+                                Medical Qualifications *
+                            </label>
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="addQualification()">
+                                <i class="fas fa-plus me-1"></i>Add Qualification
+                            </button>
+                        </div>
+                        
+                        <div id="qualifications">
+                            <div class="qualification-item">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">🎓 Degree *</label>
+                                        <input type="text" name="qualifications[0][degree]" 
+                                               class="form-control" placeholder="e.g., MBBS, MD, PhD" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">🏛️ University/Institution *</label>
+                                        <input type="text" name="qualifications[0][university]" 
+                                               class="form-control" placeholder="e.g., Harvard Medical School" required>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">📅 Year of Completion *</label>
+                                        <input type="number" name="qualifications[0][year]" 
+                                               class="form-control" placeholder="2020" min="1980" max="2030" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">🔗 Certificate URL (Optional)</label>
+                                        <input type="url" name="qualifications[0][certificateUrl]" 
+                                               class="form-control" placeholder="https://example.com/certificate">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-trophy text-primary"></i>
+                            Achievements & Awards
+                        </label>
+                        <textarea name="achievements" class="form-control" rows="4"
+                                  placeholder="List your professional achievements, awards, and recognitions (comma-separated)&#10;e.g., Best Doctor Award 2023, Published 15 research papers, Board certified cardiologist"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-flask text-primary"></i>
+                            Research Papers & Publications
+                        </label>
+                        <textarea name="researchPapers" class="form-control" rows="4"
+                                  placeholder="Format: Title | Journal | Year | Link (one per line)&#10;e.g., Heart Disease Prevention | Medical Journal | 2023 | https://pubmed.com/123"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Step Navigation Buttons -->
+                <div class="step-buttons">
+                    <button type="button" class="btn btn-outline-modern" id="prevBtn" onclick="changeStep(-1)" style="display: none;">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    
+                    <div class="ms-auto">
+                        <button type="button" class="btn btn-modern" id="nextBtn" onclick="changeStep(1)">
+                            Next <i class="fas fa-arrow-right ms-2"></i>
+                        </button>
+                        
+                        <button type="submit" class="btn btn-modern" id="submitBtn" style="display: none;">
+                            <i class="fas fa-user-md me-2"></i>Register as Doctor
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 🚀 REVOLUTIONARY JAVASCRIPT FUNCTIONALITY -->
+<script>
+let currentStep = 1;
+let qualIndex = 1;
+const totalSteps = 4;
+
+// Initialize form on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateStepIndicator();
+    updateButtons();
+    
+    // Initialize tooltips
+    const tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltips.forEach(tooltip => {
+        new bootstrap.Tooltip(tooltip);
+    });
+    
+    // Form validation
+    const form = document.getElementById('doctorRegistrationForm');
+    form.addEventListener('submit', function(e) {
+        if (!validateCurrentStep()) {
+            e.preventDefault();
+            showAlert('Please fill in all required fields correctly.', 'danger');
+        }
+    });
+});
+
+// Change step function
+function changeStep(direction) {
+    if (direction === 1) {
+        // Validate current step before proceeding
+        if (!validateCurrentStep()) {
+            showAlert('Please fill in all required fields correctly.', 'danger');
+            return;
+        }
+    }
+    
+    // Hide current step
+    document.querySelector(`[data-step="${currentStep}"]`).classList.remove('active');
+    
+    // Update current step
+    currentStep += direction;
+    
+    // Show new step
+    document.querySelector(`[data-step="${currentStep}"]`).classList.add('active');
+    
+    // Update progress bar
+    const progress = (currentStep / totalSteps) * 100;
+    document.getElementById('progressBar').style.width = progress + '%';
+    
+    // Update step indicator
+    updateStepIndicator();
+    
+    // Update buttons
+    updateButtons();
+    
+    // Smooth scroll to top
+    document.querySelector('.registration-card').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Update step indicator
+function updateStepIndicator() {
+    document.querySelectorAll('.step').forEach((step, index) => {
+        const stepNumber = index + 1;
+        step.classList.remove('active', 'completed');
+        
+        if (stepNumber === currentStep) {
+            step.classList.add('active');
+        } else if (stepNumber < currentStep) {
+            step.classList.add('completed');
+        }
+    });
+}
+
+// Update navigation buttons
+function updateButtons() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Previous button
+    prevBtn.style.display = currentStep === 1 ? 'none' : 'block';
+    
+    // Next/Submit buttons
+    if (currentStep === totalSteps) {
+        nextBtn.style.display = 'none';
+        submitBtn.style.display = 'block';
+    } else {
+        nextBtn.style.display = 'block';
+        submitBtn.style.display = 'none';
+    }
+}
+
+// Validate current step
+function validateCurrentStep() {
+    const currentStepElement = document.querySelector(`[data-step="${currentStep}"]`);
+    const requiredFields = currentStepElement.querySelectorAll('input[required], select[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        field.classList.remove('is-invalid');
+        
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        }
+        
+        // Special validation for email, phone, etc.
+        if (field.type === 'email' && field.value && !isValidEmail(field.value)) {
+            field.classList.add('is-invalid');
+            isValid = false;
+        }
+    });
+    
+    return isValid;
+}
+
+// Email validation
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Add qualification
+function addQualification() {
+    const container = document.getElementById('qualifications');
+    const qualificationItem = document.createElement('div');
+    qualificationItem.classList.add('qualification-item');
+    qualificationItem.innerHTML = `
+        <button type="button" class="remove-qualification" onclick="removeQualification(this)">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">🎓 Degree *</label>
+                <input type="text" name="qualifications[${qualIndex}][degree]" 
+                       class="form-control" placeholder="e.g., MBBS, MD, PhD" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">🏛️ University/Institution *</label>
+                <input type="text" name="qualifications[${qualIndex}][university]" 
+                       class="form-control" placeholder="e.g., Harvard Medical School" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">📅 Year of Completion *</label>
+                <input type="number" name="qualifications[${qualIndex}][year]" 
+                       class="form-control" placeholder="2020" min="1980" max="2030" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">🔗 Certificate URL (Optional)</label>
+                <input type="url" name="qualifications[${qualIndex}][certificateUrl]" 
+                       class="form-control" placeholder="https://example.com/certificate">
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(qualificationItem);
+    qualIndex++;
+    
+    // Animate the new qualification
+    qualificationItem.style.opacity = '0';
+    qualificationItem.style.transform = 'translateY(20px)';
+    setTimeout(() => {
+        qualificationItem.style.transition = 'all 0.3s ease';
+        qualificationItem.style.opacity = '1';
+        qualificationItem.style.transform = 'translateY(0)';
+    }, 100);
+}
+
+// Remove qualification
+function removeQualification(button) {
+    const qualificationItem = button.parentElement;
+    qualificationItem.style.transform = 'translateX(-100%)';
+    qualificationItem.style.opacity = '0';
+    setTimeout(() => {
+        qualificationItem.remove();
+    }, 300);
+}
+
+// Toggle day availability
+function toggleDay(day) {
+    const checkbox = document.getElementById(`enable${day}`);
+    const timeInputs = document.getElementById(`${day}Times`);
+    const inputs = timeInputs.querySelectorAll('input[type="time"]');
+    
+    if (checkbox.checked) {
+        timeInputs.style.opacity = '1';
+        inputs.forEach(input => {
+            input.disabled = false;
+            input.required = true;
+        });
+    } else {
+        timeInputs.style.opacity = '0.5';
+        inputs.forEach(input => {
+            input.disabled = true;
+            input.required = false;
+            input.value = '';
+        });
+    }
+}
+
+// Update file name display
+function updateFileName(input) {
+    const fileName = input.files[0]?.name;
+    const display = document.getElementById('selectedFileName');
+    
+    if (fileName) {
+        display.innerHTML = `
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <strong>Selected:</strong> ${fileName}
+        `;
+        
+        // Show file preview for images
+        if (input.files[0].type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                display.innerHTML += `
+                    <div class="mt-2">
+                        <img src="${e.target.result}" alt="Preview" 
+                             style="max-width: 100px; max-height: 100px; border-radius: 10px; object-fit: cover;">
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    } else {
+        display.innerHTML = '';
+    }
+}
+
+// Show alert function
+function showAlert(message, type = 'info') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert-modern alert-${type}`;
+    alertDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+        ${message}
+    `;
+    
+    const container = document.querySelector('.form-container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => alertDiv.remove(), 300);
+    }, 5000);
+    
+    // Scroll to show alert
+    alertDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+
+// Drag and drop functionality for file upload
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.querySelector('.file-upload-area');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+    });
+    
+    uploadArea.addEventListener('drop', handleDrop, false);
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    function handleDrop(e) {
+        const files = e.dataTransfer.files;
+        const fileInput = document.getElementById('profilePicture');
+        
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+            fileInput.files = files;
+            updateFileName(fileInput);
+        }
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

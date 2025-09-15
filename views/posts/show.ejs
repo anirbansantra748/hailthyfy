@@ -1,0 +1,972 @@
+<%- include('../partials/header') %>
+
+<style>
+  :root {
+    --healthcare-primary: #10B981;
+    --healthcare-secondary: #059669;
+    --healthcare-light: #ECFDF5;
+    --healthcare-accent: #34D399;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --bg-light: #F9FAFB;
+    --white: #FFFFFF;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+  }
+
+  .back-navigation {
+    margin: 2rem 0 1rem;
+  }
+
+  .btn-back {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    color: var(--healthcare-secondary);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-back:hover {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .post-article {
+    background: white;
+    border: none;
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .post-header {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    padding: 2.5rem 2rem;
+    position: relative;
+  }
+
+  .post-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    opacity: 0.3;
+  }
+
+  .post-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .author-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .author-details h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .author-details p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin: 0;
+  }
+
+  .post-stats {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+  }
+
+  .post-actions-header {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 2;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-action {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+
+  .btn-edit {
+    background: rgba(245, 158, 11, 0.9);
+    color: white;
+  }
+
+  .btn-edit:hover {
+    background: #D97706;
+    transform: scale(1.1);
+  }
+
+  .btn-delete {
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+  }
+
+  .btn-delete:hover {
+    background: #DC2626;
+    transform: scale(1.1);
+  }
+
+  .post-body {
+    padding: 2rem;
+  }
+
+  .post-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+  }
+
+  .post-images {
+    margin-bottom: 2rem;
+  }
+
+  .post-image {
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease;
+  }
+
+  .post-image:hover {
+    transform: scale(1.02);
+  }
+
+  .carousel-item img {
+    border-radius: 16px;
+    height: 400px;
+    object-fit: cover;
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .tag-badge {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    color: var(--healthcare-secondary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .tag-badge:hover {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .engagement-section {
+    background: #F9FAFB;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #F3F4F6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .engagement-actions {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .btn-engagement {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .btn-like {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+  }
+
+  .btn-like:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-like.liked {
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
+  }
+
+  .btn-share {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+  }
+
+  .btn-share:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-comment {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    color: white;
+  }
+
+  .btn-comment:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .bottom-section {
+    margin-top: 2rem;
+  }
+
+  .sidebar-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .sidebar-header {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    color: var(--healthcare-secondary);
+    padding: 1.25rem;
+    font-weight: 600;
+  }
+
+  .sidebar-body {
+    padding: 1.5rem;
+  }
+
+  .comment-form {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-control {
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    background: #F9FAFB;
+  }
+
+  .form-control:focus {
+    border-color: var(--healthcare-primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    background: white;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .comment-item {
+    background: #F9FAFB;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid var(--healthcare-light);
+  }
+
+  .comment-item:hover {
+    background: #F3F4F6;
+    border-left-color: var(--healthcare-primary);
+    transform: translateX(5px);
+  }
+
+  .comment-author {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .comment-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  .related-post-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    margin-bottom: 0.5rem;
+  }
+
+  .related-post-item:hover {
+    background: var(--healthcare-light);
+    color: var(--text-primary);
+    transform: translateX(5px);
+  }
+
+  .related-post-image {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  .related-post-content h6 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .stat-card {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--healthcare-primary);
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 768px) {
+    .post-title {
+      font-size: 2rem;
+    }
+
+    .post-meta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .post-stats {
+      flex-wrap: wrap;
+    }
+
+    .engagement-section {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .engagement-actions {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .comment-item {
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .comment-item .d-flex {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .comment-item .rounded-circle {
+      margin-bottom: 0.5rem;
+      margin-right: 0 !important;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-align: left;
+    }
+  }
+</style>
+
+<div class="container">
+  <!-- Back Navigation -->
+  <div class="back-navigation">
+    <a href="/posts" class="btn-back">
+      <i class="fas fa-arrow-left"></i>
+      Back to Healthcare Community
+    </a>
+  </div>
+
+  <!-- Post Article - Full Width -->
+  <article class="post-article mb-4">
+    <!-- Post Header -->
+    <div class="post-header">
+      <!-- Action Buttons (for post owner) -->
+      <% if (user && String(post.author._id) === String(user._id)) { %>
+      <div class="post-actions-header">
+        <a href="/posts/<%= post._id %>/edit" class="btn-action btn-edit" title="Edit Post">
+          <i class="fas fa-edit"></i>
+        </a>
+        <form action="/posts/<%= post._id %>?_method=DELETE" method="POST" class="d-inline">
+          <button type="submit" class="btn-action btn-delete" title="Delete Post" 
+                  onclick="return confirm('Are you sure you want to delete this post?')">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </form>
+      </div>
+      <% } %>
+
+      <h1 class="post-title"><%= post.title %></h1>
+      
+      <div class="post-meta">
+        <div class="author-info">
+          <% if (post.author && post.author.profilePicture) { %>
+          <img src="<%= post.author.profilePicture %>"
+               class="author-avatar" alt="<%= post.author.name %>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="author-avatar-fallback" style="display:none; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%); color: white; font-size: 1.5rem; align-items: center; justify-content: center; border: 3px solid rgba(255, 255, 255, 0.3);">
+            👨‍⚕️
+          </div>
+          <% } else { %>
+          <div class="author-avatar" style="background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%); color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center;">
+            👨‍⚕️
+          </div>
+          <% } %>
+          <div class="author-details">
+            <h4><%= post.author ? post.author.name : 'Unknown Author' %></h4>
+            <p><i class="fas fa-calendar-alt me-2"></i><%= new Date(post.createdAt).toLocaleDateString() %></p>
+          </div>
+        </div>
+        
+        <div class="post-stats">
+          <div class="stat-item">
+            <i class="fas fa-eye"></i>
+            <span><%= post.views %> views</span>
+          </div>
+          <% if (post.category) { %>
+          <div class="stat-item">
+            <i class="fas fa-folder-open"></i>
+            <span><%= post.category %></span>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Post Body -->
+    <div class="post-body">
+      <!-- Post Content -->
+      <div class="post-content">
+        <%- post.content.replace(/\n/g, '<br />') %>
+      </div>
+
+      <!-- Post Images -->
+      <% if (post.images && post.images.length > 0) { %>
+      <div class="post-images">
+        <% if (post.images.length === 1) { %>
+        <img src="<%= post.images[0] %>" class="img-fluid post-image" alt="Post image" />
+        <% } else { %>
+        <div id="postCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+            <% post.images.forEach((image, index) => { %>
+            <button type="button" data-bs-target="#postCarousel" data-bs-slide-to="<%= index %>"
+                    class="<%= index === 0 ? 'active' : '' %>" 
+                    aria-current="<%= index === 0 ? 'true' : 'false' %>"
+                    aria-label="Slide <%= index + 1 %>"></button>
+            <% }) %>
+          </div>
+          <div class="carousel-inner">
+            <% post.images.forEach((image, index) => { %>
+            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+              <img src="<%= image %>" class="d-block w-100" alt="Post image <%= index + 1 %>" />
+            </div>
+            <% }) %>
+          </div>
+          <button class="carousel-control-prev" type="button" data-bs-target="#postCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#postCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        <% } %>
+      </div>
+      <% } %>
+
+      <!-- Tags -->
+      <% if (post.tags && post.tags.length > 0) { %>
+      <div class="post-tags">
+        <% post.tags.forEach(tag => { %>
+        <a href="/posts?tag=<%= tag %>" class="tag-badge">#<%= tag %></a>
+        <% }) %>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Engagement Section -->
+    <div class="engagement-section">
+      <div class="engagement-actions">
+        <% if (user) { %>
+        <!-- Like Button -->
+        <form action="/posts/<%= post._id %>/like?_method=PUT" method="POST" class="d-inline">
+          <button type="submit" class="btn-engagement btn-like <%= post.likes.some(like => String(like.user) === String(user._id)) ? 'liked' : '' %>">
+            <i class="fas fa-heart"></i>
+            <span><%= post.likes.length %></span>
+          </button>
+        </form>
+
+        <!-- Share Button -->
+        <form action="/posts/<%= post._id %>/share?_method=PUT" method="POST" class="d-inline">
+          <button type="submit" class="btn-engagement btn-share">
+            <i class="fas fa-share"></i>
+            <span><%= post.shares ? post.shares.length : 0 %></span>
+          </button>
+        </form>
+        <% } %>
+
+        <!-- Comment Button -->
+        <a href="#comments" class="btn-engagement btn-comment" onclick="focusComment()">
+          <i class="fas fa-comment"></i>
+          <span><%= post.comments.length %></span>
+        </a>
+      </div>
+    </div>
+  </article>
+
+  <!-- Bottom Section - Full Width -->
+  <div class="row bottom-section">
+    <!-- Comments Section - Takes more space -->
+    <div class="col-lg-8">
+      <div class="sidebar-card" id="comments">
+        <div class="sidebar-header">
+          <h5 class="mb-0">
+            <i class="fas fa-comments me-2"></i>
+            Comments (<%= post.comments ? post.comments.length : 0 %>)
+          </h5>
+        </div>
+        <div class="sidebar-body">
+          <% if (user) { %>
+          <!-- Comment Form -->
+          <form id="commentForm" action="/posts/<%= post._id %>/comments" method="POST" class="comment-form">
+            <div class="mb-3">
+              <textarea id="commentText" name="text" class="form-control" rows="3" 
+                        placeholder="Share your thoughts on this healthcare topic..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane me-2"></i>Post Comment
+            </button>
+          </form>
+          <% } else { %>
+          <div class="text-center comment-form">
+            <p class="text-muted mb-3">Join the discussion</p>
+            <a href="/users/login" class="btn btn-primary">
+              <i class="fas fa-sign-in-alt me-2"></i>Login to Comment
+            </a>
+          </div>
+          <% } %>
+
+          <!-- Comments List -->
+          <div id="commentsList">
+            <% if (post.comments && post.comments.length > 0) { %>
+              <% post.comments.forEach(comment => { %>
+                <div class="comment-item">
+                  <div class="d-flex">
+                    <% if (comment.user.profilePicture) { %>
+                    <img src="<%= comment.user.profilePicture %>" 
+                         class="rounded-circle me-3" width="40" height="40" 
+                         alt="<%= comment.user.name %>" 
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                    <div class="rounded-circle me-3" style="display:none; width: 40px; height: 40px; background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%); color: white; font-size: 1.2rem; align-items: center; justify-content: center; min-width: 40px;">
+                      💬
+                    </div>
+                    <% } else { %>
+                    <div class="rounded-circle me-3" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%); color: white; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; min-width: 40px;">
+                      💬
+                    </div>
+                    <% } %>
+                    <div class="flex-grow-1">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                          <span class="comment-author fw-bold"><%= comment.user.name %></span>
+                          <small class="comment-date ms-2 text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            <%= new Date(comment.createdAt).toLocaleDateString() %>
+                          </small>
+                        </div>
+                        <% if (user && String(comment.user._id) === String(user._id)) { %>
+                          <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                    type="button" data-bs-toggle="dropdown">
+                              <i class="fas fa-ellipsis-h"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                              <li>
+                                <button class="dropdown-item" onclick="editComment('<%= comment._id %>', `<%= comment.text.replace(/`/g, '\\`').replace(/'/g, "\\'") %>`)">
+                                  <i class="fas fa-edit me-2"></i>Edit
+                                </button>
+                              </li>
+                              <li>
+                                <form action="/posts/<%= post._id %>/comments/<%= comment._id %>?_method=DELETE" method="POST" class="d-inline">
+                                  <button type="submit" class="dropdown-item text-danger" 
+                                          onclick="return confirm('Are you sure you want to delete this comment?')">
+                                    <i class="fas fa-trash me-2"></i>Delete
+                                  </button>
+                                </form>
+                              </li>
+                            </ul>
+                          </div>
+                        <% } %>
+                      </div>
+                      <div id="comment-content-<%= comment._id %>" class="comment-text">
+                        <%= comment.text %>
+                      </div>
+                      <div id="comment-edit-<%= comment._id %>" class="d-none">
+                        <div class="input-group input-group-sm">
+                          <textarea id="edit-text-<%= comment._id %>" class="form-control" rows="2" required><%= comment.text %></textarea>
+                          <button type="button" class="btn btn-primary" onclick="submitEditComment('<%= comment._id %>')">Save</button>
+                          <button type="button" class="btn btn-secondary" onclick="cancelEdit('<%= comment._id %>')">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="text-center py-5">
+                <i class="fas fa-comment-slash" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1.5rem;"></i>
+                <p class="text-muted fs-5">No comments yet. Be the first to share your thoughts!</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar - Compact -->
+    <div class="col-lg-4">
+      <!-- Post Statistics -->
+      <div class="sidebar-card mb-4">
+        <div class="sidebar-header">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-bar me-2"></i>Post Statistics
+          </h5>
+        </div>
+        <div class="sidebar-body">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number"><%= post.views %></div>
+              <div class="stat-label">
+                <i class="fas fa-eye me-1"></i>Views
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number"><%= post.likes.length %></div>
+              <div class="stat-label">
+                <i class="fas fa-heart me-1"></i>Likes
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number"><%= post.comments.length %></div>
+              <div class="stat-label">
+                <i class="fas fa-comment me-1"></i>Comments
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Posts -->
+      <div class="sidebar-card">
+        <div class="sidebar-header">
+          <h5 class="mb-0">
+            <i class="fas fa-newspaper me-2"></i>Related Articles
+          </h5>
+        </div>
+        <div class="sidebar-body">
+          <% if (typeof related !== 'undefined' && related && related.length) { %>
+            <% related.slice(0, 4).forEach(r => { %>
+            <a href="/posts/<%= r._id %>" class="related-post-item">
+              <% if (r.images && r.images[0]) { %>
+              <img src="<%= r.images[0] %>" class="related-post-image" alt="<%= r.title %>" 
+                   onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+              <div class="related-post-image" style="display:none; background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%); color: var(--healthcare-primary); font-size: 1.5rem; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 8px;">
+                📄
+              </div>
+              <% } else { %>
+              <div class="related-post-image" style="background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%); color: var(--healthcare-primary); font-size: 1.5rem; display: flex; align-items: center; justify-content: center;">
+                📄
+              </div>
+              <% } %>
+              <div class="related-post-content">
+                <h6><%= r.title %></h6>
+                <small class="text-muted">
+                  <i class="fas fa-calendar-alt me-1"></i>
+                  <%= new Date(r.createdAt).toLocaleDateString() %>
+                </small>
+              </div>
+            </a>
+            <% }) %>
+            
+            <% if (typeof related !== 'undefined' && related && related.length > 4) { %>
+            <div class="text-center mt-3">
+              <small class="text-muted">+<%= related.length - 4 %> more related articles</small>
+            </div>
+            <% } %>
+            
+            <div class="text-center mt-3">
+              <a href="/posts?category=<%= post.category %>" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-arrow-right me-2"></i>View All in <%= post.category %>
+              </a>
+            </div>
+          <% } else { %>
+          <div class="text-center py-4">
+            <i class="fas fa-newspaper" style="font-size: 2rem; color: var(--text-secondary); margin-bottom: 1rem;"></i>
+            <p class="text-muted">No related posts available.</p>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ------------------------------
+  // Edit Comment (inline toggle)
+  // ------------------------------
+  function editComment(commentId, commentText) {
+    const contentDiv = document.getElementById(`comment-content-${commentId}`);
+    const editDiv = document.getElementById(`comment-edit-${commentId}`);
+    const textarea = editDiv.querySelector("textarea");
+
+    contentDiv.classList.add("d-none");
+    editDiv.classList.remove("d-none");
+    textarea.value = commentText;
+    textarea.focus();
+  }
+
+  function cancelEdit(commentId) {
+    const contentDiv = document.getElementById(`comment-content-${commentId}`);
+    const editDiv = document.getElementById(`comment-edit-${commentId}`);
+
+    contentDiv.classList.remove("d-none");
+    editDiv.classList.add("d-none");
+  }
+
+  // ------------------------------
+  // Copy Post Link
+  // ------------------------------
+  function copyPostLink() {
+    const postUrl = window.location.href;
+    navigator.clipboard
+      .writeText(postUrl)
+      .then(() => alert("Post link copied to clipboard!"))
+      .catch((err) => console.error("Failed to copy link:", err));
+  }
+
+  // ------------------------------
+  // Scroll to comments
+  // ------------------------------
+  document
+    .querySelector('a[href="#comments"]')
+    ?.addEventListener("click", (e) => {
+      e.preventDefault();
+      document
+        .getElementById("comments")
+        ?.scrollIntoView({ behavior: "smooth" });
+    });
+
+  // ------------------------------
+  // Submit Edited Comment
+  // ------------------------------
+  async function submitEditComment(commentId) {
+    const textarea = document.getElementById(`edit-text-${commentId}`);
+    const text = textarea.value.trim();
+    if (!text) return;
+
+    try {
+      const response = await fetch(`/posts/<%= post._id %>/comments/${commentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ text })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update comment');
+      }
+
+      // Reload the page to show updated comment
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating comment:', error);
+      alert('Failed to update comment. Please try again.');
+    }
+  }
+
+  // ------------------------------
+  // Add Comment
+  // ------------------------------
+  document
+    .getElementById("commentForm")
+    ?.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const textarea = document.getElementById("commentText");
+      const text = textarea.value.trim();
+      if (!text) return;
+
+      try {
+        const response = await fetch(`/posts/<%= post._id %>/comments`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ text }),
+        });
+
+        if (response.redirected) return (window.location.href = response.url);
+        if (response.ok) location.reload();
+      } catch (error) {
+        console.error("Error adding comment:", error);
+        alert("Failed to add comment. Please try again.");
+      }
+    });
+
+  // ------------------------------
+  // Focus Comment Textarea
+  // ------------------------------
+  function focusComment() {
+    const commentText = document.getElementById("commentText");
+    if (commentText) {
+      commentText.focus();
+      commentText.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
+  // ------------------------------
+  // Share Post
+  // ------------------------------
+  async function sharePost() {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: "<%= post.title %>",
+          text: "<%= post.content.substring(0, 100) %>...",
+          url: window.location.href,
+        });
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard!");
+      }
+    } finally {
+      // Record share event (best-effort)
+      try {
+        await fetch(`/posts/<%= post._id %>/share`, {
+          method: "POST",
+          credentials: "same-origin",
+        });
+      } catch (e) {}
+    }
+  }
+  </script>
+
+
+
+<%- include('../partials/footer') %>

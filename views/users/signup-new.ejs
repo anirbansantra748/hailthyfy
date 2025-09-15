@@ -1,0 +1,702 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Healthfy</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .signup-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            max-width: 700px;
+            width: 100%;
+            margin: auto;
+        }
+
+        .signup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-floating label {
+            padding-left: 15px;
+        }
+
+        /* Step styles */
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .step-indicators {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            text-align: center;
+        }
+
+        .step-indicator i {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-indicator.active i {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .step-indicator.completed i {
+            background: #28a745;
+            color: white;
+        }
+
+        .step-indicator span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .step-indicator.active span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .step-indicator.completed span {
+            color: #28a745;
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        .btn {
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+
+        .form-select.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <!-- Header -->
+        <div class="signup-header">
+            <h2 class="mb-3">
+                <i class="fas fa-heartbeat me-2"></i>
+                Healthfy
+            </h2>
+            <p class="mb-0">Create your comprehensive healthcare account</p>
+        </div>
+        <!-- Form Body -->
+        <div class="p-4">
+            <!-- Alert Messages -->
+            <% if (typeof error !== 'undefined' && error && error.length) { %>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <%= Array.isArray(error) ? error[0] : error %>
+                </div>
+            <% } %>
+
+            <% if (typeof success !== 'undefined' && success && success.length) { %>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <%= Array.isArray(success) ? success[0] : success %>
+                </div>
+            <% } %>
+
+            <!-- Progress bar -->
+            <div class="progress mb-4" style="height: 8px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: 25%" id="progressBar"></div>
+            </div>
+
+            <!-- Step indicators -->
+            <div class="step-indicators">
+                <div class="step-indicator active" id="indicator1">
+                    <i class="fas fa-user"></i>
+                    <span>Basic Info</span>
+                </div>
+                <div class="step-indicator" id="indicator2">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Health Profile</span>
+                </div>
+                <div class="step-indicator" id="indicator3">
+                    <i class="fas fa-leaf"></i>
+                    <span>Lifestyle</span>
+                </div>
+                <div class="step-indicator" id="indicator4">
+                    <i class="fas fa-check"></i>
+                    <span>Complete</span>
+                </div>
+            </div>
+
+            <form action="/users/signup" method="POST" id="signupForm">
+                <!-- Step 1: Basic Information -->
+                <div class="step-content active" id="step1">
+                    <h4 class="mb-4">Basic Information</h4>
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Full Name" required>
+                                <label for="name">
+                                    <i class="fas fa-user me-2"></i>Full Name
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+                                <label for="email">
+                                    <i class="fas fa-envelope me-2"></i>Email address
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password" required minlength="8">
+                                <label for="password">
+                                    <i class="fas fa-lock me-2"></i>Password
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="date" class="form-control" id="dob" name="dob" required>
+                                <label for="dob">
+                                    <i class="fas fa-calendar me-2"></i>Date of Birth
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <label for="gender">
+                                    <i class="fas fa-venus-mars me-2"></i>Gender
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone Number">
+                        <label for="phone">
+                            <i class="fas fa-phone me-2"></i>Phone Number
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Step 2: Health Profile -->
+                <div class="step-content" id="step2">
+                    <h4 class="mb-4">Health Profile</h4>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="height" name="height" placeholder="Height (cm)" min="50" max="300">
+                                <label for="height">
+                                    <i class="fas fa-ruler-vertical me-2"></i>Height (cm)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="weight" name="weight" placeholder="Weight (kg)" min="10" max="500">
+                                <label for="weight">
+                                    <i class="fas fa-weight me-2"></i>Weight (kg)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="bloodGroup" name="bloodGroup">
+                            <option value="">Select Blood Group</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                        </select>
+                        <label for="bloodGroup">
+                            <i class="fas fa-tint me-2"></i>Blood Group
+                        </label>
+                    </div>
+
+                    <h5 class="mt-4 mb-3">Blood Pressure</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="systolic" name="systolic" placeholder="Systolic" min="70" max="250">
+                                <label for="systolic">
+                                    <i class="fas fa-heartbeat me-2"></i>Systolic (mmHg)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="diastolic" name="diastolic" placeholder="Diastolic" min="40" max="150">
+                                <label for="diastolic">
+                                    <i class="fas fa-heartbeat me-2"></i>Diastolic (mmHg)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="mt-4 mb-3">Blood Sugar Levels</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="fastingBloodSugar" name="fastingBloodSugar" placeholder="Fasting" min="50" max="500">
+                                <label for="fastingBloodSugar">
+                                    <i class="fas fa-vial me-2"></i>Fasting (mg/dL)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating mb-3">
+                                <input type="number" class="form-control" id="postMealBloodSugar" name="postMealBloodSugar" placeholder="Post-meal" min="50" max="500">
+                                <label for="postMealBloodSugar">
+                                    <i class="fas fa-vial me-2"></i>Post-meal (mg/dL)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Lifestyle -->
+                <div class="step-content" id="step3">
+                    <h4 class="mb-4">Lifestyle Information</h4>
+
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="diet" name="diet">
+                            <option value="">Select Diet Preference</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="non-vegetarian">Non-Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <label for="diet">
+                            <i class="fas fa-leaf me-2"></i>Diet Preference
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="exerciseFrequency" name="exerciseFrequency">
+                            <option value="">Select Exercise Frequency</option>
+                            <option value="none">None</option>
+                            <option value="low">Low (1-2 times/week)</option>
+                            <option value="moderate">Moderate (3-4 times/week)</option>
+                            <option value="high">High (5+ times/week)</option>
+                        </select>
+                        <label for="exerciseFrequency">
+                            <i class="fas fa-running me-2"></i>Exercise Frequency
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select class="form-select" id="stressLevel" name="stressLevel">
+                            <option value="">Select Stress Level</option>
+                            <option value="1">1 - Very Low</option>
+                            <option value="2">2 - Low</option>
+                            <option value="3">3 - Mild</option>
+                            <option value="4">4 - Moderate-Low</option>
+                            <option value="5">5 - Moderate</option>
+                            <option value="6">6 - Moderate-High</option>
+                            <option value="7">7 - High</option>
+                            <option value="8">8 - Very High</option>
+                            <option value="9">9 - Extremely High</option>
+                            <option value="10">10 - Maximum</option>
+                        </select>
+                        <label for="stressLevel">
+                            <i class="fas fa-brain me-2"></i>Stress Level (1-10)
+                        </label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="smoking" name="smoking">
+                                <label class="form-check-label" for="smoking">
+                                    <i class="fas fa-smoking me-2"></i>Do you smoke?
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="alcohol" name="alcohol">
+                                <label class="form-check-label" for="alcohol">
+                                    <i class="fas fa-wine-glass me-2"></i>Do you consume alcohol?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Terms and Submit -->
+                <div class="step-content" id="step4">
+                    <h4 class="mb-4">Review & Complete</h4>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Review your information:</strong> Please review all the information you've provided. You can go back to any step to make changes before submitting.
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="terms" name="terms" required>
+                        <label class="form-check-label" for="terms">
+                            I agree to the <a href="/terms" target="_blank">Terms of Service</a> and
+                            <a href="/privacy" target="_blank">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="privacyConsent" name="privacyConsent" required>
+                        <label class="form-check-label" for="privacyConsent">
+                            I consent to the collection and processing of my health data as described in the Privacy Policy
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="emailNotifications" name="emailNotifications" checked>
+                        <label class="form-check-label" for="emailNotifications">
+                            I would like to receive health tips and updates via email (optional)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="fas fa-arrow-left me-2"></i>Previous
+                    </button>
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        Next <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                        <i class="fas fa-user-plus me-2"></i>Create Account
+                    </button>
+                </div>
+            </form>
+
+            <hr class="my-4">
+
+            <div class="text-center">
+                <p class="mb-0">Already have an account?
+                    <a href="/users/login" class="text-decoration-none fw-bold">Sign in here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Simple, reliable multi-step form
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        // Get elements
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressBar = document.getElementById('progressBar');
+
+        // Add event listeners
+        nextBtn.addEventListener('click', function() {
+            console.log('Next button clicked');
+            goToNextStep();
+        });
+
+        prevBtn.addEventListener('click', function() {
+            console.log('Previous button clicked');
+            goToPreviousStep();
+        });
+
+        function goToNextStep() {
+            console.log('Moving from step', currentStep);
+
+            // Validate current step
+            if (currentStep === 1 && !validateStep1()) {
+                return;
+            }
+
+            if (currentStep === 4 && !validateStep4()) {
+                return;
+            }
+
+            // Hide current step
+            const currentStepElement = document.getElementById('step' + currentStep);
+            const currentIndicator = document.getElementById('indicator' + currentStep);
+
+            if (currentStepElement) {
+                currentStepElement.classList.remove('active');
+            }
+
+            if (currentIndicator) {
+                currentIndicator.classList.remove('active');
+                currentIndicator.classList.add('completed');
+            }
+
+            // Move to next step
+            currentStep++;
+
+            // Show next step
+            const nextStepElement = document.getElementById('step' + currentStep);
+            const nextIndicator = document.getElementById('indicator' + currentStep);
+
+            if (nextStepElement) {
+                nextStepElement.classList.add('active');
+            }
+
+            if (nextIndicator) {
+                nextIndicator.classList.add('active');
+            }
+
+            updateUI();
+            console.log('Now on step', currentStep);
+        }
+
+        function goToPreviousStep() {
+            console.log('Moving back from step', currentStep);
+
+            // Hide current step
+            const currentStepElement = document.getElementById('step' + currentStep);
+            const currentIndicator = document.getElementById('indicator' + currentStep);
+
+            if (currentStepElement) {
+                currentStepElement.classList.remove('active');
+            }
+
+            if (currentIndicator) {
+                currentIndicator.classList.remove('active');
+            }
+
+            // Move to previous step
+            currentStep--;
+
+            // Show previous step
+            const prevStepElement = document.getElementById('step' + currentStep);
+            const prevIndicator = document.getElementById('indicator' + currentStep);
+
+            if (prevStepElement) {
+                prevStepElement.classList.add('active');
+            }
+
+            if (prevIndicator) {
+                prevIndicator.classList.remove('completed');
+                prevIndicator.classList.add('active');
+            }
+
+            updateUI();
+            console.log('Now on step', currentStep);
+        }
+
+        function updateUI() {
+            // Update progress bar
+            const progress = (currentStep / totalSteps) * 100;
+            progressBar.style.width = progress + '%';
+
+            // Update buttons
+            if (currentStep > 1) {
+                prevBtn.style.display = 'inline-block';
+            } else {
+                prevBtn.style.display = 'none';
+            }
+
+            if (currentStep < totalSteps) {
+                nextBtn.style.display = 'inline-block';
+                submitBtn.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'none';
+                submitBtn.style.display = 'inline-block';
+            }
+        }
+
+        function validateStep1() {
+            const name = document.getElementById('name');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const dob = document.getElementById('dob');
+            const gender = document.getElementById('gender');
+
+            let isValid = true;
+
+            // Clear previous validation
+            [name, email, password, dob, gender].forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+
+            // Validate each field
+            if (!name.value.trim()) {
+                name.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!email.value.trim() || !email.value.includes('@')) {
+                email.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!password.value.trim() || password.value.length < 8) {
+                password.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!dob.value.trim()) {
+                dob.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!gender.value.trim()) {
+                gender.classList.add('is-invalid');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                showError('Please fill in all required fields correctly.');
+            }
+
+            return isValid;
+        }
+
+        function validateStep4() {
+            const terms = document.getElementById('terms');
+            const privacyConsent = document.getElementById('privacyConsent');
+
+            if (!terms.checked || !privacyConsent.checked) {
+                showError('Please accept the terms and privacy policy to continue.');
+                return false;
+            }
+
+            return true;
+        }
+
+        function showError(message) {
+            // Remove existing error
+            const existingError = document.querySelector('.validation-error');
+            if (existingError) {
+                existingError.remove();
+            }
+
+            // Create new error
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger validation-error mt-3';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle me-2"></i>' + message;
+
+            // Add to current step
+            const currentStepElement = document.getElementById('step' + currentStep);
+            currentStepElement.appendChild(errorDiv);
+
+            // Remove after 5 seconds
+            setTimeout(() => {
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing...');
+            updateUI();
+            console.log('Form initialized successfully');
+        });
+
+        // Form submission handler
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            if (!validateStep4()) {
+                e.preventDefault();
+                return;
+            }
+
+            // Show loading
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

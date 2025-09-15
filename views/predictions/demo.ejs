@@ -1,0 +1,617 @@
+<%- include('../partials/header') %>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="container-fluid mt-4">
+  <!-- Header -->
+  <div class="alert alert-info">
+    <h5 class="mb-2">
+      <i class="fas fa-eye me-2"></i>Demo: X-ray Analysis Results UI
+    </h5>
+    <p class="mb-0">
+      This is a demonstration of how your X-ray analysis results will be
+      displayed. The data shown is sample data for demonstration purposes only.
+    </p>
+  </div>
+
+  <div class="row">
+    <!-- Main Content Area -->
+    <div class="col-lg-8">
+      <!-- Sample X-ray Image Display -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-x-ray me-2"></i>Sample X-ray Image Analysis
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <div class="position-relative">
+            <div
+              class="bg-light rounded d-flex align-items-center justify-content-center"
+              style="height: 400px; border: 2px dashed #dee2e6"
+            >
+              <div class="text-center">
+                <i class="fas fa-x-ray fa-4x text-muted mb-3"></i>
+                <h6 class="text-muted">Sample X-ray Image</h6>
+                <small class="text-muted"
+                  >This would be your actual X-ray image</small
+                >
+              </div>
+            </div>
+            <div class="position-absolute top-0 start-0 m-3">
+              <span class="badge bg-success fs-6">
+                <i class="fas fa-check-circle me-2"></i>Completed
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Analysis Results -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-robot me-2"></i>AI Analysis Results (Demo Data)
+          </h5>
+        </div>
+        <div class="card-body">
+          <!-- Top Findings Summary Cards -->
+          <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+              <div class="card border-0 h-100 bg-danger text-white">
+                <div class="card-body text-center">
+                  <div class="display-6 fw-bold mb-2">95.8%</div>
+                  <h6 class="card-title">Nodule</h6>
+                  <small class="opacity-75">High Risk</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card border-0 h-100 bg-danger text-white">
+                <div class="card-body text-center">
+                  <div class="display-6 fw-bold mb-2">93.0%</div>
+                  <h6 class="card-title">Consolidation</h6>
+                  <small class="opacity-75">High Risk</small>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="card border-0 h-100 bg-danger text-white">
+                <div class="card-body text-center">
+                  <div class="display-6 fw-bold mb-2">91.9%</div>
+                  <h6 class="card-title">Mass</h6>
+                  <small class="opacity-75">High Risk</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Interactive Chart -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3">Prediction Confidence Distribution</h6>
+            <canvas id="demoChart" height="100"></canvas>
+          </div>
+
+          <!-- Detailed Predictions Table -->
+          <div class="table-responsive">
+            <h6 class="text-muted mb-3">Complete Analysis Breakdown</h6>
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Medical Finding</th>
+                  <th>Confidence Level</th>
+                  <th>Risk Assessment</th>
+                  <th>Visual Indicator</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="fas fa-exclamation-triangle text-danger me-2"
+                      ></i>
+                      <span class="fw-medium">Nodule</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="progress flex-grow-1 me-2"
+                        style="height: 12px"
+                      >
+                        <div
+                          class="progress-bar bg-danger"
+                          style="width: 95.8%"
+                        ></div>
+                      </div>
+                      <span class="fw-bold fs-6">95.8%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-danger fs-6">High Risk</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="spinner-grow spinner-grow-sm text-danger"
+                        style="width: 0.5rem; height: 0.5rem"
+                      ></div>
+                      <small class="ms-2 text-muted"
+                        >Requires immediate attention</small
+                      >
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="fas fa-exclamation-triangle text-danger me-2"
+                      ></i>
+                      <span class="fw-medium">Consolidation</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="progress flex-grow-1 me-2"
+                        style="height: 12px"
+                      >
+                        <div
+                          class="progress-bar bg-danger"
+                          style="width: 93%"
+                        ></div>
+                      </div>
+                      <span class="fw-bold fs-6">93.0%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-danger fs-6">High Risk</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="spinner-grow spinner-grow-sm text-danger"
+                        style="width: 0.5rem; height: 0.5rem"
+                      ></div>
+                      <small class="ms-2 text-muted"
+                        >Requires immediate attention</small
+                      >
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="fas fa-exclamation-triangle text-danger me-2"
+                      ></i>
+                      <span class="fw-medium">Mass</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="progress flex-grow-1 me-2"
+                        style="height: 12px"
+                      >
+                        <div
+                          class="progress-bar bg-danger"
+                          style="width: 91.9%"
+                        ></div>
+                      </div>
+                      <span class="fw-bold fs-6">91.9%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-danger fs-6">High Risk</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="spinner-grow spinner-grow-sm text-danger"
+                        style="width: 0.5rem; height: 0.5rem"
+                      ></div>
+                      <small class="ms-2 text-muted"
+                        >Requires immediate attention</small
+                      >
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="fas fa-exclamation-triangle text-danger me-2"
+                      ></i>
+                      <span class="fw-medium">Pneumothorax</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="progress flex-grow-1 me-2"
+                        style="height: 12px"
+                      >
+                        <div
+                          class="progress-bar bg-danger"
+                          style="width: 82.5%"
+                        ></div>
+                      </div>
+                      <span class="fw-bold fs-6">82.5%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-danger fs-6">High Risk</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="spinner-grow spinner-grow-sm text-danger"
+                        style="width: 0.5rem; height: 0.5rem"
+                      ></div>
+                      <small class="ms-2 text-muted"
+                        >Requires immediate attention</small
+                      >
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="fas fa-exclamation-triangle text-danger me-2"
+                      ></i>
+                      <span class="fw-medium">Pneumonia</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="progress flex-grow-1 me-2"
+                        style="height: 12px"
+                      >
+                        <div
+                          class="progress-bar bg-danger"
+                          style="width: 73.3%"
+                        ></div>
+                      </div>
+                      <span class="fw-bold fs-6">73.3%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-danger fs-6">High Risk</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="spinner-grow spinner-grow-sm text-danger"
+                        style="width: 0.5rem; height: 0.5rem"
+                      ></div>
+                      <small class="ms-2 text-muted"
+                        >Requires immediate attention</small
+                      >
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i
+                        class="fas fa-exclamation-circle text-warning me-2"
+                      ></i>
+                      <span class="fw-medium">Effusion</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="progress flex-grow-1 me-2"
+                        style="height: 12px"
+                      >
+                        <div
+                          class="progress-bar bg-warning"
+                          style="width: 60.7%"
+                        ></div>
+                      </div>
+                      <span class="fw-bold fs-6">60.7%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-warning text-dark fs-6"
+                      >Medium Risk</span
+                    >
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div
+                        class="spinner-grow spinner-grow-sm text-warning"
+                        style="width: 0.5rem; height: 0.5rem"
+                      ></div>
+                      <small class="ms-2 text-muted">Monitor closely</small>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+      <!-- Sample X-ray Information Card -->
+      <div class="card shadow-sm mb-4 sticky-top" style="top: 1rem">
+        <div class="card-header bg-info text-white">
+          <h6 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Sample X-ray Details
+          </h6>
+        </div>
+        <div class="card-body">
+          <!-- Scan Information -->
+          <div class="mb-3">
+            <small class="text-muted">Scan Type</small>
+            <div class="fw-bold fs-5">
+              <i class="fas fa-stethoscope me-2 text-info"></i>
+              Chest X-ray
+            </div>
+          </div>
+
+          <!-- Upload Date -->
+          <div class="mb-3">
+            <small class="text-muted">Upload Date</small>
+            <div class="fw-medium">
+              <i class="fas fa-calendar me-2 text-info"></i>
+              <%= new Date().toLocaleDateString('en-US', { year: 'numeric',
+              month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+              }) %>
+            </div>
+          </div>
+
+          <!-- Clinical Notes -->
+          <div class="mb-3">
+            <small class="text-muted">Clinical Notes</small>
+            <div class="fw-medium p-2 bg-light rounded">
+              <i class="fas fa-notes-medical me-2 text-info"></i>
+              Patient presents with chest pain and shortness of breath. Sample
+              clinical notes for demonstration.
+            </div>
+          </div>
+
+          <!-- Status Badge -->
+          <div class="mb-3">
+            <small class="text-muted">Processing Status</small>
+            <div class="mt-1">
+              <span class="badge bg-success fs-6">Completed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sample AI Model Information -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-secondary text-white">
+          <h6 class="mb-0">
+            <i class="fas fa-brain me-2"></i>Sample AI Model Details
+          </h6>
+        </div>
+        <div class="card-body">
+          <!-- Model Version -->
+          <div class="mb-3">
+            <small class="text-muted">Model Version</small>
+            <div class="fw-bold">
+              <i class="fas fa-code-branch me-2 text-secondary"></i>
+              1.0.0
+            </div>
+          </div>
+
+          <!-- Inference ID -->
+          <div class="mb-3">
+            <small class="text-muted">Analysis ID</small>
+            <div class="fw-medium text-monospace small">
+              <i class="fas fa-fingerprint me-2 text-secondary"></i>
+              68b41b53...
+            </div>
+          </div>
+
+          <!-- Processing Time -->
+          <div class="mb-3">
+            <small class="text-muted">Processing Time</small>
+            <div class="fw-bold text-success">
+              <i class="fas fa-stopwatch me-2 text-secondary"></i>
+              101.1 ms
+            </div>
+          </div>
+
+          <!-- Analysis Date -->
+          <div class="mb-3">
+            <small class="text-muted">Analysis Date</small>
+            <div class="fw-medium">
+              <i class="fas fa-clock me-2 text-secondary"></i>
+              <%= new Date().toLocaleString() %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h6 class="mb-0"><i class="fas fa-tools me-2"></i>Quick Actions</h6>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="/prediction/xray/upload" class="btn btn-primary">
+              <i class="fas fa-upload me-2"></i>Upload Real X-ray
+            </a>
+            <a href="/prediction/xray" class="btn btn-outline-secondary">
+              <i class="fas fa-list me-2"></i>View All X-rays
+            </a>
+            <a href="/prediction" class="btn btn-outline-info">
+              <i class="fas fa-chart-bar me-2"></i>Dashboard
+            </a>
+            <button
+              class="btn btn-outline-success"
+              onclick="downloadDemoReport()"
+            >
+              <i class="fas fa-download me-2"></i>Download Sample Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeDemoChart();
+  });
+
+  function initializeDemoChart() {
+    const ctx = document.getElementById("demoChart").getContext("2d");
+
+    // Sample data from the JSON response
+    const labels = [
+      "Nodule",
+      "Consolidation",
+      "Mass",
+      "Pneumothorax",
+      "Pneumonia",
+      "Effusion",
+      "Edema",
+      "Emphysema",
+      "Infiltration",
+      "Pleural_Thickening",
+      "Fibrosis",
+      "Cardiomegaly",
+      "Hernia",
+      "Atelectasis",
+    ];
+    const data = [
+      95.8, 93.0, 91.9, 82.5, 73.3, 60.7, 40.6, 26.9, 27.0, 35.7, 14.2, 24.8,
+      12.6, 11.5,
+    ];
+    const colors = data.map((value) => {
+      if (value > 70) return "#dc3545"; // Red for high risk
+      if (value > 40) return "#ffc107"; // Yellow for medium risk
+      return "#198754"; // Green for low risk
+    });
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Confidence Level",
+            data: data,
+            backgroundColor: colors,
+            borderColor: colors.map((color) => color + "80"),
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                return `Confidence: ${context.parsed.y}%`;
+              },
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              callback: function (value) {
+                return value + "%";
+              },
+            },
+          },
+          x: {
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45,
+            },
+          },
+        },
+        animation: {
+          duration: 2000,
+          easing: "easeOutQuart",
+        },
+      },
+    });
+  }
+
+  function downloadDemoReport() {
+    const report = `Sample X-ray Analysis Report
+===============================
+Generated: ${new Date().toLocaleString()}
+X-ray ID: DEMO-12345
+Scan Type: Chest
+Status: Completed
+
+Clinical Notes: Patient presents with chest pain and shortness of breath. Sample clinical notes for demonstration.
+
+AI Model Information:
+- Model Version: 1.0.0
+- Inference ID: 68b41b53df1cef3a9151e52e
+- Processing Time: 101.1 ms
+- Analysis Date: ${new Date().toLocaleString()}
+
+Prediction Results:
+1. Nodule: 95.8% (HIGH RISK)
+2. Consolidation: 93.0% (HIGH RISK)
+3. Mass: 91.9% (HIGH RISK)
+4. Pneumothorax: 82.5% (HIGH RISK)
+5. Pneumonia: 73.3% (HIGH RISK)
+6. Effusion: 60.7% (MEDIUM RISK)
+7. Edema: 40.6% (MEDIUM RISK)
+8. Emphysema: 26.9% (LOW RISK)
+9. Infiltration: 27.0% (LOW RISK)
+10. Pleural_Thickening: 35.7% (LOW RISK)
+11. Fibrosis: 14.2% (LOW RISK)
+12. Cardiomegaly: 24.8% (LOW RISK)
+13. Hernia: 12.6% (LOW RISK)
+14. Atelectasis: 11.5% (LOW RISK)
+
+Risk Assessment:
+- High Risk (>70%): 5 findings
+- Medium Risk (40-70%): 2 findings  
+- Low Risk (<40%): 7 findings
+
+Top Findings Requiring Attention:
+- Nodule: 95.8%
+- Consolidation: 93.0%
+- Mass: 91.9%
+
+This is a SAMPLE REPORT for demonstration purposes only.
+For medical decisions, please consult with qualified healthcare professionals.`;
+
+    const blob = new Blob([report], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample-xray-analysis-report.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+</script>
+
+<%- include('../partials/footer') %>

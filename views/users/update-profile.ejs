@@ -1,0 +1,616 @@
+<%- include('../partials/header') %>
+
+<% 
+// Helper functions
+function getUserEmoji(user) {
+  if (user.isDoctor) return '👩‍⚕️';
+  if (user.gender === 'female') return '👩‍💼';
+  if (user.gender === 'male') return '👨‍💼';
+  return '👤';
+}
+
+function formatDate(date) {
+  if (!date) return '';
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+%>
+
+<style>
+  :root {
+    --healthcare-primary: #0EA5E9;
+    --healthcare-secondary: #0284C7;
+    --healthcare-light: #E0F2FE;
+    --healthcare-accent: #38BDF8;
+    --healthcare-success: #22C55E;
+    --healthcare-warning: #F59E0B;
+    --healthcare-danger: #EF4444;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #F1F5F9;
+    --white: #FFFFFF;
+    --border-light: #E2E8F0;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .update-header {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    padding: 3rem 0 2rem;
+    margin-bottom: 2rem;
+    border-radius: 0 0 2rem 2rem;
+  }
+
+  .form-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .form-card-header {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, rgba(255,255,255,0.8) 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .form-card-body {
+    padding: 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .form-control, .form-select {
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: white;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: var(--healthcare-primary);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+  }
+
+  .form-check {
+    margin: 1rem 0;
+  }
+
+  .form-check-input {
+    border: 2px solid var(--border-light);
+    margin-top: 0.2rem;
+  }
+
+  .form-check-input:checked {
+    background-color: var(--healthcare-primary);
+    border-color: var(--healthcare-primary);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    border: none;
+    border-radius: 16px;
+    padding: 14px 32px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -8px rgba(14, 165, 233, 0.4);
+  }
+
+  .btn-outline-secondary {
+    border: 2px solid var(--border-light);
+    color: var(--text-primary);
+    border-radius: 16px;
+    padding: 14px 32px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-secondary:hover {
+    background: var(--bg-primary);
+    border-color: var(--healthcare-primary);
+    color: var(--healthcare-primary);
+  }
+
+  .emoji-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, rgba(255,255,255,0.8) 100%);
+    border: 3px solid white;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 1rem;
+  }
+
+  .section-title {
+    color: var(--healthcare-primary);
+    font-weight: 700;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .helper-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+  }
+
+  .required {
+    color: var(--healthcare-danger);
+  }
+
+  .range-input {
+    width: 100%;
+    margin: 1rem 0;
+  }
+
+  .range-value {
+    font-weight: 600;
+    color: var(--healthcare-primary);
+    margin-left: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .form-card-body {
+      padding: 1.5rem;
+    }
+    
+    .update-header {
+      padding: 2rem 0 1.5rem;
+    }
+  }
+</style>
+
+<div class="update-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-2 text-center">
+        <div class="emoji-avatar">
+          <%= getUserEmoji(user) %>
+        </div>
+      </div>
+      <div class="col-md-10">
+        <h1 class="mb-2" style="font-size: 2.5rem; font-weight: 700;">Update Your Profile</h1>
+        <p class="mb-0" style="font-size: 1.1rem; opacity: 0.9;">
+          Keep your health information up to date for better personalized care
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <form action="/users/update-profile" method="POST">
+    <div class="row">
+      <div class="col-lg-8">
+        <!-- Personal Information -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="section-title">
+              <i class="fas fa-user-circle"></i> Personal Information
+            </h3>
+            <p class="text-muted mb-0">Basic information about yourself</p>
+          </div>
+          <div class="form-card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="name" class="form-label">Full Name <span class="required">*</span></label>
+                  <input type="text" class="form-control" id="name" name="name" 
+                         value="<%= user.name %>" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="phone" class="form-label">Phone Number</label>
+                  <input type="tel" class="form-control" id="phone" name="phone" 
+                         value="<%= user.phone || '' %>">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="gender" class="form-label">Gender</label>
+                  <select class="form-select" id="gender" name="gender">
+                    <option value="">Select Gender</option>
+                    <option value="male" <%= user.gender === 'male' ? 'selected' : '' %>>Male</option>
+                    <option value="female" <%= user.gender === 'female' ? 'selected' : '' %>>Female</option>
+                    <option value="other" <%= user.gender === 'other' ? 'selected' : '' %>>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="dob" class="form-label">Date of Birth</label>
+                  <input type="date" class="form-control" id="dob" name="dob" 
+                         value="<%= formatDate(user.dob) %>">
+                  <div class="helper-text">Age will be calculated automatically</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Health Metrics -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="section-title">
+              <i class="fas fa-heartbeat"></i> Health Metrics
+            </h3>
+            <p class="text-muted mb-0">Your vital health measurements</p>
+          </div>
+          <div class="form-card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="height" class="form-label">Height (cm)</label>
+                  <input type="number" class="form-control" id="height" name="height" 
+                         value="<%= user.height || '' %>" min="100" max="250">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="weight" class="form-label">Weight (kg)</label>
+                  <input type="number" class="form-control" id="weight" name="weight" 
+                         value="<%= user.weight || '' %>" min="30" max="200" step="0.1">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="bloodGroup" class="form-label">Blood Group</label>
+                  <select class="form-select" id="bloodGroup" name="bloodGroup">
+                    <option value="">Select Blood Group</option>
+                    <option value="A+" <%= user.bloodGroup === 'A+' ? 'selected' : '' %>>A+</option>
+                    <option value="A-" <%= user.bloodGroup === 'A-' ? 'selected' : '' %>>A-</option>
+                    <option value="B+" <%= user.bloodGroup === 'B+' ? 'selected' : '' %>>B+</option>
+                    <option value="B-" <%= user.bloodGroup === 'B-' ? 'selected' : '' %>>B-</option>
+                    <option value="O+" <%= user.bloodGroup === 'O+' ? 'selected' : '' %>>O+</option>
+                    <option value="O-" <%= user.bloodGroup === 'O-' ? 'selected' : '' %>>O-</option>
+                    <option value="AB+" <%= user.bloodGroup === 'AB+' ? 'selected' : '' %>>AB+</option>
+                    <option value="AB-" <%= user.bloodGroup === 'AB-' ? 'selected' : '' %>>AB-</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Blood Pressure (mmHg)</label>
+                <div class="row">
+                  <div class="col-6">
+                    <input type="number" class="form-control" name="bloodPressureSystolic" 
+                           placeholder="Systolic" value="<%= user.bloodPressure?.systolic || '' %>"
+                           min="80" max="200">
+                    <div class="helper-text">Systolic (top number)</div>
+                  </div>
+                  <div class="col-6">
+                    <input type="number" class="form-control" name="bloodPressureDiastolic" 
+                           placeholder="Diastolic" value="<%= user.bloodPressure?.diastolic || '' %>"
+                           min="40" max="120">
+                    <div class="helper-text">Diastolic (bottom number)</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="heartRate" class="form-label">Heart Rate (bpm)</label>
+                  <input type="number" class="form-control" id="heartRate" name="heartRate" 
+                         value="<%= user.heartRate || '' %>" min="40" max="200">
+                </div>
+              </div>
+            </div>
+
+            <!-- Blood Sugar -->
+            <div class="row mt-3">
+              <div class="col-12">
+                <label class="form-label">Blood Sugar Levels (mg/dL)</label>
+              </div>
+              <div class="col-md-4">
+                <input type="number" class="form-control" name="bloodSugarFasting" 
+                       placeholder="Fasting" value="<%= user.bloodSugar?.fasting || '' %>"
+                       min="50" max="300">
+                <div class="helper-text">Fasting glucose</div>
+              </div>
+              <div class="col-md-4">
+                <input type="number" class="form-control" name="bloodSugarPostMeal" 
+                       placeholder="Post-meal" value="<%= user.bloodSugar?.postMeal || '' %>"
+                       min="70" max="400">
+                <div class="helper-text">2 hours after meal</div>
+              </div>
+              <div class="col-md-4">
+                <input type="number" class="form-control" name="bloodSugarHba1c" 
+                       placeholder="HbA1c" value="<%= user.bloodSugar?.hba1c || '' %>"
+                       min="4" max="15" step="0.1">
+                <div class="helper-text">HbA1c (%)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medical History -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="section-title">
+              <i class="fas fa-file-medical"></i> Medical Information
+            </h3>
+            <p class="text-muted mb-0">Your medical history and current conditions</p>
+          </div>
+          <div class="form-card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="allergies" class="form-label">Allergies</label>
+                  <textarea class="form-control" id="allergies" name="allergies" rows="3" 
+                            placeholder="Enter allergies separated by commas"><%= (user.allergies || []).join(', ') %></textarea>
+                  <div class="helper-text">e.g., peanuts, penicillin, dust</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="currentMedications" class="form-label">Current Medications</label>
+                  <textarea class="form-control" id="currentMedications" name="currentMedications" rows="3" 
+                            placeholder="Enter medications separated by commas"><%= (user.currentMedications || []).join(', ') %></textarea>
+                  <div class="helper-text">e.g., aspirin, vitamin D</div>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="medicalHistory" class="form-label">Medical History</label>
+                  <textarea class="form-control" id="medicalHistory" name="medicalHistory" rows="3" 
+                            placeholder="Enter medical conditions separated by commas"><%= (user.medicalHistory || []).join(', ') %></textarea>
+                  <div class="helper-text">e.g., diabetes, hypertension, asthma</div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="surgeries" class="form-label">Past Surgeries</label>
+                  <textarea class="form-control" id="surgeries" name="surgeries" rows="2" 
+                            placeholder="Enter surgeries separated by commas"><%= (user.surgeries || []).join(', ') %></textarea>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="familyHistory" class="form-label">Family History</label>
+                  <textarea class="form-control" id="familyHistory" name="familyHistory" rows="2" 
+                            placeholder="Enter family medical history"><%= (user.familyHistory || []).join(', ') %></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lifestyle -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="section-title">
+              <i class="fas fa-running"></i> Lifestyle Information
+            </h3>
+            <p class="text-muted mb-0">Your daily habits and lifestyle choices</p>
+          </div>
+          <div class="form-card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">Smoking Status</label>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="smokingStatus" name="smokingStatus"
+                           <%= user.lifestyle?.smoking ? 'checked' : '' %>>
+                    <label class="form-check-label" for="smokingStatus">
+                      I am a smoker
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="form-label">Alcohol Consumption</label>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="alcoholStatus" name="alcoholStatus"
+                           <%= user.lifestyle?.alcohol ? 'checked' : '' %>>
+                    <label class="form-check-label" for="alcoholStatus">
+                      I consume alcohol
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="diet" class="form-label">Dietary Preference</label>
+                  <select class="form-select" id="diet" name="diet">
+                    <option value="">Select Diet Type</option>
+                    <option value="vegetarian" <%= user.lifestyle?.diet === 'vegetarian' ? 'selected' : '' %>>Vegetarian</option>
+                    <option value="non-vegetarian" <%= user.lifestyle?.diet === 'non-vegetarian' ? 'selected' : '' %>>Non-Vegetarian</option>
+                    <option value="vegan" <%= user.lifestyle?.diet === 'vegan' ? 'selected' : '' %>>Vegan</option>
+                    <option value="other" <%= user.lifestyle?.diet === 'other' ? 'selected' : '' %>>Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="exerciseFrequency" class="form-label">Exercise Frequency</label>
+                  <select class="form-select" id="exerciseFrequency" name="exerciseFrequency">
+                    <option value="">Select Frequency</option>
+                    <option value="none" <%= user.lifestyle?.exerciseFrequency === 'none' ? 'selected' : '' %>>None</option>
+                    <option value="low" <%= user.lifestyle?.exerciseFrequency === 'low' ? 'selected' : '' %>>Low (1-2 times/week)</option>
+                    <option value="moderate" <%= user.lifestyle?.exerciseFrequency === 'moderate' ? 'selected' : '' %>>Moderate (3-4 times/week)</option>
+                    <option value="high" <%= user.lifestyle?.exerciseFrequency === 'high' ? 'selected' : '' %>>High (5+ times/week)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="sleepHours" class="form-label">Sleep Hours per Night</label>
+                  <input type="number" class="form-control" id="sleepHours" name="sleepHours" 
+                         value="<%= user.lifestyle?.sleepHours || '' %>" min="3" max="12" step="0.5">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="stressLevel" class="form-label">Stress Level</label>
+                  <input type="range" class="range-input" id="stressLevel" name="stressLevel" 
+                         min="1" max="10" value="<%= user.lifestyle?.stressLevel || 5 %>"
+                         onchange="document.getElementById('stressValue').textContent = this.value">
+                  <div>
+                    <small class="text-muted">Low stress</small>
+                    <span class="range-value" id="stressValue"><%= user.lifestyle?.stressLevel || 5 %></span>
+                    <small class="text-muted float-end">High stress</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <!-- Address Information -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="section-title">
+              <i class="fas fa-map-marker-alt"></i> Address
+            </h3>
+          </div>
+          <div class="form-card-body">
+            <div class="form-group">
+              <label for="addressStreet" class="form-label">Street Address</label>
+              <input type="text" class="form-control" id="addressStreet" name="addressStreet" 
+                     value="<%= user.address?.street || '' %>">
+            </div>
+            <div class="form-group">
+              <label for="addressCity" class="form-label">City</label>
+              <input type="text" class="form-control" id="addressCity" name="addressCity" 
+                     value="<%= user.address?.city || '' %>">
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="addressState" class="form-label">State</label>
+                  <input type="text" class="form-control" id="addressState" name="addressState" 
+                         value="<%= user.address?.state || '' %>">
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="form-group">
+                  <label for="addressPincode" class="form-label">PIN Code</label>
+                  <input type="text" class="form-control" id="addressPincode" name="addressPincode" 
+                         value="<%= user.address?.pincode || '' %>">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="addressCountry" class="form-label">Country</label>
+              <input type="text" class="form-control" id="addressCountry" name="addressCountry" 
+                     value="<%= user.address?.country || '' %>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="form-card">
+          <div class="form-card-header">
+            <h3 class="section-title">
+              <i class="fas fa-phone-alt"></i> Emergency Contact
+            </h3>
+          </div>
+          <div class="form-card-body">
+            <div class="form-group">
+              <label for="emergencyContactName" class="form-label">Contact Name</label>
+              <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName" 
+                     value="<%= user.emergencyContact?.name || '' %>">
+            </div>
+            <div class="form-group">
+              <label for="emergencyContactRelation" class="form-label">Relationship</label>
+              <input type="text" class="form-control" id="emergencyContactRelation" name="emergencyContactRelation" 
+                     value="<%= user.emergencyContact?.relation || '' %>" 
+                     placeholder="e.g., spouse, parent, sibling">
+            </div>
+            <div class="form-group">
+              <label for="emergencyContactPhone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone" 
+                     value="<%= user.emergencyContact?.phone || '' %>">
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-card">
+          <div class="form-card-body text-center">
+            <button type="submit" class="btn btn-primary btn-lg mb-3 w-100">
+              <i class="fas fa-save me-2"></i>Update Profile
+            </button>
+            <a href="/users/profile" class="btn btn-outline-secondary w-100">
+              <i class="fas fa-arrow-left me-2"></i>Back to Profile
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Auto-calculate BMI
+  document.getElementById('height').addEventListener('input', calculateBMI);
+  document.getElementById('weight').addEventListener('input', calculateBMI);
+  
+  function calculateBMI() {
+    const height = document.getElementById('height').value;
+    const weight = document.getElementById('weight').value;
+    
+    if (height && weight) {
+      const heightInM = height / 100;
+      const bmi = (weight / (heightInM * heightInM)).toFixed(1);
+      
+      // You could display BMI here if needed
+      console.log('BMI:', bmi);
+    }
+  }
+  
+  // Validate form before submission
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const name = document.getElementById('name').value.trim();
+    
+    if (!name) {
+      e.preventDefault();
+      alert('Please enter your full name.');
+      document.getElementById('name').focus();
+      return false;
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>

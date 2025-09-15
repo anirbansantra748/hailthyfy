@@ -1,0 +1,1353 @@
+<% layout('layouts/boilerplate') %>
+
+<!-- External Dependencies -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root {
+    /* Medical Color Palette */
+    --medical-primary: #10b981;
+    --medical-secondary: #059669;
+    --medical-dark: #064e3b;
+    --medical-light: #ecfdf5;
+    --medical-accent: #34d399;
+    --medical-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%);
+    
+    /* Alert Colors */
+    --alert-critical: #dc2626;
+    --alert-warning: #ea580c;
+    --alert-info: #3b82f6;
+    --alert-success: #059669;
+    
+    /* Surface Colors */
+    --surface-primary: #ffffff;
+    --surface-secondary: #f8fafc;
+    --surface-elevated: #ffffff;
+    --border-light: #e2e8f0;
+    --border-medium: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    --shadow-medical: 0 10px 30px rgba(16, 185, 129, 0.15);
+    
+    /* Typography */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Poppins', var(--font-primary);
+    
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+    font-family: var(--font-primary);
+    background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 50%, #f1f5f9 100%);
+    color: var(--text-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hero Section */
+.hero-section {
+    background: var(--medical-gradient);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    padding: 4rem 0 6rem;
+    margin-bottom: -3rem;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(52, 211, 153, 0.3) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 40% 40%, rgba(110, 231, 183, 0.2) 0%, transparent 40%);
+    animation: heroGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes heroGlow {
+    0% { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.05); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    margin-bottom: 1rem;
+    letter-spacing: -0.02em;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    opacity: 0.95;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.hero-features {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.hero-feature {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    text-align: center;
+    min-width: 150px;
+}
+
+.hero-feature-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.hero-feature-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Main Container */
+.drug-interaction-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Input Section */
+.input-section {
+    background: var(--surface-elevated);
+    border-radius: 20px;
+    box-shadow: var(--shadow-2xl);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+    position: relative;
+    z-index: 20;
+    overflow: hidden;
+    backdrop-filter: blur(20px);
+    margin-bottom: 3rem;
+}
+
+.input-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--medical-gradient);
+    animation: sectionGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes sectionGlow {
+    0% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+.input-header {
+    padding: 2rem 2rem 1rem;
+    text-align: center;
+    position: relative;
+}
+
+.input-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.input-description {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 0;
+}
+
+.medication-input-form {
+    padding: 0 2rem 2rem;
+}
+
+.medication-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.medication-input-group {
+    position: relative;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.medication-input {
+    flex: 1;
+    height: 3rem;
+    padding: 0 1rem 0 3rem;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 500;
+    background: var(--surface-primary);
+    color: var(--text-primary);
+    transition: var(--transition-normal);
+    position: relative;
+}
+
+.medication-input:focus {
+    outline: none;
+    border-color: var(--medical-primary);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    transform: translateY(-1px);
+}
+
+.medication-input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--medical-primary);
+    font-size: 1.1rem;
+    z-index: 5;
+}
+
+.remove-medication-btn {
+    width: 3rem;
+    height: 3rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-medication-btn:hover {
+    background: #fecaca;
+    transform: scale(1.05);
+}
+
+.add-medication-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--medical-light);
+    color: var(--medical-dark);
+    border: 2px dashed var(--medical-accent);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.add-medication-btn:hover {
+    background: var(--medical-accent);
+    color: white;
+    border-style: solid;
+    transform: translateY(-2px);
+}
+
+.check-interactions-btn {
+    width: 100%;
+    height: 3.5rem;
+    background: var(--medical-gradient);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.check-interactions-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medical);
+}
+
+.check-interactions-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Quick Selection */
+.quick-selection {
+    margin-bottom: 2rem;
+}
+
+.quick-selection-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.popular-drugs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.popular-drug-btn {
+    background: var(--surface-secondary);
+    border: 2px solid var(--border-light);
+    border-radius: 25px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.popular-drug-btn:hover {
+    border-color: var(--medical-primary);
+    background: var(--medical-light);
+    color: var(--medical-dark);
+    transform: translateY(-2px);
+}
+
+/* Results Section */
+.results-section {
+    margin-top: 3rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: var(--transition-slow);
+}
+
+.results-section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.results-header {
+    background: var(--surface-elevated);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-light);
+    margin-bottom: 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.results-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.results-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.results-summary {
+    position: relative;
+    z-index: 2;
+}
+
+.summary-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+.summary-badge.safe {
+    background: rgba(5, 150, 105, 0.1);
+    color: var(--alert-success);
+    border: 2px solid var(--alert-success);
+}
+
+.summary-badge.caution {
+    background: rgba(234, 88, 12, 0.1);
+    color: var(--alert-warning);
+    border: 2px solid var(--alert-warning);
+}
+
+.summary-badge.critical {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--alert-critical);
+    border: 2px solid var(--alert-critical);
+    animation: criticalPulse 2s infinite;
+}
+
+@keyframes criticalPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(220, 38, 38, 0.3); }
+}
+
+/* Interaction Cards */
+.interaction-categories {
+    display: grid;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.interaction-category {
+    background: var(--surface-elevated);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--border-light);
+    overflow: hidden;
+    transition: var(--transition-normal);
+}
+
+.interaction-category:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.interaction-category.severe {
+    border-color: var(--alert-critical);
+}
+
+.interaction-category.moderate {
+    border-color: var(--alert-warning);
+}
+
+.interaction-category.mild {
+    border-color: var(--alert-info);
+}
+
+.interaction-category.allergy {
+    border-color: #ec4899;
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.05) 0%, var(--surface-elevated) 50%);
+}
+
+.category-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.category-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.category-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.category-icon.severe {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--alert-critical);
+}
+
+.category-icon.moderate {
+    background: rgba(234, 88, 12, 0.1);
+    color: var(--alert-warning);
+}
+
+.category-icon.mild {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--alert-info);
+}
+
+.category-icon.allergy {
+    background: rgba(236, 72, 153, 0.1);
+    color: #ec4899;
+}
+
+.category-count {
+    background: var(--medical-gradient);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.interaction-list {
+    padding: 0;
+}
+
+.interaction-item {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-light);
+    transition: var(--transition-normal);
+}
+
+.interaction-item:last-child {
+    border-bottom: none;
+}
+
+.interaction-item:hover {
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.interaction-drugs {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.drug-name {
+    background: var(--medical-light);
+    color: var(--medical-dark);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.interaction-arrow {
+    color: var(--text-muted);
+    font-size: 1.25rem;
+}
+
+.interaction-description {
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+}
+
+.interaction-recommendation {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--medical-dark);
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-left: 4px solid var(--medical-primary);
+}
+
+/* Recommendations Section */
+.recommendations-section {
+    background: var(--surface-elevated);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-light);
+    padding: 2rem;
+    margin-top: 2rem;
+}
+
+.recommendations-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.recommendation-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    transition: var(--transition-normal);
+}
+
+.recommendation-item:hover {
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.recommendation-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    margin-top: 0.25rem;
+}
+
+.recommendation-icon.critical {
+    background: rgba(220, 38, 38, 0.1);
+    color: var(--alert-critical);
+}
+
+.recommendation-icon.warning {
+    background: rgba(234, 88, 12, 0.1);
+    color: var(--alert-warning);
+}
+
+.recommendation-icon.caution {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--alert-info);
+}
+
+.recommendation-content {
+    flex: 1;
+}
+
+.recommendation-message {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.recommendation-action {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* Loading States */
+.loading-spinner {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.checking-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(16, 185, 129, 0.1);
+    backdrop-filter: blur(2px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--medical-primary);
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 3rem 0 4rem;
+        margin-bottom: -2rem;
+    }
+    
+    .hero-features {
+        gap: 1rem;
+    }
+    
+    .hero-feature {
+        min-width: 120px;
+        padding: 0.75rem 1rem;
+    }
+    
+    .input-section {
+        margin: 0 0.5rem 2rem;
+    }
+    
+    .medication-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .remove-medication-btn {
+        align-self: flex-end;
+        width: auto;
+        padding: 0.5rem 1rem;
+    }
+    
+    .popular-drugs {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+    }
+    
+    .popular-drug-btn {
+        flex-shrink: 0;
+    }
+    
+    .interaction-categories {
+        margin: 0 0.5rem 2rem;
+    }
+    
+    .category-header {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .interaction-item {
+        padding: 1rem 1.5rem;
+    }
+    
+    .interaction-drugs {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .interaction-arrow {
+        transform: rotate(90deg);
+        align-self: center;
+    }
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section animate__animated animate__fadeInDown">
+    <div class="hero-content">
+        <h1 class="hero-title animate__animated animate__fadeInUp animate__delay-1s">
+            🧬 AI-Powered Drug Interaction Checker
+        </h1>
+        <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-2s">
+            Prevent dangerous drug combinations with our intelligent analysis system powered by medical AI
+        </p>
+        
+        <div class="hero-features animate__animated animate__fadeInUp animate__delay-3s">
+            <div class="hero-feature">
+                <span class="hero-feature-icon">🔬</span>
+                <span class="hero-feature-text">AI Analysis</span>
+            </div>
+            <div class="hero-feature">
+                <span class="hero-feature-icon">⚠️</span>
+                <span class="hero-feature-text">Risk Assessment</span>
+            </div>
+            <div class="hero-feature">
+                <span class="hero-feature-icon">💊</span>
+                <span class="hero-feature-text">Personalized</span>
+            </div>
+            <div class="hero-feature">
+                <span class="hero-feature-icon">📊</span>
+                <span class="hero-feature-text">Real-time</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="drug-interaction-container">
+    <!-- Input Section -->
+    <section class="input-section animate__animated animate__zoomIn animate__delay-1s">
+        <div class="input-header">
+            <h2 class="input-title">Enter Your Medications</h2>
+            <p class="input-description">Add all medications you're currently taking to check for potential interactions</p>
+        </div>
+        
+        <form class="medication-input-form" id="drugInteractionForm">
+            <div class="medication-inputs" id="medicationInputs">
+                <!-- Dynamic medication inputs will be added here -->
+                <div class="medication-input-group">
+                    <i class="fas fa-pills medication-input-icon"></i>
+                    <input 
+                        type="text" 
+                        class="medication-input" 
+                        placeholder="Enter medication name (e.g., Paracetamol, Aspirin...)"
+                        autocomplete="off"
+                        data-index="0"
+                    >
+                    <button type="button" class="remove-medication-btn" onclick="removeMedicationInput(0)" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="button" class="add-medication-btn" onclick="addMedicationInput()">
+                <i class="fas fa-plus"></i>
+                Add Another Medication
+            </button>
+            
+            <div class="quick-selection">
+                <h3 class="quick-selection-title">Or select from popular medications:</h3>
+                <div class="popular-drugs">
+                    <% popularDrugs.forEach(drug => { %>
+                        <button type="button" class="popular-drug-btn" onclick="addPopularDrug('<%= drug.name %>')">
+                            <span><%= drug.icon %></span>
+                            <span><%= drug.name %></span>
+                        </button>
+                    <% }) %>
+                </div>
+            </div>
+            
+            <button type="submit" class="check-interactions-btn" id="checkBtn">
+                <i class="fas fa-search"></i>
+                Check Drug Interactions
+            </button>
+        </form>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section" id="resultsSection">
+        <!-- Results will be dynamically populated here -->
+    </section>
+</div>
+
+<script>
+class DrugInteractionChecker {
+    constructor() {
+        this.medicationCount = 1;
+        this.medications = [];
+        this.checkingInProgress = false;
+        
+        this.init();
+    }
+    
+    init() {
+        // Initialize event listeners
+        document.getElementById('drugInteractionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.checkInteractions();
+        });
+        
+        // Initialize medication input listeners
+        this.setupInputListeners();
+        
+        // Load user's current medications if available
+        this.loadUserMedications();
+    }
+    
+    setupInputListeners() {
+        const inputs = document.querySelectorAll('.medication-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', (e) => this.handleInputChange(e));
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.checkInteractions();
+                }
+            });
+        });
+    }
+    
+    handleInputChange(e) {
+        const input = e.target;
+        const value = input.value.trim();
+        
+        // Show/hide remove button based on content
+        const removeBtn = input.parentElement.querySelector('.remove-medication-btn');
+        if (removeBtn) {
+            removeBtn.style.display = value ? 'flex' : 'none';
+        }
+        
+        // Simple autocomplete could be added here
+        // this.showSuggestions(input, value);
+    }
+    
+    addMedicationInput() {
+        const container = document.getElementById('medicationInputs');
+        const newInputGroup = document.createElement('div');
+        newInputGroup.className = 'medication-input-group slide-up';
+        
+        newInputGroup.innerHTML = `
+            <i class="fas fa-pills medication-input-icon"></i>
+            <input 
+                type="text" 
+                class="medication-input" 
+                placeholder="Enter medication name..."
+                autocomplete="off"
+                data-index="${this.medicationCount}"
+            >
+            <button type="button" class="remove-medication-btn" onclick="removeMedicationInput(${this.medicationCount})">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        container.appendChild(newInputGroup);
+        
+        // Setup listeners for new input
+        const newInput = newInputGroup.querySelector('.medication-input');
+        newInput.addEventListener('input', (e) => this.handleInputChange(e));
+        newInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.checkInteractions();
+            }
+        });
+        
+        // Focus new input
+        newInput.focus();
+        
+        this.medicationCount++;
+    }
+    
+    removeMedicationInput(index) {
+        const input = document.querySelector(`[data-index="${index}"]`);
+        if (input && input.closest('.medication-input-group')) {
+            input.closest('.medication-input-group').remove();
+        }
+    }
+    
+    addPopularDrug(drugName) {
+        // Find first empty input or add new one
+        const inputs = document.querySelectorAll('.medication-input');
+        let targetInput = null;
+        
+        for (let input of inputs) {
+            if (!input.value.trim()) {
+                targetInput = input;
+                break;
+            }
+        }
+        
+        if (!targetInput) {
+            this.addMedicationInput();
+            // Get the newly added input
+            targetInput = document.querySelector(`[data-index="${this.medicationCount - 1}"]`);
+        }
+        
+        if (targetInput) {
+            targetInput.value = drugName;
+            targetInput.focus();
+            this.handleInputChange({ target: targetInput });
+        }
+    }
+    
+    getMedicationList() {
+        const inputs = document.querySelectorAll('.medication-input');
+        const medications = [];
+        
+        inputs.forEach(input => {
+            const value = input.value.trim();
+            if (value) {
+                medications.push(value);
+            }
+        });
+        
+        return medications;
+    }
+    
+    async checkInteractions() {
+        console.log('🔍 checkInteractions called');
+        if (this.checkingInProgress) {
+            console.log('⏳ Check already in progress, returning');
+            return;
+        }
+        
+        const medications = this.getMedicationList();
+        console.log('💊 Medications found:', medications);
+        
+        if (medications.length === 0) {
+            console.log('❌ No medications entered');
+            this.showError('Please enter at least one medication.');
+            return;
+        }
+        
+        this.checkingInProgress = true;
+        this.showLoading(true);
+        
+        try {
+            console.log('🌐 Making API call to /drug-interaction-checker/check');
+            const response = await fetch('/drug-interaction-checker/check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ medications })
+            });
+            
+            console.log('📝 API Response status:', response.status);
+            const result = await response.json();
+            console.log('📄 API Response data:', result);
+            
+            if (!result.success) {
+                console.error('❌ API returned error:', result.message);
+                throw new Error(result.message || 'Failed to check interactions');
+            }
+            
+            console.log('✅ Displaying results');
+            this.displayResults(result.data);
+            
+        } catch (error) {
+            console.error('Error checking interactions:', error);
+            this.showError(error.message || 'An error occurred while checking interactions.');
+        } finally {
+            this.checkingInProgress = false;
+            this.showLoading(false);
+        }
+    }
+    
+    showLoading(show) {
+        const checkBtn = document.getElementById('checkBtn');
+        const overlay = document.querySelector('.checking-overlay');
+        
+        if (show) {
+            checkBtn.innerHTML = '<span class="loading-spinner"></span> Analyzing Interactions...';
+            checkBtn.disabled = true;
+            
+            // Create overlay if it doesn't exist
+            if (!overlay) {
+                const loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'checking-overlay';
+                loadingOverlay.innerHTML = `
+                    <div style="text-align: center;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🔬</div>
+                        <div>Analyzing drug interactions with AI...</div>
+                        <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">This may take a few seconds</div>
+                    </div>
+                `;
+                document.body.appendChild(loadingOverlay);
+            }
+        } else {
+            checkBtn.innerHTML = '<i class="fas fa-search"></i> Check Drug Interactions';
+            checkBtn.disabled = false;
+            
+            if (overlay) {
+                overlay.remove();
+            }
+        }
+    }
+    
+    displayResults(data) {
+        const resultsSection = document.getElementById('resultsSection');
+        
+        // Build results HTML
+        let resultsHTML = `
+            <div class="results-header fade-in">
+                <h3 class="results-title">
+                    <i class="fas fa-flask"></i>
+                    Drug Interaction Analysis Complete
+                </h3>
+                <div class="results-summary">
+                    <div class="summary-badge ${data.summary.status}">
+                        <i class="fas fa-${this.getSummaryIcon(data.summary.status)}"></i>
+                        <span>${data.summary.message}</span>
+                    </div>
+                    <div style="margin-top: 1rem; color: var(--text-secondary);">
+                        Analyzed <strong>${data.checkedMedications.length}</strong> medications
+                        ${data.userPersonalized ? '• Personalized for your health profile' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add interaction categories
+        if (data.severe.length > 0 || data.moderate.length > 0 || data.mild.length > 0 || data.allergicReactions.length > 0) {
+            resultsHTML += '<div class="interaction-categories">';
+            
+            // Severe interactions
+            if (data.severe.length > 0) {
+                resultsHTML += this.buildInteractionCategory('severe', 'Severe Interactions', data.severe, 'exclamation-triangle');
+            }
+            
+            // Allergic reactions
+            if (data.allergicReactions.length > 0) {
+                resultsHTML += this.buildAllergyCategory(data.allergicReactions);
+            }
+            
+            // Moderate interactions
+            if (data.moderate.length > 0) {
+                resultsHTML += this.buildInteractionCategory('moderate', 'Moderate Interactions', data.moderate, 'exclamation-circle');
+            }
+            
+            // Mild interactions
+            if (data.mild.length > 0) {
+                resultsHTML += this.buildInteractionCategory('mild', 'Mild Interactions', data.mild, 'info-circle');
+            }
+            
+            resultsHTML += '</div>';
+        }
+        
+        // Add recommendations
+        if (data.recommendations && data.recommendations.length > 0) {
+            resultsHTML += this.buildRecommendationsSection(data.recommendations);
+        }
+        
+        resultsSection.innerHTML = resultsHTML;
+        resultsSection.classList.add('show');
+        
+        // Scroll to results
+        setTimeout(() => {
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 300);
+    }
+    
+    buildInteractionCategory(severity, title, interactions, iconName) {
+        let html = `
+            <div class="interaction-category ${severity} fade-in">
+                <div class="category-header">
+                    <h4 class="category-title">
+                        <div class="category-icon ${severity}">
+                            <i class="fas fa-${iconName}"></i>
+                        </div>
+                        <span>${title}</span>
+                    </h4>
+                    <div class="category-count">${interactions.length}</div>
+                </div>
+                <div class="interaction-list">
+        `;
+        
+        interactions.forEach(interaction => {
+            html += `
+                <div class="interaction-item">
+                    <div class="interaction-drugs">
+                        <span class="drug-name">${interaction.drug1}</span>
+                        <span class="interaction-arrow">⚡</span>
+                        <span class="drug-name">${interaction.drug2}</span>
+                    </div>
+                    <div class="interaction-description">
+                        ${interaction.description}
+                    </div>
+                    <div class="interaction-recommendation">
+                        <i class="fas fa-lightbulb"></i>
+                        ${interaction.recommendation}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+        
+        return html;
+    }
+    
+    buildAllergyCategory(allergicReactions) {
+        let html = `
+            <div class="interaction-category allergy fade-in">
+                <div class="category-header">
+                    <h4 class="category-title">
+                        <div class="category-icon allergy">
+                            <i class="fas fa-allergies"></i>
+                        </div>
+                        <span>Allergy Warnings</span>
+                    </h4>
+                    <div class="category-count">${allergicReactions.length}</div>
+                </div>
+                <div class="interaction-list">
+        `;
+        
+        allergicReactions.forEach(allergy => {
+            html += `
+                <div class="interaction-item">
+                    <div class="interaction-drugs">
+                        <span class="drug-name">${allergy.medication}</span>
+                        <span class="interaction-arrow">⚠️</span>
+                        <span class="drug-name" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;">
+                            ${allergy.userAllergy}
+                        </span>
+                    </div>
+                    <div class="interaction-description">
+                        <strong>ALLERGY ALERT:</strong> This medication contains ${allergy.allergen} which may trigger your known allergy to ${allergy.userAllergy}.
+                    </div>
+                    <div class="interaction-recommendation" style="background: rgba(220, 38, 38, 0.1); border-left-color: var(--alert-critical); color: var(--alert-critical);">
+                        <i class="fas fa-ban"></i>
+                        ${allergy.action}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+        
+        return html;
+    }
+    
+    buildRecommendationsSection(recommendations) {
+        let html = `
+            <div class="recommendations-section fade-in">
+                <h3 class="recommendations-title">
+                    <i class="fas fa-lightbulb"></i>
+                    AI Recommendations
+                </h3>
+        `;
+        
+        recommendations.forEach(rec => {
+            const iconClass = rec.type === 'critical' ? 'critical' : rec.type === 'warning' ? 'warning' : 'caution';
+            const iconName = rec.type === 'critical' ? 'exclamation-triangle' : rec.type === 'warning' ? 'exclamation-circle' : 'info-circle';
+            
+            html += `
+                <div class="recommendation-item">
+                    <div class="recommendation-icon ${iconClass}">
+                        <i class="fas fa-${iconName}"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <div class="recommendation-message">${rec.message}</div>
+                        <div class="recommendation-action">Recommended action: ${rec.action.replace('_', ' ')}</div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        return html;
+    }
+    
+    getSummaryIcon(status) {
+        switch (status) {
+            case 'safe': return 'check-circle';
+            case 'caution': return 'exclamation-circle';
+            case 'critical': return 'exclamation-triangle';
+            default: return 'info-circle';
+        }
+    }
+    
+    showError(message) {
+        const resultsSection = document.getElementById('resultsSection');
+        resultsSection.innerHTML = `
+            <div class="results-header fade-in">
+                <div class="summary-badge critical">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Error: ${message}</span>
+                </div>
+            </div>
+        `;
+        resultsSection.classList.add('show');
+    }
+    
+    loadUserMedications() {
+        // Load user's current medications if available
+        <% if (userMedications && userMedications.length > 0) { %>
+            const userMeds = <%- JSON.stringify(userMedications) %>;
+            const inputs = document.querySelectorAll('.medication-input');
+            
+            userMeds.forEach((med, index) => {
+                if (index === 0 && inputs[0]) {
+                    inputs[0].value = med;
+                    this.handleInputChange({ target: inputs[0] });
+                } else {
+                    this.addMedicationInput();
+                    const newInput = document.querySelector(`[data-index="${this.medicationCount - 1}"]`);
+                    if (newInput) {
+                        newInput.value = med;
+                        this.handleInputChange({ target: newInput });
+                    }
+                }
+            });
+        <% } %>
+    }
+}
+
+// Global functions for button clicks
+function addMedicationInput() {
+    window.drugChecker.addMedicationInput();
+}
+
+function removeMedicationInput(index) {
+    window.drugChecker.removeMedicationInput(index);
+}
+
+function addPopularDrug(drugName) {
+    window.drugChecker.addPopularDrug(drugName);
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    window.drugChecker = new DrugInteractionChecker();
+});
+</script>

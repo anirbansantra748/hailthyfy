@@ -1,0 +1,875 @@
+<%- include('../partials/header') %>
+
+<!-- Chart.js and modern animations -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<style>
+  :root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --danger-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-border: rgba(255, 255, 255, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+  }
+
+  .hero-section {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 3rem 0;
+    border-radius: 0 0 50px 50px;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.3;
+  }
+
+  .status-badge {
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .prediction-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 5px solid;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .prediction-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  }
+
+  .prediction-card.high-risk {
+    border-left-color: #e74c3c;
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  }
+
+  .prediction-card.medium-risk {
+    border-left-color: #f39c12;
+    background: linear-gradient(135deg, #fffbf0 0%, #fff 100%);
+  }
+
+  .prediction-card.low-risk {
+    border-left-color: #27ae60;
+    background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
+  }
+
+  .xray-viewer {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  }
+
+  .xray-image {
+    width: 100%;
+    height: 500px;
+    object-fit: contain;
+    cursor: zoom-in;
+    filter: contrast(1.1) brightness(1.05);
+    transition: all 0.3s ease;
+  }
+
+  .xray-image:hover {
+    filter: contrast(1.2) brightness(1.1);
+    transform: scale(1.02);
+  }
+
+  .chart-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .chart-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--primary-gradient);
+  }
+
+  .action-btn {
+    background: white;
+    border: 2px solid transparent;
+    border-radius: 15px;
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    color: white;
+  }
+
+  .action-btn.download { background: var(--success-gradient); color: white; }
+  .action-btn.export { background: var(--primary-gradient); color: white; }
+  .action-btn.print { background: var(--warning-gradient); color: white; }
+  .action-btn.share { background: var(--danger-gradient); color: white; }
+
+  .floating-stats {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1000;
+  }
+
+  .stat-bubble {
+    background: white;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .stat-bubble:hover {
+    transform: scale(1.1);
+  }
+
+  .pulse {
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+  }
+
+  .risk-meter {
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(90deg, #27ae60 0%, #f39c12 50%, #e74c3c 100%);
+    border-radius: 10px;
+    position: relative;
+    margin: 1rem 0;
+  }
+
+  .risk-indicator {
+    position: absolute;
+    top: -5px;
+    width: 30px;
+    height: 30px;
+    background: white;
+    border-radius: 50%;
+    border: 3px solid #333;
+    transition: all 0.5s ease;
+  }
+
+  .modal-overlay {
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+  }
+
+  .image-modal {
+    max-width: 90vw;
+    max-height: 90vh;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--success-gradient);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    z-index: 9999;
+    transform: translateX(400px);
+    transition: all 0.3s ease;
+  }
+
+  .notification.show {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 768px) {
+    .floating-stats { display: none; }
+    .hero-section { padding: 2rem 0; }
+    .xray-image { height: 300px; }
+  }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section" data-aos="fade-down">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="display-4 fw-bold mb-3">
+          <i class="fas fa-microscope me-3"></i>
+          X-ray Analysis Results
+        </h1>
+        <p class="lead opacity-90">
+          AI-powered medical imaging analysis with comprehensive insights
+        </p>
+      </div>
+      <div class="col-md-4 text-center">
+        <% if (xray.status === 'completed') { %>
+        <div class="status-badge" style="background: var(--success-gradient);">
+          <i class="fas fa-check-circle me-2"></i>Analysis Complete
+        </div>
+        <% } else if (xray.status === 'processing') { %>
+        <div class="status-badge pulse" style="background: var(--warning-gradient);">
+          <i class="fas fa-cog fa-spin me-2"></i>Processing
+        </div>
+        <% } else if (xray.status === 'failed') { %>
+        <div class="status-badge" style="background: var(--danger-gradient);">
+          <i class="fas fa-exclamation-triangle me-2"></i>Failed
+        </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Main Content -->
+  <div class="row">
+    <!-- X-ray Image Viewer -->
+    <div class="col-lg-7 mb-4" data-aos="fade-right">
+      <div class="glass-card p-0">
+        <div class="card-header" style="background: var(--primary-gradient); color: white; border-radius: 20px 20px 0 0;">
+          <h4 class="mb-0">
+            <i class="fas fa-x-ray me-2"></i>X-ray Image
+            <small class="opacity-75 ms-3"><%= xray.scanType || 'Unknown Type' %> Scan</small>
+          </h4>
+        </div>
+        <div class="card-body p-0">
+          <div class="xray-viewer">
+            <% if (xray.image) { %>
+            <img 
+              src="/<%= xray.image %>" 
+              alt="X-ray Image" 
+              class="xray-image"
+              onclick="openFullscreen('/<%= xray.image %>')"
+              onerror="showImageError(this)"
+            >
+            <div class="position-absolute top-0 end-0 p-3">
+              <a href="#" class="btn btn-light btn-sm rounded-pill" onclick="event.preventDefault(); openFullscreen('/<%= xray.image %>');">
+                <i class="fas fa-expand-alt me-1"></i>Fullscreen
+              </a>
+            </div>
+            <% } else { %>
+            <div class="d-flex align-items-center justify-content-center" style="height: 500px; background: #f8f9fa;">
+              <div class="text-center text-muted">
+                <i class="fas fa-image fa-4x mb-3"></i>
+                <h5>X-ray Image Not Available</h5>
+                <p>The image file could not be loaded</p>
+              </div>
+            </div>
+            <% } %>
+          </div>
+          
+          <!-- Image Info -->
+          <div class="p-4">
+            <div class="row text-center">
+              <div class="col-md-4">
+                <div class="stat-item">
+                  <i class="fas fa-file fa-2x text-primary mb-2"></i>
+                  <h6>File Name</h6>
+                  <small class="text-muted"><%= xray.file_name || 'Unknown' %></small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-item">
+                  <i class="fas fa-hdd fa-2x text-success mb-2"></i>
+                  <h6>File Size</h6>
+                  <small class="text-muted">
+                    <% if (xray.file_size) { %>
+                      <%= (xray.file_size / 1024 / 1024).toFixed(2) %> MB
+                    <% } else { %>
+                      Unknown
+                    <% } %>
+                  </small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="stat-item">
+                  <i class="fas fa-calendar fa-2x text-info mb-2"></i>
+                  <h6>Upload Date</h6>
+                  <small class="text-muted"><%= new Date(xray.createdAt).toLocaleDateString() %></small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis Results -->
+    <div class="col-lg-5 mb-4" data-aos="fade-left">
+      <% if (xray.status === 'completed' && xray.predictions) { %>
+      
+      <!-- Risk Assessment -->
+      <div class="glass-card mb-4">
+        <div class="card-body p-4">
+          <h5 class="text-center mb-4">
+            <i class="fas fa-shield-alt me-2 text-primary"></i>
+            Overall Risk Assessment
+          </h5>
+          
+          <% 
+          const predictions = xray.predictions || {};
+          const topFindings = Object.entries(predictions).sort(([,a], [,b]) => b - a);
+          const maxConfidence = topFindings.length > 0 ? topFindings[0][1] : 0;
+          const riskLevel = maxConfidence >= 0.7 ? 'high' : maxConfidence >= 0.4 ? 'medium' : 'low';
+          const riskColor = riskLevel === 'high' ? '#e74c3c' : riskLevel === 'medium' ? '#f39c12' : '#27ae60';
+          const riskPosition = Math.max(10, Math.min(90, maxConfidence * 100));
+          %>
+          
+          <div class="risk-meter">
+            <div class="risk-indicator" style="left: <%= riskPosition %>%; border-color: <%= riskColor %>;"></div>
+          </div>
+          
+          <div class="text-center">
+            <h4 style="color: <%= riskColor %>;">
+              <%= riskLevel.toUpperCase() %> RISK
+            </h4>
+            <p class="text-muted">
+              Maximum confidence: <%= (maxConfidence * 100).toFixed(1) %>%
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Predictions -->
+      <div class="glass-card">
+        <div class="card-header" style="background: var(--success-gradient); color: white; border-radius: 20px 20px 0 0;">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-bar me-2"></i>AI Predictions
+          </h5>
+        </div>
+        <div class="card-body p-3">
+          <% topFindings.slice(0, 5).forEach(([label, confidence], index) => { %>
+          <% 
+          const riskClass = confidence >= 0.7 ? 'high-risk' : confidence >= 0.4 ? 'medium-risk' : 'low-risk';
+          const iconClass = index === 0 ? 'fas fa-trophy text-warning' : 
+                          index === 1 ? 'fas fa-medal text-secondary' : 
+                          'fas fa-award text-info';
+          %>
+          <div class="prediction-card <%= riskClass %>" data-aos="fade-up" data-aos-delay="<%= index * 100 %>">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <i class="<%= iconClass %> me-3 fs-4"></i>
+                <div>
+                  <h6 class="mb-0"><%= label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) %></h6>
+                  <small class="text-muted">Confidence Level</small>
+                </div>
+              </div>
+              <div class="text-end">
+                <h4 class="mb-0 fw-bold" style="color: <%= riskColor %>;">
+                  <%= (confidence * 100).toFixed(1) %>%
+                </h4>
+                <div class="progress" style="width: 60px; height: 4px;">
+                  <div class="progress-bar" style="width: <%= confidence * 100 %>%; background-color: <%= riskColor %>;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+
+      <% } else if (xray.status === 'processing') { %>
+      <!-- Processing Status -->
+      <div class="glass-card text-center">
+        <div class="card-body p-5">
+          <div class="loading-spinner"></div>
+          <h4 class="mt-4 mb-3">Analysis in Progress</h4>
+          <p class="text-muted">
+            Our AI is analyzing your X-ray. This usually takes 10-30 seconds.
+          </p>
+          <div class="mt-4">
+            <a href="#" class="btn btn-primary" onclick="event.preventDefault(); location.reload();">
+              <i class="fas fa-sync-alt me-2"></i>Refresh Status
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <% } else if (xray.status === 'failed') { %>
+      <!-- Failed Status -->
+      <div class="glass-card text-center">
+        <div class="card-body p-5">
+          <i class="fas fa-exclamation-triangle fa-4x text-danger mb-4"></i>
+          <h4 class="text-danger mb-3">Analysis Failed</h4>
+          <p class="text-muted mb-4">
+            <%= xray.error_message || 'An error occurred during processing' %>
+          </p>
+          <div class="d-grid gap-2">
+            <a href="#" class="action-btn" onclick="event.preventDefault(); retryAnalysis();">
+              <i class="fas fa-redo me-2"></i>Retry Analysis
+            </a>
+            <a href="/prediction/xray/upload" class="action-btn">
+              <i class="fas fa-upload me-2"></i>Upload New X-ray
+            </a>
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Charts and Analysis -->
+  <% if (xray.status === 'completed' && xray.predictions && Object.keys(xray.predictions).length > 0) { %>
+  <div class="row mt-5">
+    <div class="col-12" data-aos="fade-up">
+      <div class="chart-container">
+        <h4 class="text-center mb-4">
+          <i class="fas fa-chart-pie me-2"></i>
+          Detailed Analysis Breakdown
+        </h4>
+        <div style="height: 400px; position: relative;">
+          <canvas id="predictionsChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Action Buttons -->
+  <div class="text-center my-5" data-aos="fade-up">
+    <div class="d-flex flex-wrap justify-content-center">
+      <a href="/prediction/xray" class="action-btn">
+        <i class="fas fa-list me-2"></i>Back to List
+      </a>
+      <a href="/prediction/xray/upload" class="action-btn">
+        <i class="fas fa-plus me-2"></i>Upload Another
+      </a>
+      <% if (xray.status === 'completed') { %>
+      <a href="#" class="action-btn download" onclick="event.preventDefault(); downloadReport();">
+        <i class="fas fa-download me-2"></i>Download Report
+      </a>
+      <a href="#" class="action-btn export" onclick="event.preventDefault(); exportResults();">
+        <i class="fas fa-file-export me-2"></i>Export Data
+      </a>
+      <a href="#" class="action-btn print" onclick="event.preventDefault(); printResults();">
+        <i class="fas fa-print me-2"></i>Print Results
+      </a>
+      <a href="#" class="action-btn share" onclick="event.preventDefault(); shareResults();">
+        <i class="fas fa-share me-2"></i>Share Results
+      </a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Stats -->
+<div class="floating-stats">
+  <div class="stat-bubble" title="Analysis Accuracy">
+    <i class="fas fa-bullseye text-primary"></i>
+    <small class="fw-bold">
+      <% if (xray.status === 'completed' && xray.predictions) { %>
+        <%= Math.round(Object.values(xray.predictions)[0] * 100) %>%
+      <% } else { %>
+        --%
+      <% } %>
+    </small>
+  </div>
+  <div class="stat-bubble" title="Processing Time">
+    <i class="fas fa-clock text-success"></i>
+    <small class="fw-bold">
+      <%= xray.inference_time_ms ? `${Math.round(xray.inference_time_ms / 1000)}s` : '--s' %>
+    </small>
+  </div>
+</div>
+
+<!-- Chart Data -->
+<% const chartData = (xray && xray.status === 'completed' && xray.predictions) ? xray.predictions : {}; %>
+<% const chartEntries = Object.entries(chartData).sort(([,a], [,b]) => b - a).map(([label, confidence]) => ({ 
+  label: label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), 
+  confidence: Math.round(confidence * 1000) / 10 
+})); %>
+
+<script>
+  // Initialize AOS animations
+  AOS.init({
+    duration: 800,
+    once: true,
+    offset: 100
+  });
+
+  // Chart initialization
+  document.addEventListener('DOMContentLoaded', function() {
+    const chartData = <%= JSON.stringify(chartEntries) %>;
+    
+    if (chartData.length > 0) {
+      initializeChart(chartData);
+    }
+  });
+
+  function initializeChart(data) {
+    const ctx = document.getElementById('predictionsChart');
+    if (!ctx) return;
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: data.map(d => d.label),
+        datasets: [{
+          data: data.map(d => d.confidence),
+          backgroundColor: [
+            'rgba(231, 76, 60, 0.8)',
+            'rgba(243, 156, 18, 0.8)', 
+            'rgba(46, 204, 113, 0.8)',
+            'rgba(52, 152, 219, 0.8)',
+            'rgba(155, 89, 182, 0.8)',
+            'rgba(241, 196, 15, 0.8)'
+          ],
+          borderColor: [
+            'rgba(231, 76, 60, 1)',
+            'rgba(243, 156, 18, 1)',
+            'rgba(46, 204, 113, 1)',
+            'rgba(52, 152, 219, 1)',
+            'rgba(155, 89, 182, 1)',
+            'rgba(241, 196, 15, 1)'
+          ],
+          borderWidth: 3
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              padding: 20,
+              font: {
+                size: 14,
+                weight: '600'
+              }
+            }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            titleColor: 'white',
+            bodyColor: 'white',
+            borderColor: 'rgba(255,255,255,0.2)',
+            borderWidth: 1,
+            cornerRadius: 10,
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + context.parsed.toFixed(1) + '%';
+              }
+            }
+          }
+        },
+        animation: {
+          duration: 2000,
+          easing: 'easeInOutQuart'
+        }
+      }
+    });
+  }
+
+  // Image handling functions
+  function openFullscreen(imageSrc) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center';
+    modal.style.zIndex = '9999';
+    modal.innerHTML = `
+      <div class="image-modal">
+        <img src="${imageSrc}" alt="X-ray Fullscreen" style="max-width: 100%; max-height: 100%; border-radius: 20px;">
+        <button class="btn btn-light position-absolute top-0 end-0 m-3 rounded-circle" onclick="this.closest('.modal-overlay').remove();">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.remove();
+      }
+    });
+  }
+
+  function showImageError(img) {
+    const container = img.parentElement;
+    container.innerHTML = `
+      <div class="d-flex align-items-center justify-content-center text-muted" style="height: 500px;">
+        <div class="text-center">
+          <i class="fas fa-exclamation-triangle fa-4x mb-3"></i>
+          <h5>Image Not Available</h5>
+          <p>The X-ray image could not be loaded</p>
+        </div>
+      </div>
+    `;
+  }
+
+  // Action functions
+  function downloadReport() {
+    showNotification('Generating report...', 'info');
+    
+    const reportData = {
+      patientInfo: {
+        analysisId: '<%= xray._id %>',
+        scanType: '<%= xray.scanType %>',
+        uploadDate: '<%= xray.createdAt %>',
+        processedDate: '<%= xray.processed_at %>'
+      },
+      analysisResults: {
+        status: '<%= xray.status %>',
+        predictions: <%= JSON.stringify(xray.predictions || {}) %>,
+        modelVersion: '<%= xray.model_version %>',
+        inferenceTime: '<%= xray.inference_time_ms %>ms'
+      },
+      summary: `AI Analysis Report for <%= xray.scanType %> X-ray`
+    };
+
+    const reportContent = generateReportContent(reportData);
+    
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `xray-report-<%= xray._id %>.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Report downloaded successfully!', 'success');
+  }
+
+  function exportResults() {
+    showNotification('Exporting data...', 'info');
+    
+    const exportData = {
+      analysisReport: {
+        id: '<%= xray._id %>',
+        timestamp: new Date().toISOString(),
+        patient: {
+          scanType: '<%= xray.scanType %>',
+          uploadDate: '<%= xray.createdAt %>',
+          fileName: '<%= xray.file_name || "Unknown" %>'
+        },
+        results: {
+          status: '<%= xray.status %>',
+          predictions: <%= JSON.stringify(xray.predictions || {}) %>,
+          confidence: '<%= Object.values(xray.predictions || {}).length > 0 ? Object.values(xray.predictions)[0] : 0 %>',
+          modelVersion: '<%= xray.model_version %>',
+          processingTime: '<%= xray.inference_time_ms %>ms'
+        },
+        metadata: {
+          inferenceId: '<%= xray.inference_id %>',
+          processedAt: '<%= xray.processed_at %>',
+          fileSize: '<%= xray.file_size || 0 %>',
+          notes: '<%= xray.notes || "" %>'
+        }
+      }
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `healthfy-xray-analysis-<%= xray._id %>.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Data exported successfully!', 'success');
+  }
+
+  function printResults() {
+    showNotification('Preparing for print...', 'info');
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  }
+
+  function shareResults() {
+    if (navigator.share) {
+      navigator.share({
+        title: 'X-ray Analysis Results - HealthFy',
+        text: 'Check out my AI-powered X-ray analysis results!',
+        url: window.location.href
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        showNotification('Results link copied to clipboard!', 'success');
+      });
+    }
+  }
+
+  function retryAnalysis() {
+    showNotification('Retrying analysis...', 'info');
+    
+    fetch(`/prediction/xray/<%= xray._id %>/retry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('Analysis restarted successfully!', 'success');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showNotification('Retry failed: ' + (data.message || 'Unknown error'), 'error');
+      }
+    })
+    .catch(error => {
+      showNotification('Error: ' + error.message, 'error');
+    });
+  }
+
+  function generateReportContent(data) {
+    return `
+HEALTHFY - AI X-RAY ANALYSIS REPORT
+=====================================
+
+Analysis Details:
+- Report ID: ${data.patientInfo.analysisId}
+- Scan Type: ${data.patientInfo.scanType}
+- Upload Date: ${new Date(data.patientInfo.uploadDate).toLocaleString()}
+- Processed: ${data.patientInfo.processedDate ? new Date(data.patientInfo.processedDate).toLocaleString() : 'N/A'}
+
+AI Analysis Results:
+- Status: ${data.analysisResults.status.toUpperCase()}
+- Model Version: ${data.analysisResults.modelVersion}
+- Processing Time: ${data.analysisResults.inferenceTime}
+
+Findings:
+${Object.entries(data.analysisResults.predictions)
+  .sort(([,a], [,b]) => b - a)
+  .map(([condition, confidence]) => 
+    `- ${condition.replace(/_/g, ' ')}: ${(confidence * 100).toFixed(1)}%`
+  ).join('\n')}
+
+Summary:
+${data.summary}
+
+=====================================
+Generated: ${new Date().toLocaleString()}
+
+DISCLAIMER: This analysis is generated by AI and should not be used as a substitute for professional medical diagnosis. Please consult with a qualified healthcare provider for proper medical interpretation.
+    `.trim();
+  }
+
+  function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.innerHTML = `
+      <div class="d-flex align-items-center">
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    if (type === 'error') {
+      notification.style.background = 'var(--danger-gradient)';
+    } else if (type === 'info') {
+      notification.style.background = 'var(--primary-gradient)';
+    }
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.classList.add('show'), 100);
+    setTimeout(() => {
+      notification.classList.remove('show');
+      setTimeout(() => notification.remove(), 300);
+    }, 3000);
+  }
+
+  // Print styles
+  window.addEventListener('beforeprint', function() {
+    const style = document.createElement('style');
+    style.textContent = `
+      @media print {
+        .action-btn, .floating-stats, .position-fixed { display: none !important; }
+        .glass-card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        .hero-section { background: #f8f9fa !important; color: #333 !important; }
+        .xray-image { max-height: 400px !important; }
+        .chart-container { page-break-inside: avoid; }
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>
+
+<%- include('../partials/footer') %>

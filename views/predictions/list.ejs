@@ -1,0 +1,601 @@
+<%- include('../partials/header') %>
+
+<style>
+  /* X-ray emoji placeholder styling */
+  .xray-emoji-placeholder {
+    font-size: 2.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: pulse 2s infinite ease-in-out;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+  }
+</style>
+
+<div class="container mt-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">
+        <i class="fas fa-x-ray me-2 text-primary"></i>My X-ray Scans
+      </h2>
+      <p class="text-muted mb-0">
+        View and manage your uploaded X-ray images and analysis results
+      </p>
+    </div>
+    <a href="/prediction/xray/upload" class="btn btn-primary btn-lg">
+      <i class="fas fa-plus me-2"></i>Upload New X-ray
+    </a>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0"><%= stats.total %></h4>
+              <small>Total Scans</small>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-x-ray fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0"><%= stats.completed %></h4>
+              <small>Completed</small>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-check-circle fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card bg-warning text-dark">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0"><%= stats.processing %></h4>
+              <small>Processing</small>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-cog fa-spin fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card bg-danger text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4 class="mb-0"><%= stats.failed %></h4>
+              <small>Failed</small>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-4 mb-2">
+          <label for="statusFilter" class="form-label">Filter by Status</label>
+          <select class="form-select" id="statusFilter">
+            <option value="">All Statuses</option>
+            <option value="completed">Completed</option>
+            <option value="processing">Processing</option>
+            <option value="failed">Failed</option>
+            <option value="uploaded">Uploaded</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-2">
+          <label for="scanTypeFilter" class="form-label">Filter by Type</label>
+          <select class="form-select" id="scanTypeFilter">
+            <option value="">All Types</option>
+            <option value="chest">Chest</option>
+            <option value="abdominal">Abdominal</option>
+            <option value="dental">Dental</option>
+            <option value="spine">Spine</option>
+            <option value="limb">Limb</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="col-md-4 mb-2">
+          <label for="searchInput" class="form-label">Search</label>
+          <input
+            type="text"
+            class="form-control"
+            id="searchInput"
+            placeholder="Search by notes or ID..."
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- X-ray List -->
+  <div id="xrayList">
+    <% if (xrays && xrays.length > 0) { %>
+    <!-- X-ray items -->
+    <% xrays.forEach((xray) => { %>
+    <div
+      class="card mb-3 xray-item"
+      data-status="<%= xray.status %>"
+      data-scan-type="<%= xray.scanType || 'unknown' %>"
+    >
+      <div class="card-body">
+        <div class="row align-items-center">
+          <!-- Thumbnail -->
+          <div class="col-md-2 mb-3 mb-md-0">
+            <% if (xray.image) { %>
+            <div class="position-relative" style="height: 100px; width: 100%;">
+              <img
+                src="/<%= xray.image %>"
+                alt="X-ray thumbnail"
+                class="img-thumbnail xray-thumbnail"
+                style="max-height: 100px; max-width: 100%; display: block;"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+              />
+              <div
+                class="bg-light d-flex align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100 rounded"
+                style="display: none;"
+              >
+                <span class="xray-emoji-placeholder">🩻</span>
+              </div>
+            </div>
+            <% } else { %>
+            <div
+              class="bg-light d-flex align-items-center justify-content-center rounded"
+              style="height: 100px; width: 100%;"
+            >
+              <span class="xray-emoji-placeholder">🩻</span>
+            </div>
+            <% } %>
+          </div>
+
+          <!-- Details -->
+          <div class="col-md-6 mb-3 mb-md-0">
+            <div class="d-flex align-items-center mb-2">
+              <h6 class="mb-0 me-2"><%= xray.scanType || 'Unknown Type' %></h6>
+              <% if (xray.status === 'completed') { %>
+              <span class="badge bg-success">Completed</span>
+              <% } else if (xray.status === 'processing') { %>
+              <span class="badge bg-warning">Processing</span>
+              <% } else if (xray.status === 'failed') { %>
+              <span class="badge bg-danger">Failed</span>
+              <% } else { %>
+              <span class="badge bg-secondary"><%= xray.status %></span>
+              <% } %>
+            </div>
+
+            <div class="mb-2">
+              <small class="text-muted">Uploaded:</small>
+              <span><%= new Date(xray.createdAt).toLocaleDateString() %></span>
+            </div>
+
+            <div class="mb-2">
+              <small class="text-muted">File:</small>
+              <span class="text-muted"><%= xray.file_name || 'Unknown' %></span>
+            </div>
+
+            <!-- Top Predictions (if completed) -->
+            <% if (xray.status === 'completed' && xray.predictions) { %>
+            <div class="mt-2">
+              <small class="text-muted">Top findings:</small>
+              <div class="mt-1">
+                <% const topFindings = Object.entries(xray.predictions)
+                .sort(([,a], [,b]) => b - a) .slice(0, 2);
+                topFindings.forEach(([label, confidence]) => { %>
+                <span class="badge bg-light text-dark me-1">
+                  <%= label.replace(/_/g, ' ') %>: <%= (confidence *
+                  100).toFixed(1) %>%
+                </span>
+                <% }); %>
+              </div>
+            </div>
+            <% } %>
+          </div>
+
+          <!-- Actions -->
+          <div class="col-md-4 text-md-end">
+            <div class="d-grid gap-2 d-md-block">
+              <a
+                href="/prediction/xray/<%= xray._id %>"
+                class="btn btn-primary btn-sm"
+              >
+                <i class="fas fa-eye me-1"></i>View
+              </a>
+              <% if (xray.status === 'failed') { %>
+              <button
+                class="btn btn-outline-warning btn-sm"
+                onclick="retryAnalysis('<%= xray._id %>')"
+              >
+                <i class="fas fa-redo me-1"></i>Retry
+              </button>
+              <% } %>
+              <button
+                class="btn btn-outline-danger btn-sm"
+                onclick="deleteXray('<%= xray._id %>')"
+              >
+                <i class="fas fa-trash me-1"></i>Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% }); %> <% } else { %>
+    <!-- Empty state -->
+    <div class="text-center py-5">
+      <i class="fas fa-x-ray fa-3x text-muted mb-3"></i>
+      <h5 class="text-muted">No X-ray scans found</h5>
+      <p class="text-muted mb-3">
+        Upload your first X-ray to get started with AI-powered analysis
+      </p>
+      <a href="/prediction/xray/upload" class="btn btn-primary">
+        <i class="fas fa-upload me-2"></i>Upload First X-ray
+      </a>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Load More Button -->
+  <div class="text-center mt-4 d-none" id="loadMoreContainer">
+    <button class="btn btn-outline-primary" id="loadMoreBtn">
+      <i class="fas fa-chevron-down me-2"></i>Load More
+    </button>
+  </div>
+</div>
+
+<!-- X-ray Item Template -->
+<template id="xrayItemTemplate">
+  <div
+    class="card mb-3 xray-item"
+    data-status=""
+    data-scan-type=""
+    data-notes=""
+  >
+    <div class="card-body">
+      <div class="row align-items-center">
+        <!-- Thumbnail -->
+        <div class="col-md-2 mb-3 mb-md-0">
+          <div class="position-relative" style="height: 100px; width: 100%;">
+            <img
+              src=""
+              alt="X-ray thumbnail"
+              class="img-thumbnail xray-thumbnail"
+              style="max-height: 100px; max-width: 100%; display: block;"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <div
+              class="bg-light d-flex align-items-center justify-content-center position-absolute top-0 start-0 w-100 h-100 rounded"
+              style="display: none;"
+            >
+              <span class="xray-emoji-placeholder">🩻</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div class="col-md-6 mb-3 mb-md-0">
+          <div class="d-flex align-items-center mb-2">
+            <h6 class="mb-0 me-2 xray-scan-type"></h6>
+            <span class="badge xray-status-badge"></span>
+          </div>
+
+          <div class="mb-2">
+            <small class="text-muted">Uploaded:</small>
+            <span class="xray-date"></span>
+          </div>
+
+          <div class="mb-2">
+            <small class="text-muted">Notes:</small>
+            <span class="xray-notes text-muted">No notes</span>
+          </div>
+
+          <!-- Top Predictions (if completed) -->
+          <div class="xray-predictions d-none">
+            <small class="text-muted">Top findings:</small>
+            <div class="mt-1">
+              <span
+                class="badge bg-light text-dark me-1 xray-top-finding"
+              ></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="col-md-4 text-md-end">
+          <div class="d-grid gap-2 d-md-block">
+            <a href="" class="btn btn-primary btn-sm xray-view-btn">
+              <i class="fas fa-eye me-1"></i>View
+            </a>
+            <button
+              class="btn btn-outline-warning btn-sm xray-retry-btn d-none"
+            >
+              <i class="fas fa-redo me-1"></i>Retry
+            </button>
+            <button class="btn btn-outline-danger btn-sm xray-delete-btn">
+              <i class="fas fa-trash me-1"></i>Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    let xrays = [];
+    let filteredXrays = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
+    // DOM elements
+    const statusFilter = document.getElementById('statusFilter');
+    const scanTypeFilter = document.getElementById('scanTypeFilter');
+    const searchInput = document.getElementById('searchInput');
+    const xrayItems = document.getElementById('xrayItems');
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const template = document.getElementById('xrayItemTemplate');
+
+    // Load X-rays
+    loadXrays();
+
+    // Event listeners
+    statusFilter.addEventListener('change', filterXrays);
+    scanTypeFilter.addEventListener('change', filterXrays);
+    searchInput.addEventListener('input', filterXrays);
+    loadMoreBtn.addEventListener('click', loadMore);
+
+    function loadXrays() {
+      fetch('/prediction/xray')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            xrays = data.data;
+            updateStats();
+            filterXrays();
+            loadingState.classList.add('d-none');
+          } else {
+            throw new Error(data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading X-rays:', error);
+          loadingState.classList.add('d-none');
+          emptyState.classList.remove('d-none');
+        });
+    }
+
+    function updateStats() {
+      const total = xrays.length;
+      const completed = xrays.filter(x => x.status === 'completed').length;
+      const processing = xrays.filter(x => x.status === 'processing').length;
+      const failed = xrays.filter(x => x.status === 'failed').length;
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('completedCount').textContent = completed;
+      document.getElementById('processingCount').textContent = processing;
+      document.getElementById('failedCount').textContent = failed;
+    }
+
+    function filterXrays() {
+      const statusFilterValue = statusFilter.value;
+      const scanTypeFilterValue = scanTypeFilter.value;
+      const searchValue = searchInput.value.toLowerCase();
+
+      filteredXrays = xrays.filter(xray => {
+        const statusMatch = !statusFilterValue || xray.status === statusFilterValue;
+        const scanTypeMatch = !scanTypeFilterValue || xray.scanType === scanTypeFilterValue;
+        const searchMatch = !searchValue ||
+          (xray.notes && xray.notes.toLowerCase().includes(searchValue)) ||
+          xray._id.toLowerCase().includes(searchValue);
+
+        return statusMatch && scanTypeMatch && searchMatch;
+      });
+
+      currentPage = 1;
+      renderXrays();
+    }
+
+    function renderXrays() {
+      if (filteredXrays.length === 0) {
+        xrayItems.innerHTML = '';
+        emptyState.classList.remove('d-none');
+        loadMoreContainer.classList.add('d-none');
+        return;
+      }
+
+      emptyState.classList.add('d-none');
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageXrays = filteredXrays.slice(startIndex, endIndex);
+
+      xrayItems.innerHTML = '';
+      pageXrays.forEach(xray => {
+        const xrayElement = createXrayElement(xray);
+        xrayItems.appendChild(xrayElement);
+      });
+
+      // Show/hide load more button
+      if (endIndex < filteredXrays.length) {
+        loadMoreContainer.classList.remove('d-none');
+      } else {
+        loadMoreContainer.classList.add('d-none');
+      }
+    }
+
+    function createXrayElement(xray) {
+      const clone = template.content.cloneNode(true);
+
+      // Set data attributes for filtering
+      clone.querySelector('.xray-item').dataset.status = xray.status;
+      clone.querySelector('.xray-item').dataset.scanType = xray.scanType;
+      clone.querySelector('.xray-item').dataset.notes = xray.notes || '';
+
+      // Set content
+      const thumbnailImg = clone.querySelector('.xray-thumbnail');
+      if (xray.image) {
+        thumbnailImg.src = `/${xray.image}`;
+      } else {
+        // If no image path, hide the img and show emoji placeholder
+        thumbnailImg.style.display = 'none';
+        thumbnailImg.nextElementSibling.style.display = 'flex';
+      }
+      clone.querySelector('.xray-scan-type').textContent = xray.scanType.charAt(0).toUpperCase() + xray.scanType.slice(1);
+      clone.querySelector('.xray-date').textContent = new Date(xray.createdAt).toLocaleDateString();
+      clone.querySelector('.xray-notes').textContent = xray.notes || 'No notes';
+      clone.querySelector('.xray-view-btn').href = `/prediction/xray/${xray._id}`;
+
+      // Set status badge
+      const statusBadge = clone.querySelector('.xray-status-badge');
+      statusBadge.textContent = xray.status.charAt(0).toUpperCase() + xray.status.slice(1);
+
+      if (xray.status === 'completed') {
+        statusBadge.className = 'badge bg-success';
+      } else if (xray.status === 'processing') {
+        statusBadge.className = 'badge bg-warning text-dark';
+      } else if (xray.status === 'failed') {
+        statusBadge.className = 'badge bg-danger';
+      } else {
+        statusBadge.className = 'badge bg-secondary';
+      }
+
+      // Show predictions if completed
+      if (xray.status === 'completed' && xray.predictions) {
+        const predictionsDiv = clone.querySelector('.xray-predictions');
+        const topFinding = clone.querySelector('.xray-top-finding');
+
+        const topPrediction = Object.entries(xray.predictions)
+          .sort(([,a], [,b]) => b - a)[0];
+
+        if (topPrediction) {
+          topFinding.textContent = `${topPrediction[0].replace(/_/g, ' ')} (${(topPrediction[1] * 100).toFixed(1)}%)`;
+          predictionsDiv.classList.remove('d-none');
+        }
+      }
+
+      // Show retry button if failed
+      if (xray.status === 'failed') {
+        const retryBtn = clone.querySelector('.xray-retry-btn');
+        retryBtn.classList.remove('d-none');
+        retryBtn.addEventListener('click', () => retryXray(xray._id));
+      }
+
+      // Add delete functionality
+      const deleteBtn = clone.querySelector('.xray-delete-btn');
+      deleteBtn.addEventListener('click', () => deleteXray(xray._id));
+
+      return clone;
+    }
+
+    function loadMore() {
+      currentPage++;
+      renderXrays();
+    }
+
+    function retryXray(xrayId) {
+      if (confirm('Retry the analysis for this X-ray?')) {
+        fetch(`/prediction/xray/${xrayId}/retry`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              location.reload();
+            } else {
+              alert('Retry failed: ' + (data.message || 'Unknown error'));
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Retry failed. Please try again.');
+          });
+        }
+      }
+
+      function deleteXray(xrayId) {
+        if (confirm('Are you sure you want to delete this X-ray? This action cannot be undone.')) {
+          fetch(`/prediction/xray/${xrayId}`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              location.reload();
+            } else {
+              alert('Delete failed: ' + (data.message || 'Unknown error'));
+            }
+          })
+          .catch(error => {
+            console.error('Error:', error);
+            alert('Delete failed. Please try again.');
+          });
+        }
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            loadXrays(); // Reload the list
+          } else {
+            alert('Retry failed: ' + data.message);
+          }
+        })
+        .catch(error => {
+          alert('Error: ' + error.message);
+        });
+      }
+    }
+
+    function deleteXray(xrayId) {
+      if (confirm('Are you sure you want to delete this X-ray? This action cannot be undone.')) {
+        // Note: You'll need to implement the delete endpoint
+        alert('Delete functionality not yet implemented');
+      }
+    }
+
+    // Auto-refresh processing X-rays
+    setInterval(() => {
+      const hasProcessing = xrays.some(x => x.status === 'processing');
+      if (hasProcessing) {
+        loadXrays();
+      }
+    }, 30000); // Refresh every 30 seconds if there are processing X-rays
+  });
+</script>
+
+<%- include('../partials/footer') %>

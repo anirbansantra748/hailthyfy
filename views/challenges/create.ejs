@@ -1,0 +1,476 @@
+<%- include('../partials/header') %>
+
+<div class="create-challenge-page">
+    <!-- Hero Section -->
+    <div class="hero-section bg-gradient-success text-white py-5 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-5 font-weight-bold mb-3">
+                        <i class="fas fa-plus-circle me-3"></i>Create New Challenge
+                    </h1>
+                    <p class="lead mb-4">Design an engaging health challenge to motivate yourself and inspire others on their wellness journey!</p>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent p-0">
+                            <li class="breadcrumb-item"><a href="/challenges" class="text-white-50">Challenges</a></li>
+                            <li class="breadcrumb-item active text-white" aria-current="page">Create New</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="create-icon">
+                        <i class="fas fa-lightbulb fa-5x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Challenge Creation Form -->
+                <div class="card border-0 shadow-lg">
+                    <div class="card-header bg-white border-0 py-4">
+                        <h4 class="mb-0">
+                            <i class="fas fa-edit me-2 text-success"></i>Challenge Details
+                        </h4>
+                        <p class="text-muted mb-0 mt-2">Fill in the information below to create your custom health challenge.</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="createChallengeForm">
+                            <!-- Basic Information -->
+                            <div class="section mb-5">
+                                <h5 class="section-title mb-4">
+                                    <i class="fas fa-info-circle me-2"></i>Basic Information
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="title" class="form-label">Challenge Title *</label>
+                                        <input type="text" class="form-control form-control-lg" id="title" name="title" 
+                                               placeholder="Enter a catchy title for your challenge" required maxlength="100">
+                                        <div class="form-text">Make it inspiring and clear (max 100 characters)</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="category" class="form-label">Category *</label>
+                                        <select class="form-select form-select-lg" id="category" name="category" required>
+                                            <option value="">Select a category</option>
+                                            <option value="fitness">🏃‍♂️ Fitness & Exercise</option>
+                                            <option value="nutrition">🥗 Nutrition & Diet</option>
+                                            <option value="mental-health">🧠 Mental Health</option>
+                                            <option value="sleep">😴 Sleep & Rest</option>
+                                            <option value="hydration">💧 Hydration</option>
+                                            <option value="meditation">🧘‍♂️ Meditation & Mindfulness</option>
+                                            <option value="social">👥 Social Wellness</option>
+                                            <option value="medical">⚕️ Medical & Healthcare</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="difficulty" class="form-label">Difficulty Level *</label>
+                                        <select class="form-select form-select-lg" id="difficulty" name="difficulty" required>
+                                            <option value="">Select difficulty</option>
+                                            <option value="beginner">🟢 Beginner - Easy to start</option>
+                                            <option value="intermediate">🟡 Intermediate - Moderate effort</option>
+                                            <option value="advanced">🔴 Advanced - Requires dedication</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="description" class="form-label">Short Description *</label>
+                                        <textarea class="form-control" id="description" name="description" rows="3" 
+                                                  placeholder="Briefly describe what this challenge is about" required maxlength="500"></textarea>
+                                        <div class="form-text">Keep it concise and motivating (max 500 characters)</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="instructions" class="form-label">Detailed Instructions</label>
+                                        <textarea class="form-control" id="instructions" name="instructions" rows="5" 
+                                                  placeholder="Provide detailed instructions on how to complete this challenge"></textarea>
+                                        <div class="form-text">Clear instructions help participants succeed</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Challenge Configuration -->
+                            <div class="section mb-5">
+                                <h5 class="section-title mb-4">
+                                    <i class="fas fa-cogs me-2"></i>Challenge Configuration
+                                </h5>
+
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label for="targetValue" class="form-label">Target Value *</label>
+                                        <input type="number" class="form-control form-control-lg" id="targetValue" 
+                                               name="targetValue" placeholder="100" required min="1">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="targetUnit" class="form-label">Unit *</label>
+                                        <select class="form-select form-select-lg" id="targetUnit" name="targetUnit" required>
+                                            <option value="">Select unit</option>
+                                            <option value="steps">Steps</option>
+                                            <option value="minutes">Minutes</option>
+                                            <option value="hours">Hours</option>
+                                            <option value="days">Days</option>
+                                            <option value="times">Times</option>
+                                            <option value="glasses">Glasses</option>
+                                            <option value="servings">Servings</option>
+                                            <option value="kg">Kilograms</option>
+                                            <option value="lbs">Pounds</option>
+                                            <option value="calories">Calories</option>
+                                            <option value="points">Points</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="type" class="form-label">Challenge Type *</label>
+                                        <select class="form-select form-select-lg" id="type" name="type" required>
+                                            <option value="">Select type</option>
+                                            <option value="daily">📅 Daily Goal</option>
+                                            <option value="weekly">📆 Weekly Goal</option>
+                                            <option value="monthly">🗓️ Monthly Goal</option>
+                                            <option value="one-time">⚡ One-time Goal</option>
+                                            <option value="ongoing">🔄 Ongoing Challenge</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="startDate" class="form-label">Start Date *</label>
+                                        <input type="datetime-local" class="form-control form-control-lg" 
+                                               id="startDate" name="startDate" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="endDate" class="form-label">End Date *</label>
+                                        <input type="datetime-local" class="form-control form-control-lg" 
+                                               id="endDate" name="endDate" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Rewards & Motivation -->
+                            <div class="section mb-5">
+                                <h5 class="section-title mb-4">
+                                    <i class="fas fa-trophy me-2"></i>Rewards & Motivation
+                                </h5>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="rewardPoints" class="form-label">Reward Points</label>
+                                        <input type="number" class="form-control" id="rewardPoints" 
+                                               name="rewardPoints" placeholder="100" min="0" value="100">
+                                        <div class="form-text">Points awarded upon completion</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="isPublic" class="form-label">Visibility</label>
+                                        <select class="form-select" id="isPublic" name="isPublic">
+                                            <option value="true">🌐 Public - Anyone can join</option>
+                                            <option value="false">🔒 Private - Only you can see it</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="tags" class="form-label">Tags (Optional)</label>
+                                        <input type="text" class="form-control" id="tags" name="tags" 
+                                               placeholder="fitness, health, daily, motivation">
+                                        <div class="form-text">Separate tags with commas to help others find your challenge</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12 mb-3">
+                                        <label for="tips" class="form-label">Tips & Advice</label>
+                                        <textarea class="form-control" id="tips" name="tips" rows="3" 
+                                                  placeholder="Share helpful tips to help participants succeed"></textarea>
+                                        <div class="form-text">Motivational tips increase engagement</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="form-actions">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-between flex-wrap gap-3">
+                                    <div>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="history.back()">
+                                            <i class="fas fa-arrow-left me-2"></i>Cancel
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-outline-primary me-2" id="previewBtn">
+                                            <i class="fas fa-eye me-2"></i>Preview
+                                        </button>
+                                        <button type="submit" class="btn btn-success btn-lg">
+                                            <i class="fas fa-rocket me-2"></i>Create Challenge
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+.bg-gradient-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.section-title {
+    color: #495057;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0.5rem;
+}
+
+.create-challenge-page .form-control,
+.create-challenge-page .form-select {
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.create-challenge-page .form-control:focus,
+.create-challenge-page .form-select:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.create-challenge-page .form-control-lg,
+.create-challenge-page .form-select-lg {
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+}
+
+.form-actions {
+    background: rgba(248, 249, 250, 0.5);
+    margin: 0 -1.5rem -1.5rem;
+    padding: 1.5rem;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
+
+.create-icon {
+    opacity: 0.7;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.5);
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+$(document).ready(function() {
+    // Set minimum date to today
+    const now = new Date();
+    const today = now.toISOString().slice(0, 16);
+    $('#startDate').attr('min', today);
+    $('#endDate').attr('min', today);
+
+    // Update end date when start date changes
+    $('#startDate').on('change', function() {
+        const startDate = new Date($(this).val());
+        const minEndDate = new Date(startDate.getTime() + 24 * 60 * 60 * 1000); // Add 1 day
+        $('#endDate').attr('min', minEndDate.toISOString().slice(0, 16));
+    });
+
+    // Form validation and submission
+    $('#createChallengeForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+
+        const formData = gatherFormData();
+        submitChallenge(formData);
+    });
+
+    // Preview functionality
+    $('#previewBtn').on('click', function() {
+        if (validateForm()) {
+            showPreview();
+        }
+    });
+
+    // Auto-resize textareas
+    $('textarea').on('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    function validateForm() {
+        const requiredFields = ['title', 'category', 'difficulty', 'description', 'targetValue', 'targetUnit', 'type', 'startDate', 'endDate'];
+        let isValid = true;
+
+        // Reset previous validation states
+        $('.is-invalid').removeClass('is-invalid');
+
+        requiredFields.forEach(field => {
+            const element = $(`#${field}`);
+            if (!element.val() || element.val().trim() === '') {
+                element.addClass('is-invalid');
+                isValid = false;
+            }
+        });
+
+        // Date validation
+        const startDate = new Date($('#startDate').val());
+        const endDate = new Date($('#endDate').val());
+        
+        if (endDate <= startDate) {
+            $('#endDate').addClass('is-invalid');
+            showToast('Error', 'End date must be after start date', 'error');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            showToast('Error', 'Please fill in all required fields correctly', 'error');
+        }
+
+        return isValid;
+    }
+
+    function gatherFormData() {
+        const tags = $('#tags').val() ? $('#tags').val().split(',').map(tag => tag.trim()) : [];
+        const tips = $('#tips').val() ? $('#tips').val().split('\n').map(tip => tip.trim()).filter(tip => tip) : [];
+
+        return {
+            title: $('#title').val(),
+            description: $('#description').val(),
+            category: $('#category').val(),
+            type: $('#type').val(),
+            difficulty: $('#difficulty').val(),
+            target: {
+                value: parseInt($('#targetValue').val()),
+                unit: $('#targetUnit').val(),
+                description: `Reach ${$('#targetValue').val()} ${$('#targetUnit').val()}`
+            },
+            duration: {
+                start: new Date($('#startDate').val()),
+                end: new Date($('#endDate').val())
+            },
+            rewards: {
+                points: parseInt($('#rewardPoints').val()) || 100,
+                badges: [],
+                achievements: []
+            },
+            instructions: $('#instructions').val(),
+            tips: tips,
+            tags: tags,
+            isPublic: $('#isPublic').val() === 'true',
+            isActive: true
+        };
+    }
+
+    function submitChallenge(formData) {
+        // Show loading state
+        const submitBtn = $('button[type="submit"]');
+        const originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-2"></span>Creating...');
+
+        fetch('/challenges/api/challenges', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Success', 'Challenge created successfully!', 'success');
+                setTimeout(() => {
+                    window.location.href = `/challenges/challenge/${data.data._id}`;
+                }, 1500);
+            } else {
+                throw new Error(data.error || 'Failed to create challenge');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error', error.message, 'error');
+            submitBtn.prop('disabled', false).html(originalText);
+        });
+    }
+
+    function showPreview() {
+        const formData = gatherFormData();
+        const previewModal = $(`
+            <div class="modal fade" id="previewModal" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Challenge Preview</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="challenge-preview">
+                                <h4>${formData.title}</h4>
+                                <div class="badges mb-3">
+                                    <span class="badge bg-primary">${formData.category}</span>
+                                    <span class="badge bg-warning text-dark">${formData.difficulty}</span>
+                                    <span class="badge bg-info">${formData.type}</span>
+                                </div>
+                                <p><strong>Goal:</strong> ${formData.target.value} ${formData.target.unit}</p>
+                                <p><strong>Description:</strong> ${formData.description}</p>
+                                <p><strong>Duration:</strong> ${new Date(formData.duration.start).toLocaleDateString()} - ${new Date(formData.duration.end).toLocaleDateString()}</p>
+                                <p><strong>Reward:</strong> ${formData.rewards.points} points</p>
+                                ${formData.instructions ? `<p><strong>Instructions:</strong><br>${formData.instructions.replace(/\n/g, '<br>')}</p>` : ''}
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Edit</button>
+                            <button type="button" class="btn btn-success" onclick="$('#createChallengeForm').submit()">Create Challenge</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+
+        $('body').append(previewModal);
+        previewModal.modal('show');
+        previewModal.on('hidden.bs.modal', function() {
+            previewModal.remove();
+        });
+    }
+
+    function showToast(title, message, type) {
+        // Simple alert for now - you can replace with a proper toast library
+        const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        const alert = $(`
+            <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                 style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                <strong>${title}:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `);
+        $('body').append(alert);
+        
+        setTimeout(() => {
+            alert.alert('close');
+        }, 5000);
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,1082 @@
+<%- include('../partials/header') %>
+
+<style>
+  :root {
+    --healthcare-primary: #10B981;
+    --healthcare-secondary: #059669;
+    --healthcare-light: #ECFDF5;
+    --healthcare-accent: #34D399;
+    --healthcare-dark: #047857;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --bg-light: #F9FAFB;
+    --white: #FFFFFF;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  }
+
+  body {
+    background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Animated Background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(16,185,129,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(16,185,129,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(16,185,129,0.1)"/><circle cx="60" cy="30" r="1.5" fill="rgba(16,185,129,0.1)"/><circle cx="10" cy="70" r="1" fill="rgba(16,185,129,0.1)"/><circle cx="90" cy="40" r="2" fill="rgba(16,185,129,0.1)"/></svg>') repeat;
+    opacity: 0.4;
+    animation: float 25s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-1deg); }
+  }
+
+  .create-header {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    padding: 4rem 0 3rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .create-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M20,20 L25,15 L30,20 M25,15 L25,25 M45,15 Q50,10 55,15 T65,15 M15,35 L35,35 M25,30 L25,40 M45,35 C50,30 55,40 60,35 M75,20 C80,15 85,25 90,20" stroke="rgba(255,255,255,0.1)" stroke-width="2" fill="none"/></svg>') repeat;
+    opacity: 0.3;
+    animation: medicalFloat 20s ease-in-out infinite;
+  }
+
+  @keyframes medicalFloat {
+    0%, 100% { transform: translateY(0px) translateX(0px); }
+    25% { transform: translateY(-5px) translateX(2px); }
+    50% { transform: translateY(0px) translateX(-2px); }
+    75% { transform: translateY(3px) translateX(1px); }
+  }
+
+  .create-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .create-subtitle {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .back-navigation {
+    margin: 2rem 0 1rem;
+  }
+
+  .btn-back {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    color: var(--healthcare-secondary);
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 12px 20px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-back:hover {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .create-container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 32px;
+    box-shadow: var(--shadow-2xl);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .create-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--healthcare-primary) 0%, var(--healthcare-accent) 50%, var(--healthcare-secondary) 100%);
+    z-index: 1;
+  }
+
+  .create-form {
+    padding: 3rem;
+  }
+
+  .form-section {
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideUp 0.6s ease forwards;
+  }
+
+  .form-section:nth-child(1) { animation-delay: 0.1s; }
+  .form-section:nth-child(2) { animation-delay: 0.2s; }
+  .form-section:nth-child(3) { animation-delay: 0.3s; }
+  .form-section:nth-child(4) { animation-delay: 0.4s; }
+  .form-section:nth-child(5) { animation-delay: 0.5s; }
+  .form-section:nth-child(6) { animation-delay: 0.6s; }
+
+  @keyframes slideUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-description {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+  }
+
+  .form-label {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+  }
+
+  .form-label .required {
+    color: #EF4444;
+    margin-left: 4px;
+  }
+
+  .form-control {
+    width: 100%;
+    border: 2px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: #FAFAFA;
+    font-family: inherit;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--healthcare-primary);
+    background: white;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .form-control:hover:not(:focus) {
+    border-color: #D1D5DB;
+    background: white;
+  }
+
+  .form-textarea {
+    min-height: 150px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.6;
+  }
+
+  .form-select {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%2316a34a"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 20px;
+    padding-right: 50px;
+    appearance: none;
+  }
+
+  .tags-input {
+    position: relative;
+  }
+
+  .tags-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    min-height: 30px;
+    padding: 10px;
+    background: #F9FAFB;
+    border-radius: 12px;
+    border: 2px dashed #E5E7EB;
+    transition: all 0.3s ease;
+  }
+
+  .tags-preview.has-tags {
+    background: white;
+    border-color: var(--healthcare-light);
+    border-style: solid;
+  }
+
+  .tag-item {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: tagAppear 0.3s ease;
+  }
+
+  @keyframes tagAppear {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .file-upload-area {
+    border: 2px dashed #E5E7EB;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: #FAFAFA;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .file-upload-area:hover {
+    border-color: var(--healthcare-primary);
+    background: var(--healthcare-light);
+    transform: translateY(-2px);
+  }
+
+  .file-upload-area.dragover {
+    border-color: var(--healthcare-primary);
+    background: var(--healthcare-light);
+    transform: scale(1.02);
+    border-style: solid;
+  }
+  
+  .file-upload-area.dragover .file-upload-text {
+    color: var(--healthcare-primary);
+  }
+  
+  .file-upload-area.dragover .file-upload-icon {
+    color: var(--healthcare-secondary);
+    transform: scale(1.1);
+  }
+
+  .file-upload-icon {
+    font-size: 3rem;
+    color: var(--healthcare-primary);
+    margin-bottom: 1rem;
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .file-upload-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .file-upload-subtext {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .file-input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    z-index: 1;
+    top: 0;
+    left: 0;
+  }
+  
+  .file-upload-content {
+    position: relative;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .image-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+
+  .preview-item {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: transform 0.3s ease;
+  }
+
+  .preview-item:hover {
+    transform: scale(1.05);
+  }
+
+  .preview-image {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+  }
+
+  .preview-remove {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+  }
+
+  .preview-remove:hover {
+    background: #DC2626;
+    transform: scale(1.1);
+  }
+
+  .alert {
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    border: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: alertSlide 0.5s ease;
+  }
+
+  @keyframes alertSlide {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .alert-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+    border-left: 4px solid var(--healthcare-primary);
+    color: var(--healthcare-dark);
+  }
+
+  .alert-error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+    border-left: 4px solid #EF4444;
+    color: #DC2626;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid #F3F4F6;
+  }
+
+  .btn {
+    padding: 16px 32px;
+    border: none;
+    border-radius: 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+  }
+
+  .btn:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .btn-secondary {
+    background: #F3F4F6;
+    color: var(--text-primary);
+    border: 2px solid #E5E7EB;
+  }
+
+  .btn-secondary:hover {
+    background: #E5E7EB;
+    transform: translateY(-2px);
+  }
+
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .loading-spinner {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .form-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--healthcare-primary) 0%, var(--healthcare-accent) 100%);
+    transition: width 0.3s ease;
+    z-index: 1000;
+  }
+
+  .word-count {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-align: right;
+    margin-top: 5px;
+  }
+
+  .word-count.warning {
+    color: #F59E0B;
+  }
+
+  .word-count.error {
+    color: #EF4444;
+  }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    .create-title {
+      font-size: 2.5rem;
+    }
+
+    .create-form {
+      padding: 2rem 1.5rem;
+    }
+
+    .form-actions {
+      flex-direction: column-reverse;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .file-upload-area {
+      padding: 2rem 1rem;
+    }
+
+    .image-preview {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+  }
+
+  /* Accessibility */
+  .form-control:focus-visible,
+  .btn:focus-visible {
+    outline: 3px solid var(--healthcare-primary);
+    outline-offset: 2px;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #F3F4F6;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--healthcare-dark);
+  }
+</style>
+
+<!-- Progress Bar -->
+<div class="form-progress" id="formProgress"></div>
+
+<!-- Header Section -->
+<div class="create-header">
+  <div class="container">
+    <div class="text-center">
+      <h1 class="create-title">
+        <i class="fas fa-pen-fancy me-3"></i>
+        Share Your Knowledge
+      </h1>
+      <p class="create-subtitle">
+        Create compelling healthcare content that educates, inspires, and connects with the medical community
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Back Navigation -->
+  <div class="back-navigation">
+    <a href="/posts" class="btn-back">
+      <i class="fas fa-arrow-left"></i>
+      Back to Community
+    </a>
+  </div>
+
+  <!-- Main Form Container -->
+  <div class="create-container">
+    <form action="/posts" method="post" enctype="multipart/form-data" class="create-form" id="createPostForm">
+      
+      <!-- Alert Messages -->
+      <% if (typeof error !== 'undefined' && error && error.length) { %>
+        <div class="alert alert-error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <span><%= Array.isArray(error) ? error[0] : error %></span>
+        </div>
+      <% } %>
+      
+      <% if (typeof success !== 'undefined' && success && success.length) { %>
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle"></i>
+          <span><%= Array.isArray(success) ? success[0] : success %></span>
+        </div>
+      <% } %>
+
+      <!-- Title Section -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-heading"></i>
+          Article Title
+        </h2>
+        <p class="section-description">
+          Create a compelling, descriptive title that captures the essence of your healthcare topic
+        </p>
+        <div class="form-group">
+          <label for="title" class="form-label">
+            Title <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="title" 
+            name="title" 
+            class="form-control" 
+            placeholder="e.g., Latest Advances in Cardiac Surgery Techniques"
+            required 
+            maxlength="150"
+          />
+          <div class="word-count" id="titleCount">0 / 150 characters</div>
+        </div>
+      </div>
+
+      <!-- Content Section -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-file-medical-alt"></i>
+          Article Content
+        </h2>
+        <p class="section-description">
+          Share your expertise, research findings, case studies, or educational content that will benefit the healthcare community
+        </p>
+        <div class="form-group">
+          <label for="content" class="form-label">
+            Content <span class="required">*</span>
+          </label>
+          <textarea 
+            id="content" 
+            name="content" 
+            class="form-control form-textarea" 
+            placeholder="Write your comprehensive healthcare article here. Include detailed information, evidence-based insights, and practical applications..."
+            required
+            rows="8"
+          ></textarea>
+          <div class="word-count" id="contentCount">0 words</div>
+        </div>
+      </div>
+
+      <!-- Category Section -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-folder-open"></i>
+          Category & Classification
+        </h2>
+        <p class="section-description">
+          Choose the most relevant category to help readers find your content easily
+        </p>
+        <div class="form-group">
+          <label for="category" class="form-label">
+            Category
+          </label>
+          <select id="category" name="category" class="form-control form-select">
+            <option value="general">General Medicine</option>
+            <option value="cardiology">Cardiology</option>
+            <option value="neurology">Neurology</option>
+            <option value="pediatrics">Pediatrics</option>
+            <option value="surgery">Surgery</option>
+            <option value="emergency">Emergency Medicine</option>
+            <option value="radiology">Radiology</option>
+            <option value="pathology">Pathology</option>
+            <option value="psychiatry">Psychiatry</option>
+            <option value="dermatology">Dermatology</option>
+            <option value="oncology">Oncology</option>
+            <option value="orthopedics">Orthopedics</option>
+            <option value="research">Medical Research</option>
+            <option value="education">Medical Education</option>
+            <option value="technology">Healthcare Technology</option>
+            <option value="policy">Healthcare Policy</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tags Section -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-tags"></i>
+          Tags & Keywords
+        </h2>
+        <p class="section-description">
+          Add relevant tags to improve discoverability. Separate multiple tags with commas
+        </p>
+        <div class="form-group">
+          <label for="tags" class="form-label">
+            Tags
+          </label>
+          <div class="tags-input">
+            <input 
+              type="text" 
+              id="tags" 
+              name="tags" 
+              class="form-control" 
+              placeholder="e.g., heart disease, prevention, diagnosis, treatment"
+            />
+            <div class="tags-preview" id="tagsPreview">
+              <small class="text-muted">Tags will appear here as you type...</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Images Section -->
+      <div class="form-section">
+        <h2 class="section-title">
+          <i class="fas fa-images"></i>
+          Visual Content
+        </h2>
+        <p class="section-description">
+          Upload relevant images, charts, diagrams, or medical illustrations to enhance your article
+        </p>
+        <div class="form-group">
+          <label class="form-label">
+            Images (Optional)
+          </label>
+          <div class="file-upload-area" id="fileUploadArea">
+            <input 
+              type="file" 
+              name="images" 
+              multiple 
+              accept="image/*" 
+              class="file-input" 
+              id="imageInput"
+            />
+            <div class="file-upload-content">
+              <div class="file-upload-icon">
+                <i class="fas fa-cloud-upload-alt"></i>
+              </div>
+              <div class="file-upload-text">Click to browse or drag images here</div>
+              <div class="file-upload-subtext">
+                Supports: JPG, PNG, GIF • Max size: 5MB each • Up to 5 images
+              </div>
+            </div>
+          </div>
+          <div class="image-preview" id="imagePreview"></div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <a href="/posts" class="btn btn-secondary">
+          <i class="fas fa-times"></i>
+          Cancel
+        </a>
+        <button type="submit" class="btn btn-primary" id="submitBtn">
+          <i class="fas fa-paper-plane"></i>
+          <span class="loading-spinner" id="loadingSpinner"></span>
+          <span id="submitText">Publish Article</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// Enhanced form functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('createPostForm');
+  const titleInput = document.getElementById('title');
+  const contentTextarea = document.getElementById('content');
+  const tagsInput = document.getElementById('tags');
+  const imageInput = document.getElementById('imageInput');
+  const fileUploadArea = document.getElementById('fileUploadArea');
+  const imagePreview = document.getElementById('imagePreview');
+  const submitBtn = document.getElementById('submitBtn');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+  const submitText = document.getElementById('submitText');
+  const formProgress = document.getElementById('formProgress');
+  
+  let selectedFiles = [];
+  
+  // Character/Word counters
+  function updateTitleCount() {
+    const count = titleInput.value.length;
+    const counter = document.getElementById('titleCount');
+    counter.textContent = `${count} / 150 characters`;
+    
+    if (count > 120) counter.classList.add('warning');
+    else counter.classList.remove('warning');
+    
+    if (count > 140) counter.classList.add('error');
+    else counter.classList.remove('error');
+  }
+  
+  function updateContentCount() {
+    const words = contentTextarea.value.trim().split(/\s+/).filter(word => word.length > 0).length;
+    const counter = document.getElementById('contentCount');
+    counter.textContent = `${words} words`;
+    
+    if (words < 50) {
+      counter.classList.add('warning');
+      counter.textContent += ' (minimum 50 words recommended)';
+    } else {
+      counter.classList.remove('warning');
+    }
+  }
+  
+  // Progress tracking
+  function updateProgress() {
+    let progress = 0;
+    const fields = {
+      title: titleInput.value.trim().length > 0 ? 30 : 0,
+      content: contentTextarea.value.trim().length > 50 ? 40 : 0,
+      category: document.getElementById('category').value !== 'general' ? 15 : 0,
+      tags: tagsInput.value.trim().length > 0 ? 10 : 0,
+      images: selectedFiles.length > 0 ? 5 : 0
+    };
+    
+    progress = Object.values(fields).reduce((sum, val) => sum + val, 0);
+    formProgress.style.width = progress + '%';
+  }
+  
+  // Tags preview
+  function updateTagsPreview() {
+    const tagsPreview = document.getElementById('tagsPreview');
+    const tags = tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+    
+    if (tags.length === 0) {
+      tagsPreview.innerHTML = '<small class="text-muted">Tags will appear here as you type...</small>';
+      tagsPreview.classList.remove('has-tags');
+    } else {
+      tagsPreview.innerHTML = tags.map(tag => 
+        `<span class="tag-item">
+          <i class="fas fa-tag"></i>
+          ${tag}
+        </span>`
+      ).join('');
+      tagsPreview.classList.add('has-tags');
+    }
+  }
+  
+  // File upload functionality
+  function handleFiles(files) {
+    const maxFiles = 5;
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    Array.from(files).forEach(file => {
+      if (selectedFiles.length >= maxFiles) {
+        alert(`Maximum ${maxFiles} images allowed`);
+        return;
+      }
+      
+      if (file.size > maxSize) {
+        alert(`${file.name} is too large. Maximum size is 5MB`);
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        alert(`${file.name} is not an image file`);
+        return;
+      }
+      
+      selectedFiles.push(file);
+      displayImagePreview(file);
+    });
+    
+    updateProgress();
+  }
+  
+  function displayImagePreview(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const previewItem = document.createElement('div');
+      previewItem.className = 'preview-item';
+      previewItem.innerHTML = `
+        <img src="${e.target.result}" class="preview-image" alt="Preview">
+        <button type="button" class="preview-remove" onclick="removeImage(this, '${file.name}')">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      imagePreview.appendChild(previewItem);
+    };
+    reader.readAsDataURL(file);
+  }
+  
+  // Remove image function (global scope)
+  window.removeImage = function(button, fileName) {
+    selectedFiles = selectedFiles.filter(file => file.name !== fileName);
+    button.parentElement.remove();
+    updateFileInput();
+    updateProgress();
+  };
+  
+  function updateFileInput() {
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    imageInput.files = dt.files;
+  }
+  
+  // Event listeners
+  titleInput.addEventListener('input', () => {
+    updateTitleCount();
+    updateProgress();
+  });
+  
+  contentTextarea.addEventListener('input', () => {
+    updateContentCount();
+    updateProgress();
+  });
+  
+  tagsInput.addEventListener('input', () => {
+    updateTagsPreview();
+    updateProgress();
+  });
+  
+  document.getElementById('category').addEventListener('change', updateProgress);
+  
+  // File upload events
+  imageInput.addEventListener('change', function() {
+    handleFiles(this.files);
+  });
+  
+  // Click to browse functionality
+  fileUploadArea.addEventListener('click', function(e) {
+    e.preventDefault();
+    imageInput.click();
+  });
+  
+  // Simple drag and drop functionality
+  let dragCounter = 0;
+  
+  fileUploadArea.addEventListener('dragenter', function(e) {
+    e.preventDefault();
+    dragCounter++;
+    this.classList.add('dragover');
+  });
+  
+  fileUploadArea.addEventListener('dragleave', function(e) {
+    e.preventDefault();
+    dragCounter--;
+    if (dragCounter === 0) {
+      this.classList.remove('dragover');
+    }
+  });
+  
+  fileUploadArea.addEventListener('dragover', function(e) {
+    e.preventDefault();
+  });
+  
+  fileUploadArea.addEventListener('drop', function(e) {
+    e.preventDefault();
+    dragCounter = 0;
+    this.classList.remove('dragover');
+    
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      handleFiles(files);
+    }
+  });
+  
+  // Form submission
+  form.addEventListener('submit', function(e) {
+    updateFileInput();
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    loadingSpinner.style.display = 'inline-block';
+    submitText.textContent = 'Publishing...';
+    
+    // Validate form
+    if (!titleInput.value.trim() || !contentTextarea.value.trim()) {
+      e.preventDefault();
+      alert('Please fill in all required fields');
+      
+      // Reset loading state
+      submitBtn.disabled = false;
+      loadingSpinner.style.display = 'none';
+      submitText.textContent = 'Publish Article';
+    }
+  });
+  
+  // Initialize counters
+  updateTitleCount();
+  updateContentCount();
+  updateTagsPreview();
+  updateProgress();
+  
+  // Auto-save functionality (optional)
+  let autoSaveTimer;
+  function autoSave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+      const formData = {
+        title: titleInput.value,
+        content: contentTextarea.value,
+        category: document.getElementById('category').value,
+        tags: tagsInput.value
+      };
+      localStorage.setItem('healthfy_draft', JSON.stringify(formData));
+    }, 2000);
+  }
+  
+  // Load draft
+  const draft = localStorage.getItem('healthfy_draft');
+  if (draft) {
+    try {
+      const draftData = JSON.parse(draft);
+      if (confirm('A draft was found. Would you like to restore it?')) {
+        titleInput.value = draftData.title || '';
+        contentTextarea.value = draftData.content || '';
+        document.getElementById('category').value = draftData.category || 'general';
+        tagsInput.value = draftData.tags || '';
+        
+        updateTitleCount();
+        updateContentCount();
+        updateTagsPreview();
+        updateProgress();
+      }
+    } catch (e) {
+      console.error('Error loading draft:', e);
+    }
+  }
+  
+  // Auto-save on input
+  [titleInput, contentTextarea, tagsInput].forEach(input => {
+    input.addEventListener('input', autoSave);
+  });
+  
+  // Clear draft on successful submission
+  form.addEventListener('submit', function() {
+    localStorage.removeItem('healthfy_draft');
+  });
+});
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,283 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid py-4">
+  <!-- Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h1 class="h2 mb-2">
+            <i class="fas fa-comments me-3 text-primary"></i>My Chats
+          </h1>
+          <p class="text-muted mb-0">
+            <% if (user.isDoctor) { %>
+              Manage your conversations with patients
+            <% } else { %>
+              Manage your conversations with healthcare professionals
+            <% } %>
+          </p>
+        </div>
+        <div>
+          <% if (!user.isDoctor) { %>
+          <a href="/users/chat-doctors" class="btn btn-primary">
+            <i class="fas fa-comments me-2"></i>Chat with Doctors
+          </a>
+          <% } else { %>
+          <a href="/doctors/chat-requests" class="btn btn-primary">
+            <i class="fas fa-bell me-2"></i>Chat Requests
+          </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if (user.isDoctor && chatRequests && chatRequests.length > 0) { %>
+  <!-- Pending Requests Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-warning text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-clock me-2"></i>Pending Chat Requests
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row">
+            <% chatRequests.forEach(function(request) { %>
+            <div class="col-md-6 mb-3">
+              <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 me-3">
+                  <% if (request.user && request.user.profileImage) { %>
+                    <img src="/uploads/<%= request.user.profileImage %>" 
+                         class="rounded-circle" 
+                         style="width: 50px; height: 50px; object-fit: cover" 
+                         alt="<%= request.user.name %>">
+                  <% } else { %>
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white" 
+                         style="width: 50px; height: 50px">
+                      <i class="fas fa-user"></i>
+                    </div>
+                  <% } %>
+                </div>
+                <div class="flex-grow-1">
+                  <h6 class="mb-1"><%= request.user.name %></h6>
+                  <p class="mb-1 text-muted small"><%= request.reason %></p>
+                  <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>Requested on <%= new Date(request.createdAt).toLocaleDateString() %>
+                  </small>
+                </div>
+                <div class="flex-shrink-0">
+                  <button class="btn btn-success btn-sm me-2" onclick="acceptRequest('<%= request._id %>')">
+                    <i class="fas fa-check"></i> Accept
+                  </button>
+                  <button class="btn btn-danger btn-sm" onclick="rejectRequest('<%= request._id %>')">
+                    <i class="fas fa-times"></i> Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<!-- Chats List -->
+  <div class="row">
+    <div class="col-12">
+      <% if (chats && chats.length > 0) { %>
+      <div class="row">
+        <% chats.forEach(function(chat) { %>
+        <div class="col-lg-6 col-md-12 mb-4">
+          <div class="card border-0 shadow-sm chat-card">
+            <div class="card-body p-4">
+              <div class="d-flex align-items-start">
+                <!-- Participant Avatar -->
+                <div class="flex-shrink-0 me-3">
+                  <% const otherParticipant = chat.participants.find(p =>
+                  p._id.toString() !== user._id.toString()); %> <% if
+                  (otherParticipant && otherParticipant.profileImage) { %>
+                  <img
+                    src="<%= otherParticipant.profileImage %>"
+                    alt="<%= otherParticipant.name %>"
+                    class="rounded-circle"
+                    style="width: 60px; height: 60px; object-fit: cover"
+                  />
+                  <% } else { %>
+                  <div
+                    class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
+                    style="width: 60px; height: 60px"
+                  >
+                    <i class="fas fa-user fa-lg"></i>
+                  </div>
+                  <% } %>
+                </div>
+
+                <!-- Chat Info -->
+                <div class="flex-grow-1">
+                  <div
+                    class="d-flex justify-content-between align-items-start mb-2"
+                  >
+                    <h5 class="mb-1">
+                      <% if (otherParticipant) { %> <%= otherParticipant.name %>
+                      <% } else { %> Unknown User <% } %>
+                    </h5>
+                    <small class="text-muted">
+                      <%= new Date(chat.lastUpdated).toLocaleDateString() %>
+                    </small>
+                  </div>
+
+                  <!-- Chat Type Badge -->
+                  <div class="mb-2">
+                    <span class="badge bg-info">
+                      <%= chat.consultationType ?
+                      chat.consultationType.replace('_', ' ') : 'General' %>
+                    </span>
+                    <span class="badge bg-secondary ms-2">
+                      <%= chat.chatType.replace('_', ' ') %>
+                    </span>
+                  </div>
+
+                  <!-- Last Message Preview -->
+                  <div class="mb-3">
+                    <% if (chat.lastMessage) { %>
+                    <p class="text-muted mb-0">
+                      <% if (chat.lastMessageType === 'text') { %> <%=
+                      chat.lastMessage.length > 100 ?
+                      chat.lastMessage.substring(0, 100) + '...' :
+                      chat.lastMessage %> <% } else { %>
+                      <i class="fas fa-file me-1"></i>
+                      <%= chat.lastMessageType.charAt(0).toUpperCase() +
+                      chat.lastMessageType.slice(1) %> <% } %>
+                    </p>
+                    <% } else { %>
+                    <p class="text-muted mb-0">No messages yet</p>
+                    <% } %>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div class="d-flex gap-2">
+                    <a
+                      href="/chat/<%= chat._id %>"
+                      class="btn btn-primary btn-sm"
+                    >
+                      <i class="fas fa-comments me-1"></i>Open Chat
+                    </a>
+                    <% if (chat.isActive) { %>
+                    <span class="badge bg-success">Active</span>
+                    <% } else { %>
+                    <span class="badge bg-secondary">Closed</span>
+                    <% } %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+      <% } else { %>
+      <!-- Empty State -->
+      <div class="col-12">
+        <div class="text-center py-5">
+          <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+          <h4 class="text-muted">No chats yet</h4>
+          <p class="text-muted mb-3">
+            Start a conversation with a healthcare professional
+          </p>
+          <% if (!user.isDoctor) { %>
+          <a href="/users/chat-doctors" class="btn btn-primary btn-lg">
+            <i class="fas fa-comments me-2"></i>Chat with Doctors
+          </a>
+          <% } else { %>
+          <a href="/doctors/chat-requests" class="btn btn-primary btn-lg">
+            <i class="fas fa-bell me-2"></i>View Chat Requests
+          </a>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<style>
+  .chat-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  .chat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+  }
+</style>
+
+<script>
+// Accept chat request
+function acceptRequest(requestId) {
+  if (!confirm('Are you sure you want to accept this chat request?')) {
+    return;
+  }
+
+  fetch(`/chat/request/${requestId}/accept`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      notes: '',
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        alert('Chat request accepted successfully!');
+        window.location.href = `/chat/${data.chatId}`;
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    })
+    .catch((error) => {
+      console.error('Error accepting chat request:', error);
+      alert('Failed to accept chat request. Please try again.');
+    });
+}
+
+// Reject chat request
+function rejectRequest(requestId) {
+  const reason = prompt('Please provide a reason for rejection (optional):');
+  if (reason === null) return; // User cancelled
+
+  fetch(`/chat/request/${requestId}/reject`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      reason: reason,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        alert('Chat request rejected successfully!');
+        window.location.reload();
+      } else {
+        alert(`Error: ${data.message}`);
+      }
+    })
+    .catch((error) => {
+      console.error('Error rejecting chat request:', error);
+      alert('Failed to reject chat request. Please try again.');
+    });
+}
+</script>
+
+<%- include('../partials/footer') %>

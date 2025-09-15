@@ -1,0 +1,707 @@
+<%- include('../partials/header') %>
+
+<div class="challenge-dashboard">
+    <!-- Hero Section -->
+    <div class="hero-section bg-gradient-primary text-white py-5 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 font-weight-bold mb-3">
+                        <i class="fas fa-trophy me-3"></i>Health Challenges
+                    </h1>
+                    <p class="lead mb-4">Transform your health journey with engaging challenges, earn badges, and compete with friends!</p>
+                    <% if (user) { %>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="/challenges/create" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-plus me-2"></i>Create Challenge
+                            </a>
+                            <a href="/challenges/my-challenges" class="btn btn-light btn-lg text-primary">
+                                <i class="fas fa-user me-2"></i>My Challenges
+                            </a>
+                        </div>
+                    <% } else { %>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="/auth/signup" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>Join Now
+                            </a>
+                            <a href="/auth/signin" class="btn btn-light btn-lg text-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </a>
+                        </div>
+                    <% } %>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="hero-stats">
+                        <div class="stat-circle bg-white text-primary p-4 rounded-circle d-inline-block">
+                            <i class="fas fa-users fa-3x mb-2"></i>
+                            <div class="stat-number h4 font-weight-bold mb-0" id="totalParticipants">-</div>
+                            <small class="text-muted">Active Participants</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Quick Stats & Filters Row -->
+        <div class="row mb-4">
+            <!-- Quick Stats for Logged In Users -->
+            <% if (user) { %>
+            <div class="col-lg-3 mb-3">
+                <div class="stats-sidebar">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-white border-0">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>Your Progress
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-item mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Active Challenges</span>
+                                    <span class="badge bg-success" id="activeChallenges">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Completed</span>
+                                    <span class="badge bg-primary" id="completedChallenges">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Points</span>
+                                    <span class="badge bg-warning text-dark" id="totalPoints">0</span>
+                                </div>
+                            </div>
+                            <div class="stat-item mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-muted">Streak</span>
+                                    <span class="badge bg-danger" id="currentStreak">0 days</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="text-center">
+                                <a href="/challenges/profile" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-user me-1"></i>Full Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+            <% } else { %>
+            <div class="col-12">
+            <% } %>
+                <!-- Filters & Search -->
+                <div class="filters-section mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-lg-4 mb-3 mb-lg-0">
+                                    <div class="search-box">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="searchInput" placeholder="Search challenges...">
+                                            <button class="btn btn-outline-secondary" type="button">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8">
+                                    <div class="filter-controls d-flex flex-wrap gap-2">
+                                        <select class="form-select form-select-sm" id="categoryFilter" style="width: auto;">
+                                            <option value="">All Categories</option>
+                                            <option value="fitness">Fitness</option>
+                                            <option value="nutrition">Nutrition</option>
+                                            <option value="mental-health">Mental Health</option>
+                                            <option value="sleep">Sleep</option>
+                                            <option value="hydration">Hydration</option>
+                                            <option value="meditation">Meditation</option>
+                                        </select>
+                                        <select class="form-select form-select-sm" id="difficultyFilter" style="width: auto;">
+                                            <option value="">All Difficulties</option>
+                                            <option value="beginner">Beginner</option>
+                                            <option value="intermediate">Intermediate</option>
+                                            <option value="advanced">Advanced</option>
+                                        </select>
+                                        <select class="form-select form-select-sm" id="sortBy" style="width: auto;">
+                                            <option value="popularity">Popular</option>
+                                            <option value="newest">Newest</option>
+                                            <option value="participants">Most Participants</option>
+                                            <option value="difficulty">Difficulty</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Featured Challenges -->
+                <div class="featured-section mb-5">
+                    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="mb-0">
+                            <i class="fas fa-star me-2 text-warning"></i>Featured Challenges
+                        </h3>
+                        <a href="#" class="btn btn-outline-primary btn-sm">View All</a>
+                    </div>
+                    <div class="row" id="featuredChallenges">
+                        <!-- Featured challenges will be loaded here -->
+                        <div class="col-12 text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Challenges -->
+                <div class="challenges-section">
+                    <div class="section-header d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="mb-0">
+                            <i class="fas fa-list me-2 text-primary"></i>All Challenges
+                        </h3>
+                        <div class="view-toggle">
+                            <div class="btn-group" role="group">
+                                <button type="button" class="btn btn-outline-secondary btn-sm active" id="gridView">
+                                    <i class="fas fa-th"></i>
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="listView">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="challenges-grid" id="challengesContainer">
+                        <!-- Challenges will be loaded here -->
+                        <div class="col-12 text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading challenges...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination-container mt-4" id="paginationContainer">
+                        <!-- Pagination will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links Section -->
+        <div class="quick-links-section mt-5 py-4">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <a href="/challenges/leaderboard" class="card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-crown fa-3x text-warning mb-3"></i>
+                            <h6 class="card-title">Global Leaderboard</h6>
+                            <p class="card-text text-muted small">See top performers</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="/challenges/badges" class="card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-medal fa-3x text-primary mb-3"></i>
+                            <h6 class="card-title">Badges</h6>
+                            <p class="card-text text-muted small">Earn and collect badges</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="/challenges/achievements" class="card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-trophy fa-3x text-success mb-3"></i>
+                            <h6 class="card-title">Achievements</h6>
+                            <p class="card-text text-muted small">Unlock major milestones</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <a href="/challenges/create" class="card text-decoration-none h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-plus-circle fa-3x text-info mb-3"></i>
+                            <h6 class="card-title">Create Challenge</h6>
+                            <p class="card-text text-muted small">Start your own challenge</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Challenge Card Template -->
+<template id="challengeCardTemplate">
+    <div class="col-lg-4 col-md-6 mb-4 challenge-card">
+        <div class="card h-100 border-0 shadow-sm hover-lift">
+            <div class="card-img-wrapper position-relative">
+                <img class="card-img-top challenge-image" alt="Challenge Image">
+                <div class="challenge-badges position-absolute top-0 end-0 p-2">
+                    <span class="badge difficulty-badge"></span>
+                </div>
+                <div class="challenge-category position-absolute bottom-0 start-0 p-2">
+                    <span class="badge bg-dark category-badge"></span>
+                </div>
+            </div>
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title challenge-title"></h5>
+                <p class="card-text challenge-description flex-grow-1"></p>
+                <div class="challenge-stats mb-3">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-value participants-count"></div>
+                            <div class="stat-label">Participants</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value completion-rate"></div>
+                            <div class="stat-label">Success Rate</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value duration"></div>
+                            <div class="stat-label">Duration</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="challenge-actions">
+                    <button class="btn btn-primary btn-sm join-btn" data-challenge-id="">
+                        <i class="fas fa-plus me-1"></i>Join Challenge
+                    </button>
+                    <a class="btn btn-outline-primary btn-sm view-btn" href="#">
+                        <i class="fas fa-eye me-1"></i>View Details
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted challenge-creator">
+                        <i class="fas fa-user me-1"></i><span></span>
+                    </small>
+                    <small class="text-muted challenge-date"></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Custom Styles -->
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.hover-lift {
+    transition: transform 0.2s ease-in-out;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.challenge-image {
+    height: 200px;
+    object-fit: cover;
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+}
+
+.difficulty-badge.beginner { background-color: #28a745 !important; }
+.difficulty-badge.intermediate { background-color: #ffc107 !important; color: #000 !important; }
+.difficulty-badge.advanced { background-color: #dc3545 !important; }
+
+.stat-value {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #495057;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.hero-stats .stat-circle {
+    width: 150px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.filters-section .form-select-sm {
+    min-width: 120px;
+}
+
+.challenge-card {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quick-links-section .card:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link {
+    border-radius: 0.25rem;
+    margin: 0 2px;
+    border: none;
+    background-color: #f8f9fa;
+    color: #495057;
+}
+
+.pagination .page-link:hover {
+    background-color: #667eea;
+    color: white;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+$(document).ready(function() {
+    let currentPage = 1;
+    let currentFilters = {
+        category: '',
+        difficulty: '',
+        search: '',
+        sortBy: 'popularity'
+    };
+
+    // Initialize dashboard
+    loadChallenges();
+    loadUserStats();
+    loadFeaturedChallenges();
+
+    // Event listeners
+    $('#searchInput').on('input', debounce(function() {
+        currentFilters.search = $(this).val();
+        currentPage = 1;
+        loadChallenges();
+    }, 300));
+
+    $('#categoryFilter, #difficultyFilter, #sortBy').on('change', function() {
+        currentFilters.category = $('#categoryFilter').val();
+        currentFilters.difficulty = $('#difficultyFilter').val();
+        currentFilters.sortBy = $('#sortBy').val();
+        currentPage = 1;
+        loadChallenges();
+    });
+
+    // View toggle
+    $('#gridView, #listView').on('click', function() {
+        $('.view-toggle .btn').removeClass('active');
+        $(this).addClass('active');
+        
+        if ($(this).attr('id') === 'listView') {
+            $('#challengesContainer').addClass('list-view');
+        } else {
+            $('#challengesContainer').removeClass('list-view');
+        }
+    });
+
+    // Load challenges function
+    function loadChallenges() {
+        const params = new URLSearchParams({
+            page: currentPage,
+            limit: 12,
+            ...currentFilters
+        });
+
+        $('#challengesContainer').html(`
+            <div class="col-12 text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading challenges...</span>
+                </div>
+            </div>
+        `);
+
+        fetch(`/challenges/api/challenges?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderChallenges(data.data.challenges);
+                    renderPagination(data.data.pagination);
+                } else {
+                    showError('Failed to load challenges');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Failed to load challenges');
+            });
+    }
+
+    // Load featured challenges
+    function loadFeaturedChallenges() {
+        fetch('/challenges/api/challenges?limit=3&sortBy=popularity')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    renderFeaturedChallenges(data.data.challenges);
+                } else {
+                    $('#featuredChallenges').html('<div class="col-12"><p class="text-muted">No featured challenges available.</p></div>');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                $('#featuredChallenges').html('<div class="col-12"><p class="text-danger">Failed to load featured challenges.</p></div>');
+            });
+    }
+
+    // Load user stats
+    function loadUserStats() {
+        <% if (user) { %>
+        fetch('/challenges/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const stats = data.data;
+                    $('#activeChallenges').text(stats.activeChallenges || 0);
+                    $('#completedChallenges').text(stats.completedChallenges || 0);
+                    $('#totalPoints').text(stats.total_points || 0);
+                    $('#currentStreak').text((stats.current_streak || 0) + ' days');
+                }
+            })
+            .catch(error => console.error('Error loading user stats:', error));
+        <% } %>
+    }
+
+    // Render challenges
+    function renderChallenges(challenges) {
+        const container = $('#challengesContainer');
+        container.empty();
+
+        if (challenges.length === 0) {
+            container.html(`
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No challenges found</h5>
+                    <p class="text-muted">Try adjusting your filters or search terms.</p>
+                </div>
+            `);
+            return;
+        }
+
+        const template = $('#challengeCardTemplate').html();
+        challenges.forEach((challenge, index) => {
+            const card = $(template);
+            
+            // Populate card data
+            card.find('.challenge-title').text(challenge.title);
+            card.find('.challenge-description').text(challenge.description);
+            card.find('.difficulty-badge').addClass(challenge.difficulty).text(challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1));
+            card.find('.category-badge').text(challenge.category.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()));
+            card.find('.participants-count').text(challenge.statistics?.totalParticipants || 0);
+            card.find('.completion-rate').text(Math.round(challenge.completionRate || 0) + '%');
+            card.find('.duration').text(getDurationText(challenge.duration));
+            card.find('.challenge-creator span').text(challenge.createdBy?.name || 'Anonymous');
+            card.find('.challenge-date').text(new Date(challenge.createdAt).toLocaleDateString());
+            
+            // Set challenge image or placeholder
+            const img = card.find('.challenge-image');
+            if (challenge.media?.icon) {
+                img.attr('src', challenge.media.icon);
+            } else {
+                img.attr('src', getPlaceholderImage(challenge.category));
+            }
+            
+            // Set action buttons
+            card.find('.join-btn').attr('data-challenge-id', challenge._id);
+            card.find('.view-btn').attr('href', `/challenges/challenge/${challenge._id}`);
+            
+            // Add animation delay
+            card.css('animation-delay', (index * 0.1) + 's');
+            
+            container.append(card);
+        });
+
+        // Attach event handlers
+        $('.join-btn').on('click', handleJoinChallenge);
+    }
+
+    // Render featured challenges
+    function renderFeaturedChallenges(challenges) {
+        const container = $('#featuredChallenges');
+        container.empty();
+
+        if (challenges.length === 0) {
+            container.html('<div class="col-12"><p class="text-muted">No featured challenges available.</p></div>');
+            return;
+        }
+
+        challenges.forEach(challenge => {
+            const card = $(`
+                <div class="col-lg-4 mb-4">
+                    <div class="card border-0 shadow featured-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="featured-icon bg-warning text-white rounded-circle me-3" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">${challenge.title}</h6>
+                                    <small class="text-muted">${challenge.statistics?.totalParticipants || 0} participants</small>
+                                </div>
+                            </div>
+                            <p class="card-text">${challenge.description.substring(0, 100)}...</p>
+                            <a href="/challenges/challenge/${challenge._id}" class="btn btn-primary btn-sm">View Challenge</a>
+                        </div>
+                    </div>
+                </div>
+            `);
+            container.append(card);
+        });
+    }
+
+    // Render pagination
+    function renderPagination(pagination) {
+        const container = $('#paginationContainer');
+        
+        if (pagination.pages <= 1) {
+            container.empty();
+            return;
+        }
+
+        let paginationHTML = '<nav><ul class="pagination justify-content-center">';
+        
+        // Previous button
+        if (pagination.current > 1) {
+            paginationHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current - 1}">Previous</a></li>`;
+        }
+        
+        // Page numbers
+        for (let i = 1; i <= pagination.pages; i++) {
+            if (i === pagination.current) {
+                paginationHTML += `<li class="page-item active"><a class="page-link" href="#">${i}</a></li>`;
+            } else if (i === 1 || i === pagination.pages || Math.abs(i - pagination.current) <= 2) {
+                paginationHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+            } else if (i === pagination.current - 3 || i === pagination.current + 3) {
+                paginationHTML += `<li class="page-item disabled"><a class="page-link">...</a></li>`;
+            }
+        }
+        
+        // Next button
+        if (pagination.current < pagination.pages) {
+            paginationHTML += `<li class="page-item"><a class="page-link" href="#" data-page="${pagination.current + 1}">Next</a></li>`;
+        }
+        
+        paginationHTML += '</ul></nav>';
+        
+        container.html(paginationHTML);
+        
+        // Attach pagination event handlers
+        $('.page-link[data-page]').on('click', function(e) {
+            e.preventDefault();
+            currentPage = parseInt($(this).data('page'));
+            loadChallenges();
+        });
+    }
+
+    // Handle join challenge
+    function handleJoinChallenge(e) {
+        const challengeId = $(this).data('challenge-id');
+        const button = $(this);
+        
+        <% if (!user) { %>
+        // Redirect to login if not authenticated
+        window.location.href = '/auth/signin?redirect=' + encodeURIComponent(window.location.pathname);
+        return;
+        <% } %>
+
+        button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Joining...');
+
+        fetch(`/challenges/api/challenges/${challengeId}/join`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                button.removeClass('btn-primary').addClass('btn-success').html('<i class="fas fa-check me-1"></i>Joined!');
+                showSuccess('Successfully joined challenge!');
+                loadUserStats(); // Refresh user stats
+                setTimeout(() => {
+                    window.location.href = `/challenges/challenge/${challengeId}`;
+                }, 1500);
+            } else {
+                throw new Error(data.error || 'Failed to join challenge');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError(error.message);
+            button.prop('disabled', false).html('<i class="fas fa-plus me-1"></i>Join Challenge');
+        });
+    }
+
+    // Helper functions
+    function getDurationText(duration) {
+        if (!duration) return 'Ongoing';
+        const start = new Date(duration.start);
+        const end = new Date(duration.end);
+        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        return days > 1 ? `${days} days` : '1 day';
+    }
+
+    function getPlaceholderImage(category) {
+        const placeholders = {
+            'fitness': '/images/placeholders/fitness.jpg',
+            'nutrition': '/images/placeholders/nutrition.jpg',
+            'mental-health': '/images/placeholders/mental-health.jpg',
+            'sleep': '/images/placeholders/sleep.jpg',
+            'hydration': '/images/placeholders/hydration.jpg',
+            'meditation': '/images/placeholders/meditation.jpg'
+        };
+        return placeholders[category] || '/images/placeholders/default-challenge.jpg';
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function showSuccess(message) {
+        // Implement toast notification
+        console.log('Success:', message);
+    }
+
+    function showError(message) {
+        // Implement toast notification
+        console.error('Error:', message);
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,1044 @@
+<%- include('../partials/header') %>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 25%, #bbf7d0 50%, #a7f3d0 75%, #6ee7b7 100%);
+        min-height: 100vh;
+        padding: 2rem 1rem;
+        color: #1f2937;
+        position: relative;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(circle at 25% 25%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
+                          radial-gradient(circle at 75% 75%, rgba(22, 163, 74, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .signup-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 25px 50px -12px rgba(34, 197, 94, 0.25), 
+                    0 0 0 1px rgba(34, 197, 94, 0.1),
+                    0 0 100px rgba(34, 197, 94, 0.05);
+        overflow: hidden;
+        position: relative;
+        backdrop-filter: blur(20px);
+    }
+
+    .signup-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #22c55e, #16a34a, #15803d, #22c55e);
+        background-size: 400% 100%;
+        animation: gradientShift 3s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .form-header {
+        text-align: center;
+        padding: 3rem 2rem 2rem;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(34, 197, 94, 0.05) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+        50% { transform: translate(-50%, -50%) rotate(180deg); }
+    }
+
+    .form-title {
+        font-size: 3rem;
+        font-weight: 900;
+        color: #15803d;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        position: relative;
+        z-index: 1;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-subtitle {
+        color: #16a34a;
+        font-size: 1.25rem;
+        font-weight: 500;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-content {
+        padding: 3rem;
+    }
+
+    .section {
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #15803d;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #d1fae5;
+        position: relative;
+    }
+
+    .section-icon {
+        width: 3.5rem;
+        height: 3.5rem;
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .section-icon::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: rotate(45deg);
+        animation: shine 2s infinite;
+    }
+
+    @keyframes shine {
+        0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+        100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-grid.cols-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .form-grid.cols-3 {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: #166534;
+        margin-bottom: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 1.25rem;
+        color: #22c55e;
+        font-size: 1.125rem;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+        border: 3px solid #d1fae5;
+        border-radius: 16px;
+        font-size: 1rem;
+        color: #1f2937;
+        background: white;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        outline: none;
+        font-weight: 500;
+    }
+
+    .form-input:hover {
+        border-color: #a7f3d0;
+        box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-input:focus {
+        border-color: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2), 0 8px 25px -5px rgba(34, 197, 94, 0.25);
+        background: #fafffe;
+        transform: translateY(-2px);
+    }
+
+    .form-input:focus + .input-icon {
+        color: #16a34a;
+        transform: scale(1.1);
+    }
+
+    .form-input::placeholder {
+        color: #9ca3af;
+        font-weight: 400;
+    }
+
+    .form-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2322c55e' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 1.25rem center;
+        background-repeat: no-repeat;
+        background-size: 1.5rem 1.5rem;
+        padding-right: 3.5rem;
+    }
+
+    .form-textarea {
+        padding: 1.25rem;
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+
+    .checkbox-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        border: 3px solid #d1fae5;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .checkbox-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .checkbox-wrapper:hover {
+        border-color: #a7f3d0;
+        background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px -5px rgba(34, 197, 94, 0.25);
+    }
+
+    .checkbox-wrapper:hover::before {
+        left: 100%;
+    }
+
+    .form-checkbox {
+        width: 1.5rem;
+        height: 1.5rem;
+        accent-color: #22c55e;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+
+    .checkbox-label {
+        font-weight: 600;
+        color: #166534;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        padding: 3rem;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        border-top: 3px solid #d1fae5;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 1.25rem 2.5rem;
+        border-radius: 16px;
+        font-weight: 700;
+        font-size: 1.125rem;
+        text-decoration: none;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-width: 160px;
+        position: relative;
+        overflow: hidden;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: white;
+        border-color: #22c55e;
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #16a34a, #15803d);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 15px 35px rgba(34, 197, 94, 0.5);
+        color: white;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #16a34a;
+        border-color: #d1fae5;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary:hover {
+        background: #f0fdf4;
+        border-color: #a7f3d0;
+        color: #15803d;
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .alert {
+        padding: 1.25rem 1.5rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        border-left: 6px solid;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-weight: 600;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+        color: #15803d;
+        border-left-color: #22c55e;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #dc2626;
+        border-left-color: #ef4444;
+    }
+
+    /* Loading State */
+    .btn.loading {
+        pointer-events: none;
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+
+    .btn.loading .btn-text {
+        opacity: 0;
+    }
+
+    .btn.loading::after {
+        content: '';
+        position: absolute;
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 3px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        body {
+            padding: 1rem 0.5rem;
+        }
+
+        .signup-container {
+            border-radius: 20px;
+            margin: 0;
+        }
+
+        .form-header {
+            padding: 2rem 1rem;
+        }
+
+        .form-title {
+            font-size: 2.25rem;
+        }
+
+        .form-content {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-grid.cols-2,
+        .form-grid.cols-3 {
+            grid-template-columns: 1fr;
+        }
+
+        .button-group {
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 2rem 1.5rem;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+        }
+
+        .section-icon {
+            width: 3rem;
+            height: 3rem;
+            font-size: 1.25rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-content {
+            padding: 1.5rem 1rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+        }
+
+        .section-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            font-size: 1rem;
+        }
+
+        .form-input {
+            padding: 1rem 1rem 1rem 3rem;
+        }
+    }
+</style>
+
+<div class="signup-container">
+    <!-- Form Header -->
+    <div class="form-header">
+        <h1 class="form-title">Join Healthfy</h1>
+        <p class="form-subtitle">Create your account and start your wellness journey</p>
+    </div>
+
+    <!-- Alert Messages -->
+    <div class="form-content">
+        <% if (typeof error !== 'undefined' && error && error.length) { %>
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <%= Array.isArray(error) ? error[0] : error %>
+            </div>
+        <% } %>
+        
+        <% if (typeof success !== 'undefined' && success && success.length) { %>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <%= Array.isArray(success) ? success[0] : success %>
+            </div>
+        <% } %>
+
+        <form action="/users/signup" method="POST" id="signupForm" enctype="multipart/form-data">
+            
+            <!-- Personal Information Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    Personal Information
+                </h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" class="form-input" name="name" 
+                                   placeholder="Enter your full name" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" class="form-input" name="email" 
+                                   placeholder="your.email@example.com" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-phone input-icon"></i>
+                            <input type="tel" class="form-input" name="phone" 
+                                   placeholder="+1 (555) 123-4567">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="form-input" name="password" 
+                                   placeholder="Create a strong password" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" class="form-input" name="confirmPassword" 
+                                   placeholder="Confirm your password" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">Date of Birth</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-calendar input-icon"></i>
+                            <input type="date" class="form-input" name="dob">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-venus-mars input-icon"></i>
+                            <select class="form-input form-select" name="gender">
+                                <option value="">Select your gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Information Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    Address Information
+                </h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Street Address</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-map-marker-alt input-icon"></i>
+                            <input type="text" class="form-input" name="street" 
+                                   placeholder="123 Main Street">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">City</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-city input-icon"></i>
+                            <input type="text" class="form-input" name="city" 
+                                   placeholder="New York">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">State</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-flag input-icon"></i>
+                            <input type="text" class="form-input" name="state" 
+                                   placeholder="New York">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">ZIP Code</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-mail-bulk input-icon"></i>
+                            <input type="text" class="form-input" name="pincode" 
+                                   placeholder="10001">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Country</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-globe input-icon"></i>
+                            <input type="text" class="form-input" name="country" 
+                                   placeholder="United States">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Health Information Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    Health Information
+                </h2>
+                
+                <div class="form-grid cols-3">
+                    <div class="form-group">
+                        <label class="form-label">Height (cm)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-ruler-vertical input-icon"></i>
+                            <input type="number" class="form-input" name="height" 
+                                   placeholder="175" min="50" max="300">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Weight (kg)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-weight input-icon"></i>
+                            <input type="number" class="form-input" name="weight" 
+                                   placeholder="70" min="20" max="300">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Blood Group</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-tint input-icon"></i>
+                            <select class="form-input form-select" name="bloodGroup">
+                                <option value="">Select blood group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Medical History</label>
+                        <div class="input-wrapper">
+                            <textarea class="form-input form-textarea" name="medicalHistory" rows="3" 
+                                      placeholder="List any significant medical conditions, surgeries, or ongoing treatments..."></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">Known Allergies</label>
+                        <div class="input-wrapper">
+                            <textarea class="form-input form-textarea" name="allergies" rows="2" 
+                                      placeholder="Food allergies, drug reactions, etc..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Current Medications</label>
+                        <div class="input-wrapper">
+                            <textarea class="form-input form-textarea" name="currentMedications" rows="2" 
+                                      placeholder="List current medications with dosages..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vitals Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    Vital Signs
+                </h2>
+                
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">Systolic Blood Pressure</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-heartbeat input-icon"></i>
+                            <input type="number" class="form-input" name="systolic" 
+                                   placeholder="120" min="80" max="250">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Diastolic Blood Pressure</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-heartbeat input-icon"></i>
+                            <input type="number" class="form-input" name="diastolic" 
+                                   placeholder="80" min="50" max="150">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-3">
+                    <div class="form-group">
+                        <label class="form-label">Heart Rate (BPM)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-heart input-icon"></i>
+                            <input type="number" class="form-input" name="heartRate" 
+                                   placeholder="72" min="40" max="200">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Fasting Blood Sugar (mg/dL)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-vial input-icon"></i>
+                            <input type="number" class="form-input" name="sugarFasting" 
+                                   placeholder="90" min="50" max="400">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Temperature (°F)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-thermometer-half input-icon"></i>
+                            <input type="number" step="0.1" class="form-input" name="temperature" 
+                                   placeholder="98.6" min="95" max="110">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lifestyle Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    Lifestyle Information
+                </h2>
+                
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">Diet Preference</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-utensils input-icon"></i>
+                            <select class="form-input form-select" name="diet">
+                                <option value="">Select diet type</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="non-vegetarian">Non-Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Exercise Frequency</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-running input-icon"></i>
+                            <select class="form-input form-select" name="exerciseFrequency">
+                                <option value="">Select frequency</option>
+                                <option value="none">None</option>
+                                <option value="low">Low (1-2 times/week)</option>
+                                <option value="moderate">Moderate (3-4 times/week)</option>
+                                <option value="high">High (5+ times/week)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="form-checkbox" id="smoking" name="smoking" value="true">
+                        <label class="checkbox-label" for="smoking">I currently smoke tobacco</label>
+                    </div>
+                    
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="form-checkbox" id="alcohol" name="alcohol" value="true">
+                        <label class="checkbox-label" for="alcohol">I consume alcoholic beverages</label>
+                    </div>
+                </div>
+
+                <div class="form-grid cols-2">
+                    <div class="form-group">
+                        <label class="form-label">Average Sleep Hours</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-bed input-icon"></i>
+                            <input type="number" step="0.5" class="form-input" name="sleepHours" 
+                                   placeholder="8" min="2" max="16">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Stress Level (1-10)</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-brain input-icon"></i>
+                            <select class="form-input form-select" name="stressLevel">
+                                <option value="">Select stress level</option>
+                                <option value="1">1 - Very Low</option>
+                                <option value="2">2 - Low</option>
+                                <option value="3">3 - Mild</option>
+                                <option value="4">4 - Moderate-Low</option>
+                                <option value="5">5 - Moderate</option>
+                                <option value="6">6 - Moderate-High</option>
+                                <option value="7">7 - High</option>
+                                <option value="8">8 - Very High</option>
+                                <option value="9">9 - Extremely High</option>
+                                <option value="10">10 - Maximum</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Terms & Agreement Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <div class="section-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    Terms & Agreement
+                </h2>
+                
+                <div class="form-grid">
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="form-checkbox" id="termsConditions" name="termsConditions" value="true" required>
+                        <label class="checkbox-label" for="termsConditions">
+                            I agree to the <strong>Terms of Service</strong> and <strong>Privacy Policy</strong>
+                        </label>
+                    </div>
+                    
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" class="form-checkbox" id="privacyPolicy" name="privacyPolicy" value="true">
+                        <label class="checkbox-label" for="privacyPolicy">
+                            I want to receive health tips and updates via email
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="button-group">
+        <a href="/users/login" class="btn btn-secondary">
+            <i class="fas fa-sign-in-alt"></i>
+            <span class="btn-text">Already have account?</span>
+        </a>
+        <button type="submit" form="signupForm" class="btn btn-primary" id="signupBtn">
+            <i class="fas fa-user-plus"></i>
+            <span class="btn-text">Create Account</span>
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signupForm');
+    const signupBtn = document.getElementById('signupBtn');
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        signupBtn.classList.add('loading');
+        signupBtn.disabled = true;
+        
+        // Re-enable button after 10 seconds in case of error
+        setTimeout(() => {
+            signupBtn.classList.remove('loading');
+            signupBtn.disabled = false;
+        }, 10000);
+    });
+    
+    // Password confirmation validation
+    const passwordInput = document.querySelector('input[name="password"]');
+    const confirmPasswordInput = document.querySelector('input[name="confirmPassword"]');
+    
+    function validatePassword() {
+        if (confirmPasswordInput.value && passwordInput.value !== confirmPasswordInput.value) {
+            confirmPasswordInput.style.borderColor = '#ef4444';
+            confirmPasswordInput.setCustomValidity('Passwords do not match');
+        } else {
+            confirmPasswordInput.style.borderColor = '';
+            confirmPasswordInput.setCustomValidity('');
+        }
+    }
+    
+    if (passwordInput && confirmPasswordInput) {
+        passwordInput.addEventListener('input', validatePassword);
+        confirmPasswordInput.addEventListener('input', validatePassword);
+    }
+    
+    // Form validation feedback
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.style.borderColor = '#ef4444';
+            } else {
+                this.style.borderColor = '';
+            }
+        });
+        
+        input.addEventListener('focus', function() {
+            this.style.borderColor = '#22c55e';
+        });
+    });
+    
+    // Auto-calculate BMI when height and weight are entered
+    const heightInput = document.querySelector('input[name="height"]');
+    const weightInput = document.querySelector('input[name="weight"]');
+    
+    function calculateBMI() {
+        const height = parseFloat(heightInput.value);
+        const weight = parseFloat(weightInput.value);
+        
+        if (height && weight && height > 0 && weight > 0) {
+            const bmi = weight / Math.pow(height / 100, 2);
+            const bmiValue = Math.round(bmi * 10) / 10;
+            
+            // Find or create BMI display
+            let bmiDisplay = document.getElementById('bmi-display');
+            if (!bmiDisplay) {
+                bmiDisplay = document.createElement('div');
+                bmiDisplay.id = 'bmi-display';
+                bmiDisplay.style.cssText = `
+                    margin-top: 0.75rem;
+                    padding: 0.75rem 1rem;
+                    background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+                    border: 2px solid #d1fae5;
+                    border-radius: 12px;
+                    font-size: 0.875rem;
+                    font-weight: 700;
+                    text-align: center;
+                    text-transform: uppercase;
+                    letter-spacing: 0.025em;
+                `;
+                weightInput.parentNode.parentNode.appendChild(bmiDisplay);
+            }
+            
+            let category = '';
+            let color = '';
+            if (bmiValue < 18.5) {
+                category = 'Underweight';
+                color = '#f59e0b';
+            } else if (bmiValue < 25) {
+                category = 'Normal weight';
+                color = '#22c55e';
+            } else if (bmiValue < 30) {
+                category = 'Overweight';
+                color = '#f59e0b';
+            } else {
+                category = 'Obese';
+                color = '#ef4444';
+            }
+            
+            bmiDisplay.innerHTML = `BMI: <strong>${bmiValue}</strong> (${category})`;
+            bmiDisplay.style.color = color;
+        }
+    }
+    
+    if (heightInput && weightInput) {
+        heightInput.addEventListener('input', calculateBMI);
+        weightInput.addEventListener('input', calculateBMI);
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

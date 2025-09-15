@@ -1,0 +1,1362 @@
+<% layout('layouts/boilerplate') %>
+
+<!-- Include Chart.js for price comparison charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<style>
+    /* Advanced Professional Healthcare Design System */
+    :root {
+        /* Healthcare Color Palette */
+        --medical-primary: #10b981;
+        --medical-secondary: #059669;
+        --medical-accent: #34d399;
+        --medical-light: #ecfdf5;
+        --medical-dark: #064e3b;
+        
+        /* Semantic Colors */
+        --success: #22c55e;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --info: #3b82f6;
+        
+        /* Neutral Palette */
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        
+        /* Advanced Gradients */
+        --gradient-hero: linear-gradient(135deg, var(--medical-primary) 0%, var(--medical-secondary) 50%, var(--medical-dark) 100%);
+        --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.95) 100%);
+        --gradient-surface: linear-gradient(135deg, var(--medical-light) 0%, rgba(255,255,255,0.9) 100%);
+        --gradient-accent: linear-gradient(135deg, var(--medical-accent) 0%, var(--medical-primary) 100%);
+        --gradient-success: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
+        --gradient-warning: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+        
+        /* Advanced Shadows */
+        --shadow-card: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px -3px rgba(0, 0, 0, 0.1);
+        --shadow-card-hover: 0 20px 40px -10px rgba(16, 185, 129, 0.25), 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+        --shadow-floating: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        --shadow-glow: 0 0 20px rgba(16, 185, 129, 0.3);
+        
+        /* Typography */
+        --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        --font-display: 'Poppins', var(--font-primary);
+        
+        /* Spacing Scale */
+        --space-xs: 0.25rem;
+        --space-sm: 0.5rem;
+        --space-md: 1rem;
+        --space-lg: 1.5rem;
+        --space-xl: 2rem;
+        --space-2xl: 3rem;
+        --space-3xl: 4rem;
+        
+        /* Border Radius */
+        --radius-sm: 8px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --radius-xl: 24px;
+        --radius-full: 9999px;
+        
+        /* Animation Timing */
+        --transition-fast: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-smooth: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Global Styles - Fixed visibility issue */
+    body {
+        font-family: var(--font-primary);
+        background: #f0fdf4 !important; /* Force background color */
+        color: #1f2937 !important; /* Force text color */
+        min-height: 100vh;
+        line-height: 1.6;
+        font-feature-settings: 'kern' 1, 'liga' 1, 'cv02' 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Force override any conflicting styles */
+    * {
+        box-sizing: border-box;
+    }
+    
+    .medicine-search-container * {
+        color: inherit;
+    }
+
+    /* Medicine Search Container */
+    .medicine-search-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: var(--space-xl);
+        position: relative;
+    }
+
+    /* Advanced Hero Section */
+    .search-hero {
+        background: linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%) !important;
+        color: white !important;
+        padding: var(--space-3xl) var(--space-xl);
+        border-radius: var(--radius-xl);
+        margin-bottom: var(--space-2xl);
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-floating);
+        min-height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .search-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(52, 211, 153, 0.3) 0%, transparent 40%),
+            radial-gradient(circle at 80% 80%, rgba(110, 231, 183, 0.2) 0%, transparent 40%),
+            radial-gradient(circle at 40% 70%, rgba(16, 185, 129, 0.2) 0%, transparent 40%);
+        animation: heroFloat 12s ease-in-out infinite;
+    }
+
+    .search-hero::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(255, 255, 255, 0.03) 2deg, transparent 4deg);
+        animation: rotate 30s linear infinite;
+    }
+
+    @keyframes heroFloat {
+        0%, 100% { 
+            transform: scale(1) rotate(0deg);
+            filter: blur(0px);
+        }
+        25% { 
+            transform: scale(1.05) rotate(0.5deg);
+            filter: blur(0.5px);
+        }
+        50% { 
+            transform: scale(0.98) rotate(-0.5deg);
+            filter: blur(0px);
+        }
+        75% { 
+            transform: scale(1.02) rotate(0.2deg);
+            filter: blur(0.3px);
+        }
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .search-hero-content {
+        position: relative;
+        z-index: 10;
+        text-align: center;
+        max-width: 800px;
+    }
+
+    .search-hero h1 {
+        font-family: var(--font-display);
+        font-size: clamp(2.5rem, 6vw, 4rem);
+        font-weight: 900;
+        margin-bottom: var(--space-lg);
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+    }
+
+    .search-hero h1::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--medical-accent), var(--white));
+        border-radius: var(--radius-full);
+        animation: glow 3s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+        from { opacity: 0.5; transform: translateX(-50%) scaleX(0.8); }
+        to { opacity: 1; transform: translateX(-50%) scaleX(1.2); }
+    }
+
+    .search-hero p {
+        font-size: clamp(1.125rem, 2vw, 1.375rem);
+        opacity: 0.95;
+        margin-bottom: var(--space-2xl);
+        line-height: 1.7;
+        text-shadow: 0 1px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Advanced Search Form */
+    .search-form {
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        padding: var(--space-2xl);
+        border-radius: var(--radius-xl);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.15) !important;
+        margin: -100px auto 0;
+        max-width: 800px;
+        position: relative;
+        z-index: 20;
+        overflow: hidden;
+    }
+
+    .search-form::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--gradient-accent);
+        animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+        0%, 100% { opacity: 0.5; transform: scaleX(0.8); }
+        50% { opacity: 1; transform: scaleX(1.2); }
+    }
+
+    .search-input-container {
+        position: relative;
+        margin-bottom: var(--space-lg);
+    }
+
+    .search-input {
+        width: 100%;
+        padding: var(--space-lg) var(--space-3xl) var(--space-lg) var(--space-xl);
+        border: 2px solid #e5e7eb !important;
+        border-radius: var(--radius-full);
+        font-size: 1.125rem;
+        font-weight: 500;
+        background: #ffffff !important;
+        color: #1f2937 !important;
+        transition: var(--transition-smooth);
+        outline: none;
+        box-shadow: 0 4px 10px -3px rgba(0, 0, 0, 0.1) !important;
+        font-family: var(--font-primary);
+    }
+
+    .search-input:focus {
+        border-color: var(--medical-primary);
+        box-shadow: var(--shadow-glow);
+        transform: translateY(-2px);
+    }
+
+    .search-input::placeholder {
+        color: var(--gray-500);
+        font-weight: 400;
+    }
+
+    .search-btn {
+        position: absolute;
+        right: var(--space-sm);
+        top: var(--space-sm);
+        background: linear-gradient(135deg, #34d399 0%, #10b981 100%) !important;
+        color: white !important;
+        border: none;
+        padding: var(--space-md) var(--space-xl);
+        border-radius: var(--radius-full);
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        box-shadow: 0 4px 10px -3px rgba(0, 0, 0, 0.1) !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-card-hover);
+        background: var(--gradient-success);
+    }
+
+    .search-btn:active {
+        transform: translateY(0) scale(0.98);
+    }
+
+    .search-btn i {
+        font-size: 1.2rem;
+        transition: var(--transition-fast);
+    }
+
+    .search-btn:hover i {
+        transform: rotate(15deg) scale(1.1);
+    }
+
+    /* Search Suggestions */
+    .search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--white);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-floating);
+        z-index: 1000;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid var(--gray-200);
+        margin-top: var(--space-sm);
+        display: none;
+    }
+
+    .suggestion-item {
+        padding: var(--space-md) var(--space-lg);
+        cursor: pointer;
+        transition: var(--transition-fast);
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+    }
+
+    .suggestion-item:hover {
+        background: var(--medical-light);
+        color: var(--medical-dark);
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    /* Advanced Search Results */
+    .search-results {
+        margin-top: var(--space-3xl);
+        position: relative;
+    }
+
+    .results-header {
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(20px);
+        padding: var(--space-2xl);
+        border-radius: var(--radius-xl);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1) !important;
+        margin-bottom: var(--space-2xl);
+        border: 1px solid rgba(16, 185, 129, 0.2) !important;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .results-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, transparent 0%, rgba(16, 185, 129, 0.05) 50%, transparent 100%);
+        animation: resultShimmer 4s ease-in-out infinite;
+    }
+
+    @keyframes resultShimmer {
+        0%, 100% { transform: translateX(-100%); }
+        50% { transform: translateX(100%); }
+    }
+
+    .results-title {
+        font-family: var(--font-display);
+        font-size: clamp(1.75rem, 4vw, 2.5rem);
+        font-weight: 800;
+        color: #111827 !important;
+        margin-bottom: var(--space-md);
+        position: relative;
+        z-index: 2;
+    }
+
+    .results-title .search-term {
+        color: var(--medical-primary);
+        position: relative;
+        text-decoration: underline;
+        text-decoration-color: var(--medical-accent);
+        text-underline-offset: 4px;
+    }
+
+    .results-meta {
+        color: var(--gray-600);
+        font-size: 1rem;
+        font-weight: 500;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Advanced Platform Results Grid */
+    .platform-results {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+        gap: var(--space-2xl);
+        position: relative;
+    }
+
+    /* Revolutionary Platform Cards */
+    .platform-card {
+        background: var(--gradient-card);
+        backdrop-filter: blur(20px);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-card);
+        border: 2px solid rgba(16, 185, 129, 0.1);
+        overflow: hidden;
+        transition: var(--transition-slow);
+        position: relative;
+        transform-origin: center;
+    }
+
+    .platform-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+        opacity: 0;
+        transition: var(--transition-slow);
+        z-index: 1;
+    }
+
+    .platform-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: var(--shadow-card-hover);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    .platform-card:hover::before {
+        opacity: 1;
+    }
+
+    /* Enhanced Platform Header */
+    .platform-header {
+        background: var(--gradient-accent);
+        color: white;
+        padding: var(--space-lg) var(--space-xl);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .platform-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: var(--transition-slow);
+    }
+
+    .platform-card:hover .platform-header::before {
+        left: 100%;
+    }
+
+    .platform-name {
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1.375rem;
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        letter-spacing: -0.5px;
+    }
+
+    .platform-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    /* Advanced Status Badges */
+    .platform-status {
+        padding: var(--space-sm) var(--space-lg);
+        border-radius: var(--radius-full);
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .platform-status::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -20px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        transform: translateY(-50%);
+    }
+
+    .status-available {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .status-available::before {
+        background: var(--success);
+        animation: pulse 2s infinite;
+    }
+
+    .status-unavailable {
+        background: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .status-unavailable::before {
+        background: var(--danger);
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+        50% { opacity: 0.5; transform: translateY(-50%) scale(1.2); }
+    }
+
+    /* Professional Product List */
+    .product-list {
+        padding: var(--space-xl);
+        background: var(--white);
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Enhanced Product Cards */
+    .product-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--space-lg);
+        padding: var(--space-lg) 0;
+        border-bottom: 2px solid var(--gray-100);
+        transition: var(--transition-smooth);
+        position: relative;
+        border-radius: var(--radius-lg);
+    }
+
+    .product-item::before {
+        content: '';
+        position: absolute;
+        left: -var(--space-xl);
+        right: -var(--space-xl);
+        top: 0;
+        bottom: 0;
+        background: var(--medical-light);
+        border-radius: var(--radius-lg);
+        opacity: 0;
+        transition: var(--transition-smooth);
+        z-index: -1;
+    }
+
+    .product-item:hover::before {
+        opacity: 1;
+    }
+
+    .product-item:hover {
+        transform: translateX(var(--space-sm));
+        border-color: var(--medical-primary);
+    }
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .product-info h5 {
+        color: var(--gray-900);
+        font-family: var(--font-display);
+        font-size: 1.375rem;
+        font-weight: 700;
+        margin: 0;
+        line-height: 1.3;
+    }
+
+    .product-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+
+    .product-detail-item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        font-size: 0.9rem;
+        color: var(--gray-600);
+        font-weight: 500;
+        padding: var(--space-xs) var(--space-sm);
+        background: var(--gray-50);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--gray-200);
+        transition: var(--transition-fast);
+    }
+
+    .product-detail-item:hover {
+        background: var(--medical-light);
+        border-color: var(--medical-accent);
+        color: var(--medical-dark);
+    }
+
+    .product-detail-item.in-stock {
+        background: rgba(34, 197, 94, 0.1);
+        border-color: var(--success);
+        color: var(--success);
+    }
+
+    .product-detail-item.out-of-stock {
+        background: rgba(239, 68, 68, 0.1);
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .rating-stars {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        color: #fbbf24;
+    }
+
+    .rating-text {
+        color: var(--gray-600);
+        font-weight: 500;
+    }
+
+    /* Advanced Price Section */
+    .product-price {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        text-align: right;
+        gap: var(--space-sm);
+        min-width: 200px;
+        position: relative;
+    }
+
+    .price-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: var(--space-xs);
+    }
+
+    .current-price {
+        font-family: var(--font-display);
+        font-size: 1.75rem;
+        font-weight: 900;
+        color: var(--medical-primary);
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-xs);
+        position: relative;
+    }
+
+    .currency {
+        font-size: 1.25rem;
+        font-weight: 700;
+        opacity: 0.8;
+    }
+
+    .original-price {
+        font-size: 1rem;
+        color: var(--gray-500);
+        text-decoration: line-through;
+        font-weight: 500;
+        opacity: 0.8;
+    }
+
+    .savings-amount {
+        font-size: 0.875rem;
+        color: var(--success);
+        font-weight: 600;
+    }
+
+    .discount-badge {
+        background: var(--gradient-success);
+        color: white;
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--radius-full);
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: var(--shadow-card);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .discount-badge::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: var(--transition-smooth);
+    }
+
+    .discount-badge:hover::before {
+        left: 100%;
+    }
+
+    /* Enhanced Action Buttons */
+    .product-actions {
+        margin-top: var(--space-md);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-sm);
+        align-items: flex-end;
+    }
+
+    .btn-primary-action {
+        background: var(--gradient-accent);
+        color: white;
+        border: none;
+        padding: var(--space-sm) var(--space-lg);
+        border-radius: var(--radius-full);
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: var(--transition-smooth);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        box-shadow: var(--shadow-card);
+        min-width: 160px;
+        justify-content: center;
+    }
+
+    .btn-primary-action:hover {
+        background: var(--gradient-success);
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: var(--shadow-card-hover);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary-action {
+        color: var(--medical-primary);
+        background: transparent;
+        border: 2px solid var(--medical-primary);
+        padding: var(--space-xs) var(--space-md);
+        border-radius: var(--radius-full);
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition-fast);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-sm);
+        justify-content: center;
+        min-width: 160px;
+    }
+
+    .btn-secondary-action:hover {
+        background: var(--medical-primary);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-card);
+        text-decoration: none;
+    }
+
+    .cheapest-highlight {
+        border: 3px solid var(--emerald-500) !important;
+        position: relative;
+        box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.1), var(--shadow-emerald) !important;
+    }
+
+    .cheapest-badge {
+        position: absolute;
+        top: -15px;
+        left: 30px;
+        background: var(--gradient-primary);
+        color: white;
+        padding: 0.5rem 1.5rem;
+        border-radius: 25px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+
+    /* Trending Section */
+    .trending-section {
+        margin-top: 4rem;
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 3rem;
+        color: var(--gray-900);
+        text-align: center;
+        position: relative;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: var(--gradient-primary);
+        border-radius: 2px;
+    }
+
+    .trending-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .trending-card {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(20px);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .trending-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .trending-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-emerald);
+        border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .trending-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .trending-card h4 {
+        color: var(--emerald-600);
+        margin-bottom: 1rem;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .trending-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+    }
+
+    .trending-searches {
+        color: var(--gray-600);
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+
+    .trending-category {
+        background: var(--gradient-primary);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* No Results Section */
+    .no-results {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--gradient-surface);
+        border-radius: 20px;
+        margin: 2rem 0;
+        box-shadow: var(--shadow-md);
+    }
+
+    .no-results h3 {
+        color: var(--gray-700);
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .no-results p {
+        color: var(--gray-600);
+        font-size: 1.1rem;
+    }
+
+    /* Enhanced Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .medicine-search-container {
+            padding: var(--space-md);
+        }
+
+        .search-hero {
+            padding: var(--space-2xl) var(--space-md);
+            margin-bottom: var(--space-xl);
+            min-height: 300px;
+        }
+
+        .search-hero h1 {
+            font-size: clamp(2rem, 8vw, 2.5rem);
+        }
+
+        .search-hero p {
+            font-size: 1rem;
+        }
+
+        .search-form {
+            padding: var(--space-lg);
+            margin: -60px auto 0;
+            max-width: 95%;
+        }
+
+        .search-input {
+            padding: var(--space-md) var(--space-2xl) var(--space-md) var(--space-md);
+        }
+
+        .search-btn {
+            padding: var(--space-sm) var(--space-md);
+            font-size: 0.9rem;
+        }
+
+        .platform-results {
+            grid-template-columns: 1fr;
+            gap: var(--space-lg);
+        }
+
+        .platform-header {
+            padding: var(--space-md);
+            flex-direction: column;
+            gap: var(--space-sm);
+            text-align: center;
+        }
+
+        .platform-name {
+            font-size: 1.25rem;
+        }
+
+        .product-item {
+            grid-template-columns: 1fr;
+            gap: var(--space-md);
+            text-align: left;
+        }
+
+        .product-details {
+            grid-template-columns: 1fr;
+        }
+
+        .product-price {
+            align-items: flex-start;
+            text-align: left;
+            min-width: auto;
+        }
+
+        .price-container {
+            align-items: flex-start;
+        }
+
+        .product-actions {
+            align-items: flex-start;
+            gap: var(--space-xs);
+        }
+
+        .btn-primary-action,
+        .btn-secondary-action {
+            min-width: 140px;
+            font-size: 0.85rem;
+        }
+
+        .trending-grid {
+            grid-template-columns: 1fr;
+            gap: var(--space-md);
+        }
+
+        .results-title {
+            font-size: clamp(1.5rem, 6vw, 2rem);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .search-hero h1::after {
+            width: 60px;
+            height: 3px;
+        }
+
+        .search-input {
+            font-size: 1rem;
+        }
+
+        .search-btn {
+            position: static;
+            width: 100%;
+            margin-top: var(--space-md);
+            border-radius: var(--radius-lg);
+        }
+
+        .search-input-container {
+            margin-bottom: 0;
+        }
+
+        .product-actions {
+            flex-direction: column;
+        }
+
+        .btn-primary-action,
+        .btn-secondary-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Loading Animation */
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* AOS Animation Overrides */
+    [data-aos] {
+        transition-duration: 0.8s;
+    }
+</style>
+
+<div class="medicine-search-container">
+    <!-- Hero Section -->
+    <div class="search-hero" data-aos="fade-down" data-aos-duration="800">
+        <div class="search-hero-content">
+            <h1 data-aos="fade-up" data-aos-delay="200">💊 Medicine Price Comparison</h1>
+            <p data-aos="fade-up" data-aos-delay="400">Find the best prices for your medicines across multiple pharmacies with AI-powered search</p>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-form" data-aos="zoom-in" data-aos-delay="600">
+        <form action="/medicine-search" method="POST">
+            <div class="search-input-container">
+                <input
+                    type="text"
+                    class="search-input"
+                    name="medicineName"
+                    placeholder="Enter medicine name (e.g., Paracetamol, Dolo 650...)"
+                    value="<%= searchQuery || '' %>"
+                    required
+                    minlength="2"
+                    autocomplete="off"
+                    data-aos="fade-right"
+                    data-aos-delay="700"
+                >
+                <button type="submit" class="search-btn" data-aos="fade-left" data-aos-delay="800">
+                    <i class="fas fa-search"></i>
+                    Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    <% if (searchResults) { %>
+        <div class="search-results">
+            <div class="results-header" data-aos="fade-up" data-aos-delay="200">
+                <h2 class="results-title">Results for "<span class="search-term"><%= searchResults.medicineName %></span>"</h2>
+                <p class="results-meta">Search completed in <%= searchResults.searchDuration %>ms • <%= searchResults.platforms.length %> platforms checked</p>
+            </div>
+            <div class="platform-results">
+                <% searchResults.platforms.forEach(function(platform, index) { %>
+                    <% const isCheapest = searchResults.cheapestOption && platform.available && platform.prices && platform.prices.length > 0 && platform.prices[0].price === searchResults.cheapestOption.price && platform.platform === searchResults.cheapestOption.platform; %>
+                    <div class="platform-card <%= isCheapest ? 'cheapest-highlight' : '' %>" data-aos="fade-up" data-aos-delay="<%= (index + 1) * 100 %>">
+                        <% if (isCheapest) { %>
+                            <div class="cheapest-badge">💰 Best Price</div>
+                        <% } %>
+                        <div class="platform-header">
+                            <div class="platform-name">
+                                <div class="platform-icon">
+                                    <% if (platform.platform === '1mg') { %>🏥
+                                    <% } else if (platform.platform === 'PharmEasy') { %>💊
+                                    <% } else if (platform.platform === 'Netmeds') { %>⚕️
+                                    <% } else if (platform.platform === 'Amazon') { %>📦
+                                    <% } else { %>🏪<% } %>
+                                </div>
+                                <%= platform.platform %>
+                            </div>
+                            <div class="platform-status <%= platform.available ? 'status-available' : 'status-unavailable' %>">
+                                <%= platform.available ? 'Available' : 'Not Available' %>
+                            </div>
+                        </div>
+                        <% if (platform.available && platform.prices && platform.prices.length > 0) { %>
+                            <div class="product-list">
+                                <% platform.prices.forEach(function(product) { %>
+                                    <div class="product-item">
+                                        <div class="product-info">
+                                            <h5><%= product.name %></h5>
+                                            <div class="product-details">
+                                                <div class="product-detail-item">
+                                                    <i class="fas fa-store"></i>
+                                                    <span><%= product.seller %></span>
+                                                </div>
+                                                <div class="product-detail-item <%= product.inStock ? 'in-stock' : 'out-of-stock' %>">
+                                                    <i class="fas fa-<%= product.inStock ? 'check-circle' : 'times-circle' %>"></i>
+                                                    <span><%= product.inStock ? 'In Stock' : 'Out of Stock' %></span>
+                                                </div>
+                                                <div class="product-detail-item">
+                                                    <i class="fas fa-shipping-fast"></i>
+                                                    <span><%= product.deliveryTime %></span>
+                                                </div>
+                                            </div>
+                                            <div class="product-rating">
+                                                <div class="rating-stars">
+                                                    <% for (let i = 1; i <= 5; i++) { %>
+                                                        <i class="fas fa-star <%= i <= product.rating ? '' : 'text-muted' %>"></i>
+                                                    <% } %>
+                                                    <span class="rating-text"><%= product.rating %></span>
+                                                </div>
+                                                <span class="rating-text">(<%= product.reviews %> reviews)</span>
+                                            </div>
+                                        </div>
+                                        <div class="product-price">
+                                            <div class="price-container">
+                                                <div class="current-price">
+                                                    <span class="currency">₹</span><%= product.price %>
+                                                </div>
+                                                <% if (product.discount > 0) { %>
+                                                    <div class="original-price">₹<%= product.originalPrice %></div>
+                                                    <div class="savings-amount">You save ₹<%= (product.originalPrice - product.price) %></div>
+                                                    <div class="discount-badge"><%= product.discount %>% OFF</div>
+                                                <% } %>
+                                            </div>
+                                            <div class="product-actions">
+                                                <a href="<%= product.productUrl %>" target="_blank" class="btn-primary-action">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                    Buy Now
+                                                </a>
+                                                <a href="<%= product.productUrl %>" target="_blank" class="btn-secondary-action">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                    View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                                <p style="text-align: center; margin-top: 1rem; color: #6c757d; font-size: 0.9rem;">
+                                    Last updated: <%= new Date(platform.lastUpdated).toLocaleString() %>
+                                </p>
+                            </div>
+                        <% } else { %>
+                            <div class="product-list">
+                                <p style="text-align: center; color: #6c757d; padding: 2rem;">
+                                    <%= platform.error || 'Medicine not available on this platform' %>
+                                </p>
+                                <p style="text-align: center;">
+                                    <a href="<%= platform.searchUrl %>" target="_blank" class="btn-primary-action">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        Search on <%= platform.platform %>
+                                    </a>
+                                </p>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% } else if (searchQuery && searchResults === null) { %>
+        <!-- No Results -->
+        <div class="no-results">
+            <h3>😔 No Results Found for "<%= searchQuery %>"</h3>
+            <p>We couldn't find any results for your search. Please try a different medicine name.</p>
+        </div>
+    <% } %>
+
+    <!-- Trending Medicines -->
+    <div class="trending-section" data-aos="fade-up" data-aos-delay="400">
+        <h2 class="section-title">🔥 Trending Medicines</h2>
+        <div class="trending-grid">
+            <% trending.forEach((medicine, index) => { %>
+            <div class="trending-card" onclick="document.querySelector('input[name=medicineName]').value='<%= medicine.name %>'; document.querySelector('form').submit();" data-aos="fade-up" data-aos-delay="<%= 600 + (index * 100) %>">
+                <h4><%= medicine.name %></h4>
+                <p class="trending-info">
+                    <span class="trending-searches">📈 <%= medicine.searches %> searches</span>
+                    <span class="trending-category"><%= medicine.category %></span>
+                </p>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize AOS (Animate On Scroll)
+document.addEventListener('DOMContentLoaded', function() {
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 100,
+        delay: 100
+    });
+    
+    // Enhanced search input interactions
+    const searchInput = document.querySelector('.search-input');
+    const searchBtn = document.querySelector('.search-btn');
+    
+    if (searchInput) {
+        // Add loading state on form submission
+        searchInput.closest('form').addEventListener('submit', function(e) {
+            searchBtn.innerHTML = '<span class="loading-spinner"></span> Searching...';
+            searchBtn.disabled = true;
+        });
+        
+        // Enhanced focus effects
+        searchInput.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.02)';
+            this.parentElement.style.transition = 'transform 0.3s ease';
+        });
+        
+        searchInput.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    }
+    
+    // Add hover effects to platform cards
+    const platformCards = document.querySelectorAll('.platform-card');
+    platformCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.zIndex = '10';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.zIndex = '1';
+        });
+    });
+    
+    // Add click animations to buttons
+    const actionButtons = document.querySelectorAll('.btn-primary-action, .btn-secondary-action');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.transform = 'scale(0)';
+            ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+            ripple.style.animation = 'ripple 0.6s linear';
+            
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = e.clientX - rect.left - size / 2 + 'px';
+            ripple.style.top = e.clientY - rect.top - size / 2 + 'px';
+            
+            this.style.position = 'relative';
+            this.style.overflow = 'hidden';
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+});
+
+// Add ripple animation CSS
+const rippleCSS = document.createElement('style');
+rippleCSS.textContent = `
+    @keyframes ripple {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(rippleCSS);
+</script>

@@ -1,0 +1,123 @@
+version: "3.8"
+
+services:
+  # Redis for job queue
+  redis:
+    image: redis:7-alpine
+    container_name: healthfy-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Python ML Service
+  ml-service:
+    build: ./ml_service
+    container_name: healthfy-ml-service
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - ML_API_KEY=${ML_API_KEY:-dev_key_for_development_only}
+      - MODEL_VERSION=${MODEL_VERSION:-chexnet_v1.0.0}
+      - CHEXNET_MODEL_PATH=/app/model/chexnet_model.h5
+      - CUDA_VISIBLE_DEVICES=0
+      - TF_FORCE_GPU_ALLOW_GROWTH=true
+    volumes:
+      - ./ml_service/model:/app/model
+      - ./ml_service/uploads:/app/uploads
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Node.js Application
+  app:
+    build: .
+    container_name: healthfy-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=3000
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/healthfy}
+      - ML_API_URL=http://ml-service:8000
+      - ML_API_KEY=${ML_API_KEY:-dev_key_for_development_only}
+      - PREDICTION_MODE=${PREDICTION_MODE:-sync}
+      - ML_API_TIMEOUT_MS=${ML_API_TIMEOUT_MS:-30000}
+      - REDIS_URL=redis://redis:6379
+      - SESSION_SECRET=${SESSION_SECRET:-your_session_secret_here}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./public:/app/public
+    depends_on:
+      mongo:
+        condition: service_healthy
+      ml-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # MongoDB
+  mongo:
+    image: mongo:6
+    container_name: healthfy-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=healthfy
+    volumes:
+      - mongo_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Queue Worker (optional, for async processing)
+  worker:
+    build: .
+    container_name: healthfy-worker
+    command: ["node", "workers/predictionWorker.js"]
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - MONGODB_URI=${MONGODB_URI:-mongodb://mongo:27017/healthfy}
+      - ML_API_URL=http://ml-service:8000
+      - ML_API_KEY=${ML_API_KEY:-dev_key_for_development_only}
+      - ML_API_TIMEOUT_MS=${ML_API_TIMEOUT_MS:-30000}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+      ml-service:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - queue
+
+volumes:
+  redis_data:
+  mongo_data:
+
+networks:
+  default:
+    name: healthfy-network

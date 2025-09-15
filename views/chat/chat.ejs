@@ -1,0 +1,618 @@
+<%- include('../partials/header') %>
+
+<!-- Telegram-style Chat Interface -->
+<div class="telegram-chat-container">
+  <!-- Left Sidebar - Chat List -->
+  <div class="chat-sidebar">
+    <div class="sidebar-header">
+      <h5 class="mb-0 text-white">Chats</h5>
+    </div>
+    <div class="chat-list">
+      <% if (typeof allChats !== 'undefined' && allChats.length > 0) { %>
+        <% allChats.forEach(function(chatItem) { %>
+          <% const otherUser = chatItem.participants.find(p => p._id.toString() !== user._id.toString()); %>
+          <a href="/chat/<%= chatItem._id %>" class="chat-item <%= chatItem._id.toString() === chat._id.toString() ? 'active' : '' %>">
+            <div class="chat-avatar">
+              <% if (otherUser && otherUser.profileImage) { %>
+                <img src="<%= otherUser.profileImage %>" alt="<%= otherUser.name %>">
+              <% } else { %>
+                <div class="avatar-placeholder">
+                  <%= otherUser ? otherUser.name.charAt(0).toUpperCase() : 'U' %>
+                </div>
+              <% } %>
+            </div>
+            <div class="chat-info">
+              <div class="chat-name"><%= otherUser ? otherUser.name : 'Unknown User' %></div>
+              <div class="chat-preview"><%= chatItem.lastMessage || 'No messages yet' %></div>
+            </div>
+            <div class="chat-time">
+              <%= chatItem.lastUpdated ? new Date(chatItem.lastUpdated).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) : '' %>
+            </div>
+          </a>
+        <% }); %>
+      <% } else { %>
+        <div class="no-chats">
+          <i class="fas fa-comments fa-2x mb-2"></i>
+          <p>No chats yet</p>
+          <a href="/users/chat-doctors" class="btn btn-primary btn-sm">Start a chat</a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Right Side - Active Chat -->
+  <div class="chat-main">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <% const otherParticipant = chat.participants.find(p => p._id.toString() !== user._id.toString()); %>
+      <div class="d-flex align-items-center">
+        <div class="chat-avatar me-3">
+          <% if (otherParticipant && otherParticipant.profileImage) { %>
+            <img src="<%= otherParticipant.profileImage %>" alt="<%= otherParticipant.name %>">
+          <% } else { %>
+            <div class="avatar-placeholder">
+              <%= otherParticipant ? otherParticipant.name.charAt(0).toUpperCase() : 'U' %>
+            </div>
+          <% } %>
+        </div>
+        <div>
+          <h6 class="mb-0"><%= otherParticipant ? otherParticipant.name : 'Unknown User' %></h6>
+          <small class="text-muted">Online</small>
+        </div>
+      </div>
+      <div class="chat-actions">
+        <% if (user.isDoctor) { %>
+          <!-- Doctor can start video calls -->
+          <form action="/video-calls/create/<%= chat._id %>" method="POST" style="display: inline;">
+            <button type="submit" class="btn btn-sm btn-outline-light" title="Start Video Call">
+              <i class="fas fa-video"></i> Start Call
+            </button>
+          </form>
+        <% } else { %>
+          <!-- User can join with meeting ID -->
+          <button class="btn btn-sm btn-outline-light" onclick="showJoinCallModal()" title="Join Video Call">
+            <i class="fas fa-phone"></i> Join Call
+          </button>
+        <% } %>
+        <button class="btn btn-sm btn-outline-light" onclick="shareFiles()">
+          <i class="fas fa-paperclip"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Area -->
+    <div class="messages-area" id="messagesContainer">
+      <% if (chat.messages && chat.messages.length > 0) { %>
+        <% chat.messages.forEach(function(message) { %>
+          <% const isOwn = message.sender._id.toString() === user._id.toString(); %>
+          <div class="message-wrapper <%= isOwn ? 'own' : 'other' %>">
+            <% if (message.type === 'video_call_request') { %>
+              <!-- Video Call Message -->
+              <div class="video-call-message <%= isOwn ? 'own' : 'other' %>">
+                <div class="video-call-content">
+                  <i class="fas fa-video fa-lg mb-2"></i>
+                  <div class="call-text">
+                    <strong>📹 Video Call Started!</strong>
+                    <div class="meeting-info">
+                      <span class="meeting-id">Meeting ID: <strong><%= message.meetingId %></strong></span>
+                    </div>
+                  </div>
+                  <% if (!isOwn) { %>
+                    <!-- Join button for the receiver -->
+                    <a href="/video-calls/<%= message.videoCallId %>" class="join-call-btn">
+                      <i class="fas fa-phone"></i> Join Call
+                    </a>
+                  <% } else { %>
+                    <!-- Go to call button for the initiator -->
+                    <a href="/video-calls/<%= message.videoCallId %>" class="join-call-btn">
+                      <i class="fas fa-video"></i> Go to Call
+                    </a>
+                  <% } %>
+                </div>
+                <div class="message-time">
+                  <%= new Date(message.createdAt).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) %>
+                </div>
+              </div>
+            <% } else { %>
+              <!-- Regular Text Message -->
+              <div class="message-bubble <%= isOwn ? 'own' : 'other' %>">
+                <div class="message-content">
+                  <%= message.content %>
+                </div>
+                <div class="message-time">
+                  <%= new Date(message.createdAt).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'}) %>
+                  <% if (isOwn) { %>
+                    <i class="fas fa-check message-status"></i>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <div class="empty-chat">
+          <i class="fas fa-comments fa-3x mb-3"></i>
+          <h5>No messages yet</h5>
+          <p>Start the conversation by sending a message</p>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Message Input -->
+    <div class="message-input-area">
+      <form action="/chat/<%= chat._id %>/messages" method="POST" class="message-form">
+        <div class="input-wrapper">
+          <input 
+            type="text" 
+            name="content" 
+            class="message-input" 
+            placeholder="Type a message..."
+            required
+            maxlength="1000"
+          >
+          <input type="hidden" name="type" value="text">
+          <button type="submit" class="send-btn">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Join Video Call Modal -->
+<div class="modal fade" id="joinCallModal" tabindex="-1" aria-labelledby="joinCallModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="joinCallModalLabel">
+          <i class="fas fa-video me-2"></i>Join Video Call
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/video-calls/join" method="POST" id="joinCallForm">
+          <div class="mb-3">
+            <label for="meetingIdInput" class="form-label">Meeting ID</label>
+            <input 
+              type="text" 
+              class="form-control text-center" 
+              id="meetingIdInput" 
+              name="meetingId" 
+              placeholder="Enter 6-digit meeting ID"
+              maxlength="6"
+              required
+              style="font-size: 18px; font-weight: bold; letter-spacing: 2px;"
+            >
+            <div class="form-text">Enter the meeting ID provided by the doctor</div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="joinCallForm" class="btn btn-success">
+          <i class="fas fa-phone me-1"></i>Join Call
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- File Upload Modal -->
+<div
+  class="modal fade"
+  id="fileUploadModal"
+  tabindex="-1"
+  aria-labelledby="fileUploadModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="fileUploadModalLabel">Share Files</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="fileUploadForm">
+          <div class="mb-3">
+            <label for="fileInput" class="form-label">Select File</label>
+            <input
+              type="file"
+              class="form-control"
+              id="fileInput"
+              accept="image/*,.pdf,.doc,.docx,.txt"
+            />
+            <small class="text-muted"
+              >Supported: Images, PDFs, Documents (Max 5MB)</small
+            >
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" onclick="uploadFile()">
+          Upload & Send
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Simple chat functions
+function shareFiles() {
+  alert('File sharing coming soon!');
+}
+
+function showJoinCallModal() {
+  const modal = new bootstrap.Modal(document.getElementById('joinCallModal'));
+  modal.show();
+}
+
+// Auto-scroll to bottom when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('messagesContainer');
+  if (container) {
+    container.scrollTop = container.scrollHeight;
+  }
+});
+</script>
+
+<style>
+/* Telegram-style Chat Interface */
+.telegram-chat-container {
+  height: 100vh;
+  display: flex;
+  background: #f0f2f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Left Sidebar */
+.chat-sidebar {
+  width: 320px;
+  background: #2b5278;
+  border-right: 1px solid #e1e8ed;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  padding: 20px;
+  background: #1e3a5f;
+  border-bottom: 1px solid #2b5278;
+}
+
+.chat-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #3a6b9e;
+  color: white;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.chat-item:hover {
+  background: #3a6b9e;
+  color: white;
+  text-decoration: none;
+}
+
+.chat-item.active {
+  background: #4a7ba7;
+  color: white;
+}
+
+.chat-avatar {
+  width: 50px;
+  height: 50px;
+  margin-right: 12px;
+  position: relative;
+}
+
+.chat-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.chat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-name {
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-preview {
+  font-size: 14px;
+  color: #a8c8ec;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-time {
+  font-size: 12px;
+  color: #a8c8ec;
+  margin-left: 8px;
+}
+
+.no-chats {
+  padding: 40px 20px;
+  text-align: center;
+  color: #a8c8ec;
+}
+
+/* Right Chat Area */
+.chat-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+/* Chat Header */
+.chat-header {
+  padding: 15px 20px;
+  background: #2b5278;
+  color: white;
+  border-bottom: 1px solid #e1e8ed;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header .chat-avatar {
+  width: 40px;
+  height: 40px;
+}
+
+.chat-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Messages Area */
+.messages-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #f8f9fa;
+  background-image: 
+    radial-gradient(circle at 25% 25%, #f0f2f5 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, #e9ecef 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+.message-wrapper {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.message-wrapper.own {
+  justify-content: flex-end;
+}
+
+.message-wrapper.other {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.message-bubble.own {
+  background: linear-gradient(135deg, #0084ff 0%, #0066cc 100%);
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message-bubble.other {
+  background: #ffffff;
+  color: #333;
+  border: 1px solid #e1e8ed;
+  border-bottom-left-radius: 4px;
+}
+
+.message-content {
+  font-size: 15px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  margin-bottom: 4px;
+}
+
+.message-time {
+  font-size: 12px;
+  opacity: 0.7;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.message-status {
+  font-size: 10px;
+}
+
+.empty-chat {
+  text-align: center;
+  color: #65676b;
+  padding: 60px 20px;
+}
+
+.empty-chat i {
+  color: #bcc0c4;
+}
+
+/* Message Input */
+.message-input-area {
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #e1e8ed;
+}
+
+.message-form {
+  width: 100%;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background: #f0f2f5;
+  border-radius: 25px;
+  padding: 8px 16px;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.message-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 15px;
+  padding: 8px 0;
+  color: #333;
+}
+
+.message-input::placeholder {
+  color: #8a8d91;
+}
+
+.send-btn {
+  background: linear-gradient(135deg, #0084ff 0%, #0066cc 100%);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.send-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0,132,255,0.3);
+}
+
+.send-btn:active {
+  transform: scale(0.95);
+}
+
+/* Scrollbar Styling */
+.chat-list::-webkit-scrollbar,
+.messages-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-list::-webkit-scrollbar-track,
+.messages-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+}
+
+.messages-area::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.1);
+  border-radius: 3px;
+}
+
+.chat-list::-webkit-scrollbar-thumb:hover,
+.messages-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chat-sidebar {
+    width: 100%;
+    position: absolute;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  
+  .chat-sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .chat-main {
+    width: 100%;
+  }
+}
+
+/* Animation Effects */
+.message-wrapper {
+  animation: messageSlideIn 0.3s ease-out;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-item {
+  transition: all 0.2s ease;
+}
+
+.message-bubble {
+  transition: all 0.2s ease;
+}
+
+.message-bubble:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+</style>
+
+<%- include('../partials/footer') %>

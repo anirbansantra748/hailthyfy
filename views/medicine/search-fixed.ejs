@@ -1,0 +1,763 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+    .medicine-search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .search-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .search-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .search-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .search-form {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin: -30px auto 3rem;
+        max-width: 600px;
+        position: relative;
+        z-index: 10;
+    }
+
+    .search-input-group {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        border: 2px solid #e0e6ed;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    .search-input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .search-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .search-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 3rem;
+    }
+
+    .spinner {
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .search-results {
+        display: none;
+        margin-top: 2rem;
+    }
+
+    .results-header {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        margin-bottom: 2rem;
+        border: 1px solid #e0e6ed;
+    }
+
+    .results-title {
+        font-size: 1.5rem;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .results-meta {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .platform-results {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .platform-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        border: 1px solid #e0e6ed;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .platform-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .platform-header {
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e0e6ed;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .platform-name {
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 1.1rem;
+    }
+
+    .platform-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-available {
+        background: #d1f2eb;
+        color: #00695c;
+    }
+
+    .status-unavailable {
+        background: #fadbd8;
+        color: #c62d42;
+    }
+
+    .product-list {
+        padding: 1.5rem;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f5f5f5;
+    }
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+    .product-info h5 {
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .product-details {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+
+    .product-price {
+        text-align: right;
+        flex-shrink: 0;
+        margin-left: 1rem;
+    }
+
+    .current-price {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #28a745;
+        margin-bottom: 0.25rem;
+    }
+
+    .original-price {
+        font-size: 0.9rem;
+        color: #6c757d;
+        text-decoration: line-through;
+        margin-bottom: 0.25rem;
+    }
+
+    .discount-badge {
+        background: #dc3545;
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 10px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    .product-actions {
+        margin-top: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-sm {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+        border-radius: 15px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-outline-primary {
+        color: #667eea;
+        border: 1px solid #667eea;
+        background: transparent;
+    }
+
+    .btn-outline-primary:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-outline-secondary {
+        color: #6c757d;
+        border: 1px solid #6c757d;
+        background: transparent;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        color: white;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+        display: none;
+    }
+
+    .cheapest-highlight {
+        border: 2px solid #28a745 !important;
+        position: relative;
+    }
+
+    .cheapest-badge {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        background: #28a745;
+        color: white;
+        padding: 0.3rem 1rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .trending-section {
+        margin-bottom: 3rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: #2d3748;
+        text-align: center;
+    }
+
+    .trending-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .trending-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #e0e6ed;
+        cursor: pointer;
+    }
+
+    .trending-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .trending-card h4 {
+        color: #667eea;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .trending-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .trending-searches {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .trending-category {
+        background: #f8f9fa;
+        color: #495057;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .medicine-search-container {
+            padding: 15px;
+        }
+
+        .search-header {
+            padding: 2rem 1rem;
+        }
+
+        .search-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .search-form {
+            padding: 1.5rem;
+            margin: -20px auto 2rem;
+        }
+
+        .trending-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .product-item {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .product-price {
+            text-align: left;
+            margin-left: 0;
+            margin-top: 1rem;
+        }
+
+        .product-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+<div class="medicine-search-container">
+    <!-- Search Header -->
+    <div class="search-header">
+        <h1>💊 Medicine Price Comparison</h1>
+        <p>Find the best prices for your medicines across multiple pharmacies</p>
+    </div>
+
+    <!-- Search Form -->
+    <div class="search-form">
+        <div class="search-input-group">
+            <input 
+                type="text" 
+                class="search-input" 
+                id="medicineSearch" 
+                placeholder="Search for medicine (e.g., Paracetamol, Dolo 650...)"
+                autocomplete="off"
+            >
+        </div>
+        <button type="button" class="search-btn" id="searchBtn">
+            🔍 Search Medicine Prices
+        </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p>Searching across pharmacy websites...</p>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results" id="searchResults">
+        <div class="results-header">
+            <h2 class="results-title" id="resultsTitle">Search Results</h2>
+            <p class="results-meta" id="resultsMeta"></p>
+        </div>
+        <div class="platform-results" id="platformResults"></div>
+    </div>
+
+    <!-- No Results -->
+    <div class="no-results" id="noResults">
+        <h3>😔 No Results Found</h3>
+        <p>We couldn't find any results for your search. Please try a different medicine name.</p>
+    </div>
+
+    <!-- Trending Medicines -->
+    <div class="trending-section">
+        <h2 class="section-title">🔥 Trending Medicines</h2>
+        <div class="trending-grid">
+            <% trending.forEach(medicine => { %>
+            <div class="trending-card" data-medicine="<%= medicine.name %>">
+                <h4><%= medicine.name %></h4>
+                <p class="trending-info">
+                    <span class="trending-searches">📊 <%= medicine.searches %> searches</span>
+                    <span class="trending-category"><%= medicine.category %></span>
+                </p>
+            </div>
+            <% }); %>
+        </div>
+    </div>
+</div>
+
+<script>
+    console.log('🏥 Medicine Search page loaded');
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM loaded, initializing search functionality');
+
+        // Get DOM elements
+        const searchInput = document.getElementById('medicineSearch');
+        const searchBtn = document.getElementById('searchBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const searchResults = document.getElementById('searchResults');
+        const noResults = document.getElementById('noResults');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const resultsMeta = document.getElementById('resultsMeta');
+        const platformResults = document.getElementById('platformResults');
+
+        // Check if all elements exist
+        if (!searchInput || !searchBtn || !loadingSpinner || !searchResults) {
+            console.error('❌ Required DOM elements not found');
+            return;
+        }
+
+        console.log('✅ All DOM elements found');
+
+        // Add event listeners
+        searchBtn.addEventListener('click', function() {
+            console.log('🔍 Search button clicked');
+            performSearch();
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                console.log('⏎ Enter key pressed in search input');
+                performSearch();
+            }
+        });
+
+        // Add trending card click listeners
+        const trendingCards = document.querySelectorAll('.trending-card');
+        trendingCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const medicineName = this.getAttribute('data-medicine');
+                console.log('📈 Trending card clicked:', medicineName);
+                searchInput.value = medicineName;
+                performSearch();
+            });
+        });
+
+        console.log('✅ Event listeners attached');
+
+        // Main search function
+        async function performSearch() {
+            const medicineName = searchInput.value.trim();
+            
+            console.log('🔍 Starting search for:', medicineName);
+            
+            if (!medicineName || medicineName.length < 2) {
+                alert('Please enter a medicine name (at least 2 characters)');
+                return;
+            }
+
+            // Show loading state
+            showLoading();
+
+            try {
+                console.log('📡 Making API request to /medicine-search/search');
+                
+                const response = await fetch('/medicine-search/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ medicineName: medicineName })
+                });
+
+                console.log('📡 Response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('📡 Response data:', data);
+
+                if (data.success) {
+                    displayResults(data.data);
+                } else {
+                    console.error('❌ Search failed:', data.message);
+                    showNoResults();
+                }
+
+            } catch (error) {
+                console.error('❌ Search request failed:', error);
+                showNoResults();
+                alert('Search failed. Please check your internet connection and try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Show loading state
+        function showLoading() {
+            console.log('⏳ Showing loading state');
+            loadingSpinner.style.display = 'block';
+            searchResults.style.display = 'none';
+            noResults.style.display = 'none';
+            searchBtn.disabled = true;
+            searchBtn.textContent = '🔍 Searching...';
+        }
+
+        // Hide loading state
+        function hideLoading() {
+            console.log('✅ Hiding loading state');
+            loadingSpinner.style.display = 'none';
+            searchBtn.disabled = false;
+            searchBtn.textContent = '🔍 Search Medicine Prices';
+        }
+
+        // Display search results
+        function displayResults(results) {
+            console.log('📊 Displaying results for:', results.medicineName);
+            
+            resultsTitle.textContent = `Results for "${results.medicineName}"`;
+            resultsMeta.textContent = `Search completed in ${results.searchDuration}ms • ${results.platforms.length} platforms checked`;
+
+            platformResults.innerHTML = '';
+
+            if (!results.platforms || results.platforms.length === 0) {
+                showNoResults();
+                return;
+            }
+
+            // Create platform cards
+            results.platforms.forEach((platform, index) => {
+                console.log(`📦 Creating card for ${platform.platform}:`, platform.available);
+                const platformCard = createPlatformCard(platform, results.cheapestOption);
+                platformResults.appendChild(platformCard);
+            });
+
+            searchResults.style.display = 'block';
+            noResults.style.display = 'none';
+
+            // Scroll to results
+            searchResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Create platform card HTML
+        function createPlatformCard(platform, cheapestOption) {
+            const card = document.createElement('div');
+            card.className = 'platform-card';
+
+            // Check if this platform has the cheapest option
+            const isCheapest = cheapestOption && 
+                              platform.available && 
+                              platform.prices && platform.prices.length > 0 && 
+                              platform.prices[0].price === cheapestOption.price &&
+                              platform.platform === cheapestOption.platform;
+
+            if (isCheapest) {
+                card.classList.add('cheapest-highlight');
+                const badge = document.createElement('div');
+                badge.className = 'cheapest-badge';
+                badge.textContent = '💰 Best Price';
+                card.appendChild(badge);
+            }
+
+            const headerHTML = `
+                <div class="platform-header">
+                    <div class="platform-name">${platform.platform}</div>
+                    <div class="platform-status ${platform.available ? 'status-available' : 'status-unavailable'}">
+                        ${platform.available ? '✅ Available' : '❌ Not Available'}
+                    </div>
+                </div>
+            `;
+
+            if (!platform.available) {
+                card.innerHTML += headerHTML + `
+                    <div class="product-list">
+                        <p style="text-align: center; color: #6c757d; padding: 2rem;">
+                            ${platform.error || 'Medicine not available on this platform'}
+                        </p>
+                        <p style="text-align: center;">
+                            <a href="${platform.searchUrl}" target="_blank" class="btn-sm btn-outline-primary">
+                                🔗 Search on ${platform.platform}
+                            </a>
+                        </p>
+                    </div>
+                `;
+                return card;
+            }
+
+            let productsHTML = '';
+            if (platform.prices && platform.prices.length > 0) {
+                platform.prices.forEach(product => {
+                    const stockClass = product.inStock ? 'text-success' : 'text-danger';
+                    const stockIcon = product.inStock ? '✅' : '❌';
+                    
+                    productsHTML += `
+                        <div class="product-item">
+                            <div class="product-info">
+                                <h5>${product.name}</h5>
+                                <div class="product-details">
+                                    <div>Seller: ${product.seller}</div>
+                                    <div class="${stockClass}">${stockIcon} ${product.inStock ? 'In Stock' : 'Out of Stock'}</div>
+                                    <div>📦 ${product.deliveryTime}</div>
+                                </div>
+                                <div class="product-rating">
+                                    <span>⭐ ${product.rating}</span>
+                                    <span>(${product.reviews} reviews)</span>
+                                </div>
+                            </div>
+                            <div class="product-price">
+                                <div class="current-price">₹${product.price}</div>
+                                ${product.discount > 0 ? `
+                                    <div class="original-price">₹${product.originalPrice}</div>
+                                    <div class="discount-badge">${product.discount}% OFF</div>
+                                ` : ''}
+                                <div class="product-actions">
+                                    <a href="${product.productUrl}" target="_blank" class="btn-sm btn-outline-primary">
+                                        🛒 View Product
+                                    </a>
+                                    <button class="btn-sm btn-outline-secondary" onclick="addToFavorites('${product.name}', '${platform.platform}', ${product.price})">
+                                        ❤️ Save
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            card.innerHTML += headerHTML + `
+                <div class="product-list">
+                    ${productsHTML}
+                    <p style="text-align: center; margin-top: 1rem; color: #6c757d; font-size: 0.9rem;">
+                        Last updated: ${new Date(platform.lastUpdated).toLocaleString()}
+                    </p>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Show no results
+        function showNoResults() {
+            console.log('❌ Showing no results');
+            searchResults.style.display = 'none';
+            noResults.style.display = 'block';
+        }
+
+        // Test the API immediately on load
+        setTimeout(async () => {
+            console.log('🧪 Testing API endpoints...');
+            try {
+                const testResponse = await fetch('/medicine-search/debug');
+                const testData = await testResponse.json();
+                console.log('🧪 API test successful:', testData);
+            } catch (error) {
+                console.error('🧪 API test failed:', error);
+            }
+        }, 1000);
+    });
+
+    // Global function for favorites (called from dynamically created buttons)
+    async function addToFavorites(medicineName, platform, price) {
+        try {
+            const response = await fetch('/medicine-search/favorites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ medicineName, platform, price })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`✅ ${medicineName} added to your favorites!`);
+            } else {
+                alert(`❌ ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Failed to add to favorites:', error);
+            alert('❌ Failed to add to favorites. Please try again.');
+        }
+    }
+
+    console.log('🚀 Medicine Search JavaScript loaded successfully!');
+</script>

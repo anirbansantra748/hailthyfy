@@ -1,0 +1,1487 @@
+<%- include('../partials/header') %>
+
+<style>
+    /* Professional Color & Spacing System */
+    :root {
+        --emerald-50: #ecfdf5;
+        --emerald-100: #d1fae5;
+        --emerald-200: #a7f3d0;
+        --emerald-300: #6ee7b7;
+        --emerald-400: #34d399;
+        --emerald-500: #10b981;
+        --emerald-600: #059669;
+        --emerald-700: #047857;
+        --emerald-800: #065f46;
+        --emerald-900: #064e3b;
+        
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        
+        /* Professional Gradients */
+        --gradient-primary: linear-gradient(135deg, var(--emerald-500) 0%, var(--emerald-600) 100%);
+        --gradient-secondary: linear-gradient(135deg, var(--emerald-400) 0%, var(--emerald-500) 100%);
+        --gradient-light: linear-gradient(135deg, var(--emerald-50) 0%, white 100%);
+        --gradient-surface: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.98) 100%);
+        --gradient-hero: linear-gradient(135deg, var(--emerald-600) 0%, var(--emerald-700) 50%, var(--emerald-800) 100%);
+        
+        /* Professional Spacing */
+        --space-16: 4rem;
+        --space-20: 5rem;
+        --space-24: 6rem;
+        --space-32: 8rem;
+        
+        /* Typography */
+        --text-lg: 1.125rem;
+        --text-xl: 1.25rem;
+        --text-2xl: 1.5rem;
+        --text-3xl: 1.875rem;
+        --text-4xl: 2.25rem;
+        --text-5xl: 3rem;
+        --text-6xl: 3.75rem;
+        
+        /* Shadows */
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        --shadow-emerald: 0 20px 25px -5px rgb(16 185 129 / 0.15), 0 8px 10px -6px rgb(16 185 129 / 0.1);
+    }
+
+    /* Global Reset & Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        line-height: 1.6;
+        color: var(--gray-800);
+        background: var(--gradient-light);
+        overflow-x: hidden;
+    }
+
+    /* Hero Section - Revolutionary Design */
+    .hero-section {
+        min-height: 100vh;
+        background: var(--gradient-hero);
+        position: relative;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(52, 211, 153, 0.15) 0%, transparent 25%),
+            radial-gradient(circle at 80% 80%, rgba(110, 231, 183, 0.1) 0%, transparent 25%),
+            radial-gradient(circle at 40% 70%, rgba(16, 185, 129, 0.1) 0%, transparent 25%);
+        animation: heroFloat 20s ease-in-out infinite;
+    }
+
+    @keyframes heroFloat {
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        33% { transform: scale(1.05) rotate(1deg); }
+        66% { transform: scale(0.98) rotate(-0.5deg); }
+    }
+
+    .hero-grid {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 3rem;
+        align-items: center;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        min-height: 100vh;
+    }
+
+    .hero-content {
+        color: white;
+    }
+
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-full);
+        padding: 0.75rem 1.5rem;
+        font-size: var(--text-sm);
+        font-weight: 600;
+        margin-bottom: var(--space-8);
+        box-shadow: var(--shadow-lg);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .hero-title {
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: var(--space-6);
+        letter-spacing: -0.02em;
+        animation: fadeInUp 0.8s ease-out 0.1s both;
+    }
+
+    .hero-highlight {
+        background: linear-gradient(45deg, var(--emerald-300), var(--emerald-200));
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+    }
+
+    .hero-description {
+        font-size: var(--text-xl);
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: var(--space-10);
+        max-width: 32rem;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+        animation: fadeInUp 0.8s ease-out 0.3s both;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .btn-primary {
+        background: rgba(255, 255, 255, 0.95);
+        color: var(--emerald-700);
+        border: none;
+        border-radius: 50px;
+        padding: 1.2rem 2.5rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2), 0 4px 15px rgba(0, 0, 0, 0.1);
+        min-width: 220px;
+        justify-content: center;
+        letter-spacing: 0.3px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-primary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn-primary:hover::before {
+        left: 100%;
+    }
+
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 50px;
+        padding: 1.2rem 2.5rem;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px);
+        min-width: 220px;
+        justify-content: center;
+        letter-spacing: 0.3px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-secondary::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn-secondary:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(255, 255, 255, 0.25), 0 8px 25px rgba(0, 0, 0, 0.15);
+        color: var(--emerald-700);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.7);
+        transform: translateY(-4px) scale(1.02);
+        color: white;
+        box-shadow: 0 20px 40px rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(30px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: 20px;
+        padding: 2rem 1.5rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 25px rgba(255, 255, 255, 0.1);
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: var(--text-3xl);
+        font-weight: 800;
+        color: white;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: var(--text-sm);
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+    }
+
+    .hero-visual {
+        position: relative;
+        animation: fadeInRight 1s ease-out 0.3s both;
+    }
+
+    .hero-dashboard {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 15px 35px rgba(16, 185, 129, 0.1);
+        transform: perspective(1000px) rotateY(-8deg) rotateX(3deg);
+        animation: float 6s ease-in-out infinite;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: perspective(1000px) rotateY(-5deg) rotateX(5deg) translateY(0px); }
+        50% { transform: perspective(1000px) rotateY(-5deg) rotateX(5deg) translateY(-10px); }
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .dashboard-title {
+        font-size: var(--text-2xl);
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+
+    .dashboard-status {
+        background: var(--gradient-secondary);
+        color: white;
+        border-radius: var(--radius-full);
+        padding: 0.5rem 1rem;
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+
+    .dashboard-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 0;
+    }
+
+    .metric-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: 12px;
+        padding: 1.25rem 1rem;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.1);
+    }
+
+    .metric-value {
+        font-size: var(--text-2xl);
+        font-weight: 700;
+        color: var(--emerald-600);
+    }
+
+    .metric-label {
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+        margin-top: 0.25rem;
+    }
+
+    /* Services Section - Compact & Professional */
+    .services-section {
+        padding: var(--space-32) 0;
+        background: white;
+        position: relative;
+    }
+
+    .services-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 var(--space-8);
+    }
+
+    .services-header {
+        text-align: center;
+        margin-bottom: var(--space-20);
+    }
+
+    .services-title {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: var(--space-4);
+        letter-spacing: -0.02em;
+    }
+
+    .services-subtitle {
+        font-size: var(--text-xl);
+        color: var(--gray-600);
+        max-width: 48rem;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .text-gradient {
+        background: var(--gradient-primary);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: var(--space-8);
+    }
+
+    .service-card {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-10);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .service-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+        transform: scaleX(0);
+        transition: transform 0.4s ease;
+    }
+
+    .service-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--shadow-emerald);
+        border-color: var(--emerald-200);
+    }
+
+    .service-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .service-icon {
+        width: 4rem;
+        height: 4rem;
+        background: var(--gradient-primary);
+        border-radius: var(--radius-xl);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: var(--space-6);
+        box-shadow: var(--shadow-emerald);
+        transition: transform 0.3s ease;
+    }
+
+    .service-card:hover .service-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .service-icon i {
+        font-size: var(--text-2xl);
+        color: white;
+    }
+
+    .service-title {
+        font-size: var(--text-2xl);
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: var(--space-4);
+        line-height: 1.3;
+    }
+
+    .service-description {
+        color: var(--gray-600);
+        line-height: 1.6;
+        margin-bottom: var(--space-6);
+        flex-grow: 1;
+    }
+
+    .service-features {
+        list-style: none;
+        margin-bottom: var(--space-6);
+    }
+
+    .service-features li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        font-size: var(--text-sm);
+        color: var(--gray-700);
+    }
+
+    .service-features li::before {
+        content: '✓';
+        background: var(--emerald-100);
+        color: var(--emerald-600);
+        border-radius: 50%;
+        width: 1.25rem;
+        height: 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .service-action {
+        background: var(--gradient-secondary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-lg);
+        padding: 0.875rem 1.5rem;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        justify-content: center;
+    }
+
+    .service-action:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
+        color: white;
+    }
+
+    /* Statistics Section - Elegant & Impactful */
+    .stats-section {
+        padding: var(--space-24) 0;
+        background: var(--gradient-hero);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stats-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1.5" fill="%23ffffff" opacity="0.1"/></svg>') repeat;
+        background-size: 50px 50px;
+        animation: backgroundMove 20s linear infinite;
+    }
+
+    @keyframes backgroundMove {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(50px, 50px); }
+    }
+
+    .stats-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 var(--space-8);
+        position: relative;
+        z-index: 2;
+    }
+
+    .stats-header {
+        text-align: center;
+        margin-bottom: var(--space-16);
+    }
+
+    .stats-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 800;
+        margin-bottom: var(--space-4);
+        letter-spacing: -0.02em;
+    }
+
+    .stats-subtitle {
+        font-size: var(--text-lg);
+        color: rgba(255, 255, 255, 0.8);
+        max-width: 40rem;
+        margin: 0 auto;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: var(--space-8);
+    }
+
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-xl);
+        padding: var(--space-8);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: var(--shadow-2xl);
+    }
+
+    .stat-icon {
+        font-size: var(--text-4xl);
+        color: var(--emerald-300);
+        margin-bottom: var(--space-4);
+    }
+
+    .stat-value {
+        font-size: var(--text-4xl);
+        font-weight: 800;
+        margin-bottom: var(--space-2);
+        display: block;
+    }
+
+    .stat-label {
+        font-size: var(--text-lg);
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 500;
+    }
+
+    /* Testimonials Section - Social Proof */
+    .testimonials-section {
+        padding: var(--space-32) 0;
+        background: var(--gradient-light);
+    }
+
+    .testimonials-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 var(--space-8);
+    }
+
+    .testimonials-header {
+        text-align: center;
+        margin-bottom: var(--space-20);
+    }
+
+    .testimonials-title {
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: var(--space-4);
+        letter-spacing: -0.02em;
+    }
+
+    .testimonials-subtitle {
+        font-size: var(--text-xl);
+        color: var(--gray-600);
+        max-width: 48rem;
+        margin: 0 auto;
+    }
+
+    .testimonials-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: var(--space-8);
+    }
+
+    .testimonial-card {
+        background: white;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-8);
+        transition: all 0.3s ease;
+        position: relative;
+        box-shadow: var(--shadow-md);
+    }
+
+    .testimonial-card::before {
+        content: '"';
+        position: absolute;
+        top: -0.5rem;
+        left: var(--space-8);
+        font-size: 4rem;
+        color: var(--emerald-200);
+        font-family: Georgia, serif;
+        line-height: 1;
+    }
+
+    .testimonial-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-emerald);
+        border-color: var(--emerald-200);
+    }
+
+    .testimonial-content {
+        font-size: var(--text-lg);
+        line-height: 1.6;
+        color: var(--gray-700);
+        margin-bottom: var(--space-6);
+        font-style: italic;
+    }
+
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+    }
+
+    .author-avatar {
+        width: 3rem;
+        height: 3rem;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: var(--text-lg);
+    }
+
+    .author-info h5 {
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+    }
+
+    .author-info p {
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+        margin: 0;
+    }
+
+    .author-rating {
+        margin-left: auto;
+        color: #fbbf24;
+        font-size: var(--text-lg);
+    }
+
+    /* CTA Section - Powerful Call to Action */
+    .cta-section {
+        padding: var(--space-32) 0;
+        background: var(--gradient-hero);
+        color: white;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .cta-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 50% 50%, rgba(110, 231, 183, 0.1) 0%, transparent 50%);
+    }
+
+    .cta-container {
+        max-width: 56rem;
+        margin: 0 auto;
+        padding: 0 var(--space-8);
+        position: relative;
+        z-index: 2;
+    }
+
+    .cta-title {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 800;
+        margin-bottom: var(--space-6);
+        letter-spacing: -0.02em;
+    }
+
+    .cta-description {
+        font-size: var(--text-xl);
+        color: rgba(255, 255, 255, 0.9);
+        margin-bottom: var(--space-10);
+        line-height: 1.6;
+    }
+
+    .cta-actions {
+        display: flex;
+        gap: var(--space-4);
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: var(--space-12);
+    }
+
+    .cta-trust {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-8);
+        flex-wrap: wrap;
+        margin-top: var(--space-8);
+    }
+
+    .trust-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: var(--text-sm);
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    .trust-icon {
+        color: var(--emerald-300);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .hero-grid {
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            text-align: center;
+            padding: 0 1.5rem;
+        }
+        
+        .hero-dashboard {
+            transform: none;
+            max-width: 24rem;
+            margin: 0 auto;
+        }
+        
+        .hero-actions {
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .hero-stats {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .hero-actions {
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .btn-primary, .btn-secondary {
+            width: 100%;
+            max-width: 280px;
+            min-width: 280px;
+        }
+        
+        .dashboard-metrics {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        
+        .cta-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .hero-grid {
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+        
+        .hero-dashboard {
+            max-width: 20rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        :root {
+            --space-8: 1.5rem;
+            --space-10: 2rem;
+            --space-12: 2.5rem;
+            --space-16: 3rem;
+            --space-20: 3.5rem;
+            --space-24: 4rem;
+            --space-32: 5rem;
+        }
+        
+        .services-grid {
+            grid-template-columns: 1fr;
+            gap: var(--space-6);
+        }
+        
+        .service-card {
+            padding: var(--space-6);
+        }
+    }
+</style>
+
+<!-- Hero Section with Revolutionary Design -->
+<section class="hero-section">
+    <div class="hero-grid">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-award"></i>
+                <span>#1 AI-Powered Healthcare Platform</span>
+            </div>
+            
+            <h1 class="hero-title">
+                Transform Your <span class="hero-highlight">Healthcare Journey</span> 
+                with AI Intelligence
+            </h1>
+            
+            <p class="hero-description">
+                Experience next-generation healthcare combining world-class medical professionals, 
+                cutting-edge AI diagnostics, and a supportive global community. 
+                Your health, reimagined for the digital age.
+            </p>
+            
+            <div class="hero-actions">
+                <% if (!user) { %>
+                    <a href="/users/signup" class="btn-primary">
+                        <i class="fas fa-rocket"></i>
+                        Start Your Journey
+                    </a>
+                    <a href="/prediction/xray" class="btn-secondary">
+                        <i class="fas fa-brain"></i>
+                        Try AI Analysis
+                    </a>
+                <% } else { %>
+                    <a href="/users/dashboard" class="btn-primary">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Your Dashboard
+                    </a>
+                    <a href="/prediction/xray" class="btn-secondary">
+                        <i class="fas fa-brain"></i>
+                        AI Health Scan
+                    </a>
+                <% } %>
+            </div>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number" data-count="85000">0+</span>
+                    <span class="stat-label">Patients Served</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-count="2500">0+</span>
+                    <span class="stat-label">Medical Experts</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99.9%</span>
+                    <span class="stat-label">Uptime</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="hero-dashboard">
+                <div class="dashboard-header">
+                    <h3 class="dashboard-title">Health Dashboard</h3>
+                    <div class="dashboard-status">Live</div>
+                </div>
+                <div class="dashboard-metrics">
+                    <div class="metric-card">
+                        <div class="metric-value">98%</div>
+                        <div class="metric-label">Health Score</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">24/7</div>
+                        <div class="metric-label">AI Monitoring</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">15+</div>
+                        <div class="metric-label">Specialists</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">Real-time</div>
+                        <div class="metric-label">Analytics</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Services Section with Comprehensive Features -->
+<section class="services-section">
+    <div class="services-container">
+        <div class="services-header">
+            <h2 class="services-title">
+                Comprehensive <span class="text-gradient">Healthcare Solutions</span>
+            </h2>
+            <p class="services-subtitle">
+                From AI-powered diagnostics to personalized care plans, discover how our 
+                integrated platform transforms every aspect of your healthcare experience.
+            </p>
+        </div>
+        
+        <div class="services-grid">
+            <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="service-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3 class="service-title">AI Medical Analysis</h3>
+                <p class="service-description">
+                    Revolutionary machine learning algorithms analyze medical imaging, 
+                    lab results, and symptoms with 99.8% accuracy for instant preliminary diagnoses.
+                </p>
+                <ul class="service-features">
+                    <li>X-ray & MRI Analysis</li>
+                    <li>Symptom Assessment</li>
+                    <li>Risk Prediction</li>
+                    <li>Treatment Recommendations</li>
+                </ul>
+                <a href="/prediction/xray" class="service-action">
+                    Try AI Analysis <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="service-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="service-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <h3 class="service-title">Expert Medical Team</h3>
+                <p class="service-description">
+                    Connect with 2,500+ board-certified physicians and specialists across 
+                    50+ medical disciplines available 24/7 for consultations worldwide.
+                </p>
+                <ul class="service-features">
+                    <li>Board-Certified Doctors</li>
+                    <li>Multi-Language Support</li>
+                    <li>Instant Consultations</li>
+                    <li>Second Opinions</li>
+                </ul>
+                <a href="/doctors" class="service-action">
+                    Find Specialists <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="service-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="service-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h3 class="service-title">Advanced Telemedicine</h3>
+                <p class="service-description">
+                    Ultra-HD video consultations with real-time vital monitoring, 
+                    secure file sharing, and integrated prescription management systems.
+                </p>
+                <ul class="service-features">
+                    <li>4K Video Quality</li>
+                    <li>Real-time Monitoring</li>
+                    <li>Digital Prescriptions</li>
+                    <li>Session Recording</li>
+                </ul>
+                <a href="/video-calls" class="service-action">
+                    Start Video Call <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="service-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="service-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="service-title">Global Health Community</h3>
+                <p class="service-description">
+                    Join 85,000+ members in our moderated health community featuring 
+                    expert-verified content, peer support, and wellness challenges.
+                </p>
+                <ul class="service-features">
+                    <li>Moderated Discussions</li>
+                    <li>Expert Q&A Sessions</li>
+                    <li>Wellness Challenges</li>
+                    <li>Support Groups</li>
+                </ul>
+                <a href="/posts" class="service-action">
+                    Join Community <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="service-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="service-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="service-title">Enterprise Security</h3>
+                <p class="service-description">
+                    Military-grade encryption, HIPAA compliance, and SOC 2 certification 
+                    ensure your health data remains private and secure at all times.
+                </p>
+                <ul class="service-features">
+                    <li>End-to-End Encryption</li>
+                    <li>HIPAA Compliant</li>
+                    <li>Zero-Trust Architecture</li>
+                    <li>Audit Logging</li>
+                </ul>
+                <a href="/security" class="service-action">
+                    Security Details <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            
+            <div class="service-card" data-aos="fade-up" data-aos-delay="600">
+                <div class="service-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3 class="service-title">24/7 Emergency Care</h3>
+                <p class="service-description">
+                    Round-the-clock emergency response with instant triage, 
+                    emergency room coordination, and automated alert systems for critical situations.
+                </p>
+                <ul class="service-features">
+                    <li>Instant Triage</li>
+                    <li>Emergency Dispatch</li>
+                    <li>Hospital Network</li>
+                    <li>Family Notifications</li>
+                </ul>
+                <a href="/emergency" class="service-action">
+                    Emergency Access <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section">
+    <div class="stats-container">
+        <div class="stats-header">
+            <h2 class="stats-title">Trusted Worldwide</h2>
+            <p class="stats-subtitle">
+                Our platform has revolutionized healthcare delivery with measurable results 
+                and exceptional patient outcomes across the globe.
+            </p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span class="stat-value" data-count="85000">0+</span>
+                <div class="stat-label">Active Patients</div>
+            </div>
+            
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="stat-icon">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <span class="stat-value" data-count="2500">0+</span>
+                <div class="stat-label">Medical Experts</div>
+            </div>
+            
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="stat-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <span class="stat-value" data-count="750000">0+</span>
+                <div class="stat-label">Consultations</div>
+            </div>
+            
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="stat-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <span class="stat-value">4.9/5</span>
+                <div class="stat-label">Patient Rating</div>
+            </div>
+            
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="500">
+                <div class="stat-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <span class="stat-value" data-count="95">0+</span>
+                <div class="stat-label">Countries</div>
+            </div>
+            
+            <div class="stat-card" data-aos="fade-up" data-aos-delay="600">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span class="stat-value">99.8%</span>
+                <div class="stat-label">AI Accuracy</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <div class="testimonials-container">
+        <div class="testimonials-header">
+            <h2 class="testimonials-title">
+                Real Stories, <span class="text-gradient">Real Impact</span>
+            </h2>
+            <p class="testimonials-subtitle">
+                Discover how our platform has transformed healthcare experiences 
+                for thousands of patients and medical professionals worldwide.
+            </p>
+        </div>
+        
+        <div class="testimonials-grid">
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="testimonial-content">
+                    "The AI diagnosis caught my early-stage condition when three different 
+                    specialists missed it. The accuracy is phenomenal and literally saved my life. 
+                    This platform is the future of healthcare."
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">SM</div>
+                    <div class="author-info">
+                        <h5>Dr. Sarah Mitchell</h5>
+                        <p>Oncology Patient & Surgeon</p>
+                    </div>
+                    <div class="author-rating">★★★★★</div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="testimonial-content">
+                    "As a busy CEO, having instant access to world-class specialists 
+                    has been transformative. The telemedicine quality is exceptional, 
+                    and the AI insights help me stay proactive about my health."
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MJ</div>
+                    <div class="author-info">
+                        <h5>Michael Johnson</h5>
+                        <p>CEO, Fortune 500 Company</p>
+                    </div>
+                    <div class="author-rating">★★★★★</div>
+                </div>
+            </div>
+            
+            <div class="testimonial-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="testimonial-content">
+                    "The community support during my recovery was incredible. 
+                    Combined with expert medical care and AI monitoring, 
+                    I found hope, treatment, and lifelong connections."
+                </div>
+                <div class="testimonial-author">
+                    <div class="author-avatar">ER</div>
+                    <div class="author-info">
+                        <h5>Emily Rodriguez</h5>
+                        <p>Cancer Survivor & Advocate</p>
+                    </div>
+                    <div class="author-rating">★★★★★</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+    <div class="cta-container">
+        <h2 class="cta-title">
+            Ready to Transform Your <span class="hero-highlight">Healthcare</span>?
+        </h2>
+        <p class="cta-description">
+            Join 85,000+ patients and 2,500+ medical professionals who've already 
+            discovered the future of healthcare. Start your journey today.
+        </p>
+        
+        <div class="cta-actions">
+            <% if (!user) { %>
+                <a href="/users/signup" class="btn-primary">
+                    <i class="fas fa-rocket"></i>
+                    Get Started Free
+                </a>
+                <a href="/doctors" class="btn-secondary">
+                    <i class="fas fa-user-md"></i>
+                    Meet Our Experts
+                </a>
+            <% } else { %>
+                <a href="/posts/new" class="btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Share Your Story
+                </a>
+                <a href="/users/dashboard" class="btn-secondary">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Your Dashboard
+                </a>
+            <% } %>
+        </div>
+        
+        <div class="cta-trust">
+            <div class="trust-item">
+                <i class="fas fa-shield-alt trust-icon"></i>
+                <span>HIPAA Compliant</span>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-lock trust-icon"></i>
+                <span>Bank-Level Security</span>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-certificate trust-icon"></i>
+                <span>SOC 2 Certified</span>
+            </div>
+            <div class="trust-item">
+                <i class="fas fa-clock trust-icon"></i>
+                <span>24/7 Support</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Enhanced JavaScript for Interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize AOS animations
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 600,
+                easing: 'ease-out-cubic',
+                once: true,
+                offset: 50,
+                delay: 0
+            });
+        }
+        
+        // Animated counter function
+        function animateCounter(element, target, isDecimal = false) {
+            let current = 0;
+            const increment = target / (isDecimal ? 49 : 100);
+            const duration = isDecimal ? 1000 : 2000;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                
+                if (isDecimal) {
+                    element.textContent = current.toFixed(1) + '/5';
+                } else if (element.textContent.includes('%')) {
+                    element.textContent = Math.floor(current) + '%';
+                } else {
+                    element.textContent = Math.floor(current).toLocaleString() + '+';
+                }
+            }, duration / (isDecimal ? 49 : 100));
+        }
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('[data-count], .stat-value');
+                    counters.forEach(counter => {
+                        const target = counter.getAttribute('data-count');
+                        if (target) {
+                            animateCounter(counter, parseInt(target));
+                        } else if (counter.textContent === '4.9/5') {
+                            animateCounter(counter, 4.9, true);
+                        } else if (counter.textContent.includes('%')) {
+                            const value = parseFloat(counter.textContent);
+                            animateCounter(counter, value);
+                        }
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        // Observe stats sections
+        document.querySelectorAll('.hero-stats, .stats-section').forEach(section => {
+            observer.observe(section);
+        });
+        
+        // Enhanced service card interactions
+        const serviceCards = document.querySelectorAll('.service-card');
+        serviceCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-12px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Enhanced button interactions
+        const buttons = document.querySelectorAll('.btn-primary, .btn-secondary, .service-action');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px) scale(1.05)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        // Parallax effect for hero section
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                heroSection.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+        });
+        
+        // Dynamic background animation
+        function createFloatingElements() {
+            const container = document.querySelector('.hero-section');
+            if (!container) return;
+            
+            for (let i = 0; i < 5; i++) {
+                const element = document.createElement('div');
+                element.style.cssText = `
+                    position: absolute;
+                    width: ${Math.random() * 100 + 50}px;
+                    height: ${Math.random() * 100 + 50}px;
+                    background: rgba(110, 231, 183, ${Math.random() * 0.1 + 0.05});
+                    border-radius: 50%;
+                    left: ${Math.random() * 100}%;
+                    top: ${Math.random() * 100}%;
+                    animation: float ${Math.random() * 10 + 10}s ease-in-out infinite;
+                    z-index: 1;
+                `;
+                container.appendChild(element);
+            }
+        }
+        
+        createFloatingElements();
+        
+        // Performance optimization: lazy load images
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.remove('lazy');
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('img[data-src]').forEach(img => {
+                imageObserver.observe(img);
+            });
+        }
+    });
+</script>
+
+<%- include('../partials/footer') %>

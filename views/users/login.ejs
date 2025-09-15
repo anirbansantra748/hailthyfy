@@ -1,0 +1,386 @@
+<%- include('../partials/header') %>
+
+<style>
+    /* Hide navbar for login page */
+    .navbar { display: none !important; }
+    
+    /* 🚀 REVOLUTIONARY LOGIN PAGE */
+    body {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Inter', sans-serif;
+        padding: 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: backgroundFloat 20s ease-in-out infinite;
+        pointer-events: none;
+    }
+    
+    @keyframes backgroundFloat {
+        0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+        50% { transform: translate(-50%, -50%) rotate(180deg); }
+    }
+    
+    .login-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 30px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.15),
+                    0 0 0 1px rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        max-width: 450px;
+        width: 100%;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .login-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #10b981, #34d399, #6ee7b7, #10b981);
+        background-size: 400% 100%;
+        animation: gradientShift 3s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+        padding: 3rem 2rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .login-header::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+        animation: headerFloat 8s ease-in-out infinite;
+    }
+    
+    @keyframes headerFloat {
+        0%, 100% { transform: translate(-50%, -50%) scale(1); }
+        50% { transform: translate(-50%, -50%) scale(1.1); }
+    }
+    
+    .brand-logo {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s ease-in-out infinite;
+        filter: drop-shadow(0 4px 15px rgba(16, 185, 129, 0.3));
+    }
+    
+    .brand-title {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #059669;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.025em;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .brand-subtitle {
+        color: #16a34a;
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        opacity: 0.9;
+    }
+    
+    .form-body {
+        padding: 3rem 2.5rem;
+        background: white;
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #059669;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .form-control {
+        border: 2px solid #d1fae5;
+        border-radius: 15px;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 10px rgba(16, 185, 129, 0.05);
+    }
+    
+    .form-control:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.15),
+                    0 5px 15px rgba(16, 185, 129, 0.1);
+        outline: none;
+        transform: translateY(-2px);
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6b7280;
+        transition: all 0.3s ease;
+        pointer-events: none;
+    }
+    
+    .form-control:focus + .input-icon {
+        color: #10b981;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        border-radius: 20px;
+        padding: 1rem 2rem;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: white;
+        width: 100%;
+        margin-top: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-login::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s ease;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        color: white;
+    }
+    
+    .btn-login:hover::before {
+        left: 100%;
+    }
+    
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 2rem 0;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #d1fae5;
+    }
+    
+    .divider span {
+        background: white;
+        padding: 0 1rem;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .signup-link {
+        text-align: center;
+        color: #6b7280;
+    }
+    
+    .signup-link a {
+        color: #10b981;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    
+    .signup-link a:hover {
+        color: #059669;
+        transform: translateY(-1px);
+    }
+    
+    .signup-link a::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: #10b981;
+        transition: width 0.3s ease;
+    }
+    
+    .signup-link a:hover::after {
+        width: 100%;
+    }
+    
+    .alert-modern {
+        border: none;
+        border-radius: 15px;
+        padding: 1.25rem;
+        margin-bottom: 2rem;
+        font-weight: 500;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2, #fee2e2);
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+    
+    .alert-success {
+        background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+        color: #166534;
+        border-left: 4px solid #22c55e;
+    }
+    
+    @media (max-width: 768px) {
+        body {
+            padding: 1rem 0.5rem;
+        }
+        
+        .login-container {
+            margin: 0;
+            border-radius: 20px;
+        }
+        
+        .login-header {
+            padding: 2rem 1.5rem;
+        }
+        
+        .brand-title {
+            font-size: 2rem;
+        }
+        
+        .form-body {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+
+<div class="login-container">
+    <!-- Modern Header -->
+    <div class="login-header">
+        <div class="brand-logo">🏪</div>
+        <h1 class="brand-title">Healthfy</h1>
+        <p class="brand-subtitle">Welcome back! Sign in to your account</p>
+    </div>
+    
+    <!-- Form Body -->
+    <div class="form-body">
+        <!-- Alert Messages -->
+        <% if (typeof error !== 'undefined' && error && error.length) { %>
+            <div class="alert-modern alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Error:</strong> <%= Array.isArray(error) ? error[0] : error %>
+            </div>
+        <% } %>
+        
+        <% if (typeof success !== 'undefined' && success && success.length) { %>
+            <div class="alert-modern alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Success:</strong> <%= Array.isArray(success) ? success[0] : success %>
+            </div>
+        <% } %>
+        
+        <form action="/users/login" method="POST" id="loginForm">
+            <div class="form-group">
+                <label class="form-label">
+                    📧 Email Address
+                </label>
+                <input type="email" 
+                       class="form-control" 
+                       id="email" 
+                       name="email" 
+                       placeholder="Enter your email address" 
+                       required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    🔒 Password
+                </label>
+                <input type="password" 
+                       class="form-control" 
+                       id="password" 
+                       name="password" 
+                       placeholder="Enter your password" 
+                       required>
+            </div>
+            
+            <button class="btn btn-login" type="submit">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Sign In to Healthfy
+            </button>
+        </form>
+        
+        <div class="divider">
+            <span>New to Healthfy?</span>
+        </div>
+        
+        <div class="signup-link">
+            <p class="mb-0">
+                Create your free account 
+                <a href="/users/signup">Sign up here</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add form submission loader
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const button = this.querySelector('button[type="submit"]');
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing in...';
+    button.disabled = true;
+});
+</script>
+
+<%- include('../partials/footer') %>

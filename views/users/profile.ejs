@@ -1,0 +1,666 @@
+<%- include('../partials/header') %>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
+        color: #1f2937;
+        min-height: 100vh;
+        padding: 0;
+    }
+
+    /* Header Section */
+    .profile-header {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 3rem 0 6rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.05)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        opacity: 0.3;
+    }
+
+    .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #34d399, #10b981);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: white;
+        margin: 0 auto 1.5rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        position: relative;
+    }
+
+    .profile-avatar::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, rgba(255,255,255,0.2), transparent, rgba(255,255,255,0.1));
+        z-index: -1;
+    }
+
+    .profile-name {
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-subtitle {
+        text-align: center;
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .profile-stats {
+        display: flex;
+        justify-content: center;
+        gap: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-top: 0.25rem;
+    }
+
+    /* Main Content */
+    .profile-content {
+        max-width: 1200px;
+        margin: -3rem auto 0;
+        padding: 0 2rem 3rem;
+        position: relative;
+        z-index: 3;
+    }
+
+    /* Info Cards Grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        border: 1px solid #f3f4f6;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .info-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #34d399);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .info-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .info-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #ecfdf5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #10b981;
+    }
+
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f9fafb;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 500;
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+
+    .info-value {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 0.95rem;
+    }
+
+    .info-value.empty {
+        color: #9ca3af;
+        font-style: italic;
+    }
+
+    /* Health Metrics */
+    .health-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .metric-card {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #10b981;
+        margin-bottom: 0.25rem;
+    }
+
+    .metric-label {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .metric-unit {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+
+    /* Action Buttons */
+    .profile-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px -2px rgba(16, 185, 129, 0.3);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+        background: #f9fafb;
+        border-color: #10b981;
+        color: #374151;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-complete {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status-incomplete {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-content {
+            padding: 0 1rem 2rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .profile-stats {
+            gap: 2rem;
+        }
+
+        .profile-name {
+            font-size: 2rem;
+        }
+
+        .profile-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+    }
+</style>
+
+<!-- Profile Header -->
+<div class="profile-header">
+    <div class="header-content">
+        <div class="profile-avatar">
+            <% if (user.name) { %>
+                <%= user.name.charAt(0).toUpperCase() %>
+            <% } else { %>
+                👤
+            <% } %>
+        </div>
+        
+        <h1 class="profile-name">
+            <%= user.name || 'Your Name' %>
+        </h1>
+        
+        <p class="profile-subtitle">
+            Health Profile • Member since <%= new Date(user.createdAt || Date.now()).getFullYear() %>
+        </p>
+
+        <div class="profile-stats">
+            <div class="stat-item">
+                <span class="stat-value"><%= user.age || '--' %></span>
+                <span class="stat-label">Age</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value"><%= user.bloodGroup || '--' %></span>
+                <span class="stat-label">Blood Group</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value"><%= user.bmi ? user.bmi.toFixed(1) : '--' %></span>
+                <span class="stat-label">BMI</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value"><%= (user.healthLogs && user.healthLogs.length) || 0 %></span>
+                <span class="stat-label">Health Records</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Content -->
+<div class="profile-content">
+    <div class="info-grid">
+        <!-- Personal Information -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">👤</div>
+                <h3 class="card-title">Personal Information</h3>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Full Name</span>
+                <span class="info-value <%= !user.name ? 'empty' : '' %>">
+                    <%= user.name || 'Not provided' %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value"><%= user.email %></span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Phone</span>
+                <span class="info-value <%= !user.phone ? 'empty' : '' %>">
+                    <%= user.phone || 'Not provided' %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Date of Birth</span>
+                <span class="info-value <%= !user.dob ? 'empty' : '' %>">
+                    <% if (user.dob) { %>
+                        <%= new Date(user.dob).toLocaleDateString() %>
+                    <% } else { %>
+                        Not provided
+                    <% } %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Gender</span>
+                <span class="info-value <%= !user.gender ? 'empty' : '' %>">
+                    <%= user.gender ? user.gender.charAt(0).toUpperCase() + user.gender.slice(1) : 'Not provided' %>
+                </span>
+            </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">🏠</div>
+                <h3 class="card-title">Address</h3>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Street</span>
+                <span class="info-value <%= !user.address?.street ? 'empty' : '' %>">
+                    <%= user.address?.street || 'Not provided' %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">City</span>
+                <span class="info-value <%= !user.address?.city ? 'empty' : '' %>">
+                    <%= user.address?.city || 'Not provided' %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">State</span>
+                <span class="info-value <%= !user.address?.state ? 'empty' : '' %>">
+                    <%= user.address?.state || 'Not provided' %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Country</span>
+                <span class="info-value <%= !user.address?.country ? 'empty' : '' %>">
+                    <%= user.address?.country || 'Not provided' %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">PIN Code</span>
+                <span class="info-value <%= !user.address?.pincode ? 'empty' : '' %>">
+                    <%= user.address?.pincode || 'Not provided' %>
+                </span>
+            </div>
+        </div>
+
+        <!-- Health Metrics -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">❤️</div>
+                <h3 class="card-title">Health Metrics</h3>
+            </div>
+            <div class="health-metrics">
+                <div class="metric-card">
+                    <div class="metric-value"><%= user.height || '--' %></div>
+                    <div class="metric-label">Height <span class="metric-unit">cm</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value"><%= user.weight || '--' %></div>
+                    <div class="metric-label">Weight <span class="metric-unit">kg</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value"><%= user.heartRate || '--' %></div>
+                    <div class="metric-label">Heart Rate <span class="metric-unit">bpm</span></div>
+                </div>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Blood Pressure</span>
+                <span class="info-value <%= (!user.bloodPressure?.systolic && !user.bloodPressure?.diastolic) ? 'empty' : '' %>">
+                    <% if (user.bloodPressure?.systolic && user.bloodPressure?.diastolic) { %>
+                        <%= user.bloodPressure.systolic %>/<%= user.bloodPressure.diastolic %> mmHg
+                    <% } else { %>
+                        Not recorded
+                    <% } %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Blood Sugar (Fasting)</span>
+                <span class="info-value <%= !user.bloodSugar?.fasting ? 'empty' : '' %>">
+                    <% if (user.bloodSugar?.fasting) { %>
+                        <%= user.bloodSugar.fasting %> mg/dL
+                    <% } else { %>
+                        Not recorded
+                    <% } %>
+                </span>
+            </div>
+        </div>
+
+        <!-- Medical Information -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">🩺</div>
+                <h3 class="card-title">Medical Information</h3>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Allergies</span>
+                <span class="info-value <%= (!user.allergies || user.allergies.length === 0) ? 'empty' : '' %>">
+                    <% if (user.allergies && user.allergies.length > 0) { %>
+                        <%= user.allergies.join(', ') %>
+                    <% } else { %>
+                        None reported
+                    <% } %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Medical History</span>
+                <span class="info-value <%= (!user.medicalHistory || user.medicalHistory.length === 0) ? 'empty' : '' %>">
+                    <% if (user.medicalHistory && user.medicalHistory.length > 0) { %>
+                        <%= user.medicalHistory.join(', ') %>
+                    <% } else { %>
+                        None reported
+                    <% } %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Current Medications</span>
+                <span class="info-value <%= (!user.currentMedications || user.currentMedications.length === 0) ? 'empty' : '' %>">
+                    <% if (user.currentMedications && user.currentMedications.length > 0) { %>
+                        <%= user.currentMedications.join(', ') %>
+                    <% } else { %>
+                        None currently
+                    <% } %>
+                </span>
+            </div>
+        </div>
+
+        <!-- Lifestyle Information -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">🏃‍♂️</div>
+                <h3 class="card-title">Lifestyle</h3>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Smoking</span>
+                <span class="info-value">
+                    <% if (user.lifestyle?.smoking) { %>
+                        Yes
+                    <% } else if (user.lifestyle?.smoking === false) { %>
+                        No
+                    <% } else { %>
+                        <span class="empty">Not specified</span>
+                    <% } %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Alcohol</span>
+                <span class="info-value">
+                    <% if (user.lifestyle?.alcohol) { %>
+                        Yes
+                    <% } else if (user.lifestyle?.alcohol === false) { %>
+                        No
+                    <% } else { %>
+                        <span class="empty">Not specified</span>
+                    <% } %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Exercise Frequency</span>
+                <span class="info-value <%= !user.lifestyle?.exerciseFrequency ? 'empty' : '' %>">
+                    <%= user.lifestyle?.exerciseFrequency ? user.lifestyle.exerciseFrequency.charAt(0).toUpperCase() + user.lifestyle.exerciseFrequency.slice(1) : 'Not specified' %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Sleep Hours</span>
+                <span class="info-value <%= !user.lifestyle?.sleepHours ? 'empty' : '' %>">
+                    <% if (user.lifestyle?.sleepHours) { %>
+                        <%= user.lifestyle.sleepHours %> hours/night
+                    <% } else { %>
+                        Not specified
+                    <% } %>
+                </span>
+            </div>
+        </div>
+
+        <!-- Profile Completion -->
+        <div class="info-card">
+            <div class="card-header">
+                <div class="card-icon">📊</div>
+                <h3 class="card-title">Profile Status</h3>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Profile Completeness</span>
+                <span class="info-value">
+                    <% 
+                        // Calculate completion percentage
+                        let completionFields = 0;
+                        let totalFields = 15; // Adjust based on important fields
+                        
+                        if (user.name) completionFields++;
+                        if (user.phone) completionFields++;
+                        if (user.dob) completionFields++;
+                        if (user.gender) completionFields++;
+                        if (user.address?.street) completionFields++;
+                        if (user.address?.city) completionFields++;
+                        if (user.height) completionFields++;
+                        if (user.weight) completionFields++;
+                        if (user.bloodGroup) completionFields++;
+                        if (user.bloodPressure?.systolic) completionFields++;
+                        if (user.bloodSugar?.fasting) completionFields++;
+                        if (user.heartRate) completionFields++;
+                        if (user.allergies && user.allergies.length) completionFields++;
+                        if (user.medicalHistory && user.medicalHistory.length) completionFields++;
+                        if (user.lifestyle?.exerciseFrequency) completionFields++;
+                        
+                        const completionPercentage = Math.round((completionFields / totalFields) * 100);
+                    %>
+                    <span class="status-badge <%= completionPercentage >= 70 ? 'status-complete' : 'status-incomplete' %>">
+                        <%= completionPercentage %>% Complete
+                    </span>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Last Updated</span>
+                <span class="info-value">
+                    <% if (user.updatedAt) { %>
+                        <%= new Date(user.updatedAt).toLocaleDateString() %>
+                    <% } else { %>
+                        <span class="empty">Never</span>
+                    <% } %>
+                </span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Member Since</span>
+                <span class="info-value">
+                    <%= new Date(user.createdAt || Date.now()).toLocaleDateString() %>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="profile-actions">
+        <a href="/users/update-profile" class="btn btn-primary">
+            <i class="fas fa-edit"></i>
+            Update Profile
+        </a>
+        <a href="/users/dashboard" class="btn btn-secondary">
+            <i class="fas fa-tachometer-alt"></i>
+            Dashboard
+        </a>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

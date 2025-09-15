@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Picker Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .upload-zone {
+            border: 3px dashed #007bff;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f8f9ff 0%, #e6f3ff 100%);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            padding: 3rem;
+        }
+        .upload-zone:hover {
+            border-color: #0056b3;
+            background: linear-gradient(135deg, #e6f3ff 0%, #cce7ff 100%);
+            transform: translateY(-2px);
+        }
+        .upload-zone.dragover {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #f0fff4 0%, #d4edda 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4>File Picker Test</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="uploadZone" class="upload-zone text-center">
+                            <div id="uploadContent">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                <h5 class="mb-2">Drop your file here or click to browse</h5>
+                                <p class="text-muted mb-3">Supports JPG, PNG, JPEG files up to 10MB</p>
+                                <button type="button" class="btn btn-outline-primary" id="chooseFileBtn">
+                                    <i class="fas fa-folder-open me-2"></i>Choose File
+                                </button>
+                            </div>
+                            
+                            <div id="previewContent" class="d-none">
+                                <div class="row align-items-center">
+                                    <div class="col-md-4">
+                                        <img id="previewImage" class="img-fluid rounded shadow" style="max-height: 150px;">
+                                    </div>
+                                    <div class="col-md-8 text-start">
+                                        <h6 class="mb-1" id="fileName"></h6>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-hdd me-1"></i><span id="fileSize"></span>
+                                            <span class="mx-2">•</span>
+                                            <i class="fas fa-file-image me-1"></i><span id="fileType"></span>
+                                        </p>
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearFile()">
+                                                <i class="fas fa-times me-1"></i>Remove
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" id="changeFileBtn">
+                                                <i class="fas fa-edit me-1"></i>Change
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="file" id="fileInput" accept="image/*" class="d-none">
+                        
+                        <div class="mt-3">
+                            <div class="alert alert-info">
+                                <h6>Test Status:</h6>
+                                <ul id="testResults" class="mb-0">
+                                    <li>Page loaded successfully</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadZone = document.getElementById('uploadZone');
+            const uploadContent = document.getElementById('uploadContent');
+            const previewContent = document.getElementById('previewContent');
+            const fileInput = document.getElementById('fileInput');
+            const chooseFileBtn = document.getElementById('chooseFileBtn');
+            const changeFileBtn = document.getElementById('changeFileBtn');
+            const testResults = document.getElementById('testResults');
+            
+            // Add test result
+            function addTestResult(message, success = true) {
+                const li = document.createElement('li');
+                li.innerHTML = success ? 
+                    `<i class="fas fa-check text-success me-1"></i>${message}` : 
+                    `<i class="fas fa-times text-danger me-1"></i>${message}`;
+                testResults.appendChild(li);
+            }
+            
+            addTestResult('JavaScript initialized successfully');
+            
+            // Upload zone click handler
+            uploadZone.addEventListener('click', function(e) {
+                addTestResult('Upload zone clicked');
+                if (e.target === uploadZone || e.target.closest('#uploadContent')) {
+                    addTestResult('Triggering file picker...');
+                    fileInput.click();
+                }
+            });
+            
+            // Choose file button click handler
+            chooseFileBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                addTestResult('Choose File button clicked');
+                fileInput.click();
+            });
+            
+            // Change file button click handler
+            changeFileBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                addTestResult('Change File button clicked');
+                fileInput.click();
+            });
+            
+            // File input change handler
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    addTestResult(`File selected: ${file.name}`);
+                    handleFileSelect(file);
+                }
+            });
+            
+            // Handle file selection
+            function handleFileSelect(file) {
+                addTestResult(`Processing file: ${file.type}, ${formatFileSize(file.size)}`);
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('fileName').textContent = file.name;
+                    document.getElementById('fileSize').textContent = formatFileSize(file.size);
+                    document.getElementById('fileType').textContent = file.type;
+                    
+                    uploadContent.classList.add('d-none');
+                    previewContent.classList.remove('d-none');
+                    
+                    addTestResult('File preview loaded successfully', true);
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Clear file
+            window.clearFile = function() {
+                fileInput.value = '';
+                uploadContent.classList.remove('d-none');
+                previewContent.classList.add('d-none');
+                addTestResult('File cleared');
+            };
+            
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+            
+            // Test drag and drop
+            uploadZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadZone.classList.add('dragover');
+                addTestResult('File dragged over upload zone');
+            });
+            
+            uploadZone.addEventListener('dragleave', function(e) {
+                if (!uploadZone.contains(e.relatedTarget)) {
+                    uploadZone.classList.remove('dragover');
+                }
+            });
+            
+            uploadZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    addTestResult('File dropped successfully');
+                    handleFileSelect(files[0]);
+                }
+            });
+            
+            addTestResult('All event listeners attached successfully');
+        });
+    </script>
+</body>
+</html>

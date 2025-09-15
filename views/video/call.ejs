@@ -1,0 +1,598 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid p-0 m-0 vh-100 d-flex flex-column">
+  <!-- Video Call Header -->
+  <div class="bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <a href="/chat/<%= chat._id %>" class="btn btn-outline-light me-3">
+        <i class="fas fa-arrow-left"></i>
+      </a>
+      <div>
+        <h5 class="mb-0"><%= otherParticipant.name %></h5>
+        <small class="text-muted">Call started: <span id="callTimer">00:00</span></small>
+      </div>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-light" id="toggleMicBtn">
+        <i class="fas fa-microphone"></i>
+      </button>
+      <button class="btn btn-outline-light" id="toggleVideoBtn">
+        <i class="fas fa-video"></i>
+      </button>
+      <button class="btn btn-danger" id="endCallBtn">
+        <i class="fas fa-phone-slash"></i> End Call
+      </button>
+    </div>
+  </div>
+
+  <!-- Video Container -->
+  <div class="flex-grow-1 position-relative bg-dark">
+    <!-- Remote Video (Full Screen) -->
+    <div id="remoteVideo" class="position-absolute top-0 start-0 w-100 h-100">
+      <video class="w-100 h-100" autoplay playsinline></video>
+      <div class="position-absolute top-50 start-50 translate-middle text-white" id="waitingMessage">
+        <div class="text-center">
+          <div class="spinner-border mb-3" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <h5 id="waitingTitle">Waiting for <%= otherParticipant.name %> to join...</h5>
+          <p id="waitingSubtitle" class="text-muted">Role: <%= call.initiator._id.toString() === user._id.toString() ? 'Call Initiator' : 'Joining Call' %></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Local Video (Picture-in-Picture) -->
+    <div id="localVideo" class="position-absolute bottom-0 end-0 m-3" style="width: 200px; height: 150px;">
+      <video class="w-100 h-100 rounded shadow" autoplay playsinline muted></video>
+    </div>
+  </div>
+</div>
+
+<!-- Call Status Modal -->
+<div class="modal fade" id="callStatusModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center py-4">
+        <div id="callStatusIcon" class="mb-3 fs-1">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <h5 id="callStatusTitle">Connecting...</h5>
+        <p id="callStatusMessage" class="text-muted">Please wait while we establish the connection.</p>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <a href="/chat/<%= chat._id %>" class="btn btn-secondary" id="returnToChatBtn">Return to Chat</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  // Call data
+  const callId = '<%= call._id %>';
+  const chatId = '<%= chat._id %>';
+  const currentUserId = '<%= user._id %>';
+  
+  // Socket.io connection
+  const socket = io();
+  
+  // WebRTC variables
+  let localStream;
+  let peerConnection;
+  let callTimer;
+  let callDuration = 0;
+  let remoteSocketId = null;
+  
+  // DOM elements
+  const localVideoElement = document.querySelector('#localVideo video');
+  const remoteVideoElement = document.querySelector('#remoteVideo video');
+  const toggleMicBtn = document.getElementById('toggleMicBtn');
+  const toggleVideoBtn = document.getElementById('toggleVideoBtn');
+  const endCallBtn = document.getElementById('endCallBtn');
+  const callTimerElement = document.getElementById('callTimer');
+  const waitingMessage = document.getElementById('waitingMessage');
+  const waitingTitle = document.getElementById('waitingTitle');
+  const waitingSubtitle = document.getElementById('waitingSubtitle');
+  
+  // Call status modal
+  const callStatusModal = new bootstrap.Modal(document.getElementById('callStatusModal'));
+  const callStatusIcon = document.getElementById('callStatusIcon');
+  const callStatusTitle = document.getElementById('callStatusTitle');
+  const callStatusMessage = document.getElementById('callStatusMessage');
+  const returnToChatBtn = document.getElementById('returnToChatBtn');
+  
+  // Determine if current user is the call initiator
+  const isInitiator = '<%= call.initiator._id %>' === currentUserId;
+  console.log('🎯 User role:', isInitiator ? 'INITIATOR' : 'JOINER');
+  
+  // Function to update waiting message
+  function updateWaitingMessage(title, subtitle = '') {
+    if (waitingTitle) waitingTitle.textContent = title;
+    if (waitingSubtitle && subtitle) waitingSubtitle.textContent = subtitle;
+  }
+  
+  // Socket.io event handlers
+  socket.on('connect', () => {
+    console.log('🔌 Connected to Socket.io server with ID:', socket.id);
+    console.log('😊 Joining video call room:', callId);
+    console.log('📝 Call info - Initiator ID: <%= call.initiator._id %>, Current User ID:', currentUserId);
+    console.log('🎯 Final role determination: User is', isInitiator ? 'INITIATOR' : 'JOINER');
+    socket.emit('join video call', callId);
+  });
+  
+  socket.on('user joined call', (data) => {
+    console.log('👤 User joined call:', data.socketId, 'My ID:', socket.id);
+    if (data.socketId !== socket.id) {
+      remoteSocketId = data.socketId;
+      console.log('🤝 Setting remote socket ID:', remoteSocketId);
+      
+      // Only the INITIATOR should create offers when someone joins
+      if (localStream && isInitiator) {
+        console.log('📞 INITIATOR: Creating offer for new participant');
+        updateWaitingMessage('Connecting...', 'Starting video call');
+        setTimeout(() => createAndSendOffer(data.socketId), 1000);
+      } else {
+        console.log('⏳ JOINER: Waiting for offer from initiator...');
+        updateWaitingMessage('Connecting...', 'Waiting for call to start');
+      }
+    }
+  });
+  
+  socket.on('current participants', (participants) => {
+    console.log('👥 Current participants:', participants, 'My ID:', socket.id);
+    const otherParticipants = participants.filter(id => id !== socket.id);
+    
+    if (otherParticipants.length > 0) {
+      remoteSocketId = otherParticipants[0];
+      console.log('🎯 Selected remote participant:', remoteSocketId);
+      
+      // Only INITIATOR creates offer when joining an existing call
+      if (localStream && isInitiator) {
+        console.log('📞 INITIATOR: Creating offer for existing participant');
+        updateWaitingMessage('Connecting...', 'Joining existing call');
+        setTimeout(() => createAndSendOffer(remoteSocketId), 1000);
+      } else {
+        console.log('⏳ JOINER: Waiting for offer from initiator...');
+        updateWaitingMessage('Connecting...', 'Waiting for initiator to start call');
+        // Fail-safe: If no offer is received within 10 seconds, show error
+        setTimeout(() => {
+          if (!peerConnection.remoteDescription) {
+            console.log('⚠️ Fail-safe: No offer received within 10 seconds');
+            updateWaitingMessage('Connection timeout', 'Could not connect to the other participant');
+            showCallError('Connection timeout', 'Could not establish connection with the other participant.');
+          }
+        }, 10000);
+      }
+    } else {
+      console.log('⏳ No other participants yet, waiting...');
+    }
+  });
+  
+  socket.on('user left call', (data) => {
+    console.log('👋 User left call:', data.socketId);
+    if (data.socketId === remoteSocketId) {
+      handleRemoteUserLeft();
+    }
+  });
+  
+  socket.on('video call offer received', async (data) => {
+    console.log('📨 Received offer from:', data.fromSocketId);
+    remoteSocketId = data.fromSocketId;
+    await handleOffer(data.offer, data.fromSocketId);
+  });
+  
+  socket.on('video call answer received', async (data) => {
+    console.log('📬 Received answer from:', data.fromSocketId);
+    await handleAnswer(data.answer);
+  });
+  
+  socket.on('ice candidate received', async (data) => {
+    console.log('🧊 Received ICE candidate from:', data.fromSocketId);
+    await handleIceCandidate(data.candidate);
+  });
+  
+  socket.on('call ended', (data) => {
+    console.log('☎️ Call ended by:', data.endedBy);
+    if (data.endedBy !== socket.id) {
+      showCallError('Call Ended', 'The other participant has ended the call.');
+      cleanup();
+    }
+  });
+  
+  // Initialize call
+  async function initializeCall() {
+    try {
+      console.log('🎬 Initializing video call...');
+      console.log('🎯 User role:', isInitiator ? 'INITIATOR (creates offers)' : 'JOINER (waits for offers)');
+      
+      // Get local media stream
+      localStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+      });
+      
+      console.log('📹 Local media stream obtained');
+      
+      // Display local video
+      localVideoElement.srcObject = localStream;
+      
+      // Initialize WebRTC connection
+      setupPeerConnection();
+      
+      // Start call timer
+      startCallTimer();
+      
+      // Setup button handlers
+      setupButtonHandlers();
+      
+      console.log('✅ Call initialization complete');
+      
+    } catch (error) {
+      console.error('❌ Error initializing call:', error);
+      showCallError('Could not access camera or microphone', 'Please check your device permissions and try again.');
+    }
+  }
+  
+  // Setup WebRTC peer connection
+  function setupPeerConnection() {
+    // Create RTCPeerConnection with STUN/TURN servers
+    const configuration = {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        // Add TURN servers in production
+      ]
+    };
+    
+    peerConnection = new RTCPeerConnection(configuration);
+    
+    // Add local tracks to connection
+    localStream.getTracks().forEach(track => {
+      peerConnection.addTrack(track, localStream);
+    });
+    
+  // Handle incoming tracks
+    peerConnection.ontrack = (event) => {
+      console.log('🎥 Received remote track:', event.track.kind);
+      if (event.streams && event.streams[0]) {
+        console.log('🎬 Setting remote video stream');
+        remoteVideoElement.srcObject = event.streams[0];
+        waitingMessage.style.display = 'none';
+        
+        // Update UI to show connected state
+        const otherParticipantName = '<%= otherParticipant.name %>';
+        document.querySelector('.text-white h5').textContent = `Connected to ${otherParticipantName}`;
+        
+        console.log('✨ SUCCESS: Video call connected! Both users can now see each other.');
+      }
+    };
+    
+    // Handle ICE candidates
+    peerConnection.onicecandidate = (event) => {
+      if (event.candidate && remoteSocketId) {
+        console.log('🧊 Sending ICE candidate to:', remoteSocketId);
+        socket.emit('ice candidate', {
+          callId,
+          candidate: event.candidate,
+          targetSocketId: remoteSocketId
+        });
+      } else if (event.candidate) {
+        console.log('⚠️ ICE candidate generated but no remote socket ID');
+      }
+    };
+    
+    // Connection state changes
+    peerConnection.onconnectionstatechange = () => {
+      console.log('🔗 Connection state changed to:', peerConnection.connectionState);
+      switch(peerConnection.connectionState) {
+        case 'connected':
+          console.log('✅ Peers connected successfully!');
+          hideCallStatus();
+          waitingMessage.style.display = 'none';
+          break;
+        case 'connecting':
+          console.log('🔄 Connecting to peer...');
+          showCallStatus('Connecting...', 'Establishing connection with the other participant');
+          break;
+        case 'disconnected':
+          console.log('⚠️ Connection disconnected');
+          break;
+        case 'failed':
+          console.log('❌ Connection failed');
+          showCallError('Connection lost', 'The call has been disconnected.');
+          break;
+        case 'closed':
+          console.log('🔒 Connection closed');
+          break;
+      }
+    };
+  }
+  
+  // Handle remote user leaving
+  function handleRemoteUserLeft() {
+    console.log('Remote user left the call');
+    
+    // Hide remote video and show waiting message
+    document.getElementById('remoteVideo').style.display = 'block';
+    waitingMessage.style.display = 'block';
+    waitingMessage.innerHTML = `
+      <div class="text-center">
+        <div class="spinner-border mb-3" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <h5>The other participant has left the call</h5>
+      </div>
+    `;
+    
+    // Reset remote video
+    remoteVideoElement.srcObject = null;
+    remoteSocketId = null;
+  }
+  
+  // Create and send offer
+  async function createAndSendOffer(targetSocketId) {
+    try {
+      console.log('📞 Creating offer for:', targetSocketId);
+      
+      if (!peerConnection) {
+        console.error('❌ Peer connection not initialized!');
+        return;
+      }
+      
+      // Check if we already have a local description (to prevent duplicate offers)
+      if (peerConnection.localDescription) {
+        console.log('⚠️ Already have local description, skipping duplicate offer creation');
+        return;
+      }
+      
+      const offer = await peerConnection.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: true
+      });
+      
+      console.log('✅ Offer created successfully');
+      await peerConnection.setLocalDescription(offer);
+      console.log('✅ Local description set');
+      
+      // Send offer via Socket.io
+      console.log('📤 Sending offer to:', targetSocketId);
+      socket.emit('video call offer', {
+        callId,
+        offer: offer,
+        targetSocketId: targetSocketId
+      });
+      
+      showCallStatus('Calling...', `Waiting for <%= otherParticipant.name %> to answer`);
+    } catch (error) {
+      console.error('❌ Error creating offer:', error);
+      showCallError('Failed to start call', 'Please try again later.');
+    }
+  }
+  
+  // Handle incoming answer
+  async function handleAnswer(answer) {
+    try {
+      console.log('📬 Handling answer...');
+      
+      if (!peerConnection) {
+        console.error('❌ Peer connection not initialized!');
+        return;
+      }
+      
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+      console.log('✅ Answer processed successfully');
+      
+      showCallStatus('Connecting...', 'Finalizing connection...');
+    } catch (error) {
+      console.error('❌ Error handling answer:', error);
+      showCallError('Connection Error', 'Failed to establish connection.');
+    }
+  }
+  
+  // Handle incoming offer
+  async function handleOffer(offer, fromSocketId) {
+    try {
+      console.log('📨 Handling offer from:', fromSocketId);
+      
+      if (!peerConnection) {
+        console.error('❌ Peer connection not initialized!');
+        return;
+      }
+      
+      // Check if we already have a remote description (to prevent conflicts)
+      if (peerConnection.remoteDescription) {
+        console.log('⚠️ Already have remote description, ignoring duplicate offer');
+        return;
+      }
+      
+      console.log('🔧 Setting remote description...');
+      await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+      console.log('✅ Remote description set');
+      
+      console.log('📞 Creating answer...');
+      const answer = await peerConnection.createAnswer();
+      console.log('✅ Answer created');
+      
+      await peerConnection.setLocalDescription(answer);
+      console.log('✅ Local description set for answer');
+      
+      // Send answer via Socket.io
+      console.log('📤 Sending answer to:', fromSocketId);
+      socket.emit('video call answer', {
+        callId,
+        answer: answer,
+        targetSocketId: fromSocketId
+      });
+      
+      showCallStatus('Connecting...', 'Establishing video connection...');
+    } catch (error) {
+      console.error('❌ Error handling offer:', error);
+      showCallError('Connection Error', 'Failed to process the call request.');
+    }
+  }
+  
+  // Handle incoming ICE candidate
+  async function handleIceCandidate(candidate) {
+    try {
+      console.log('🧊 Adding ICE candidate...');
+      
+      if (!peerConnection) {
+        console.error('❌ Peer connection not initialized!');
+        return;
+      }
+      
+      await peerConnection.addIceCandidate(new RTCIceCandidate(candidate));
+      console.log('✅ ICE candidate added successfully');
+    } catch (error) {
+      console.error('❌ Error adding ICE candidate:', error);
+    }
+  }
+  
+  // Cleanup function
+  function cleanup() {
+    // Stop call timer
+    if (callTimer) {
+      clearInterval(callTimer);
+    }
+    
+    // Close peer connection
+    if (peerConnection) {
+      peerConnection.close();
+      peerConnection = null;
+    }
+    
+    // Stop local stream
+    if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = null;
+    }
+    
+    // Reset UI
+    localVideoElement.srcObject = null;
+    remoteVideoElement.srcObject = null;
+    remoteSocketId = null;
+  }
+  
+  // Setup button handlers
+  function setupButtonHandlers() {
+    // Toggle microphone
+    toggleMicBtn.addEventListener('click', () => {
+      const audioTrack = localStream.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !audioTrack.enabled;
+        toggleMicBtn.innerHTML = audioTrack.enabled ? 
+          '<i class="fas fa-microphone"></i>' : 
+          '<i class="fas fa-microphone-slash"></i>';
+      }
+    });
+    
+    // Toggle video
+    toggleVideoBtn.addEventListener('click', () => {
+      const videoTrack = localStream.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.enabled = !videoTrack.enabled;
+        toggleVideoBtn.innerHTML = videoTrack.enabled ? 
+          '<i class="fas fa-video"></i>' : 
+          '<i class="fas fa-video-slash"></i>';
+      }
+    });
+    
+    // End call
+    endCallBtn.addEventListener('click', async () => {
+      try {
+        // Notify other participants via Socket.io
+        socket.emit('end video call', callId);
+        
+        // Clean up local resources
+        cleanup();
+        
+        // Call server endpoint to end call
+        const result = await endCall();
+        if (result.success) {
+          window.location.href = `/chat/${result.chatId}`;
+        } else {
+          showCallError('Failed to end call', result.message || 'Please try again');
+        }
+      } catch (error) {
+        console.error('Error ending call:', error);
+        showCallError('Error ending call', 'Please try again later');
+      }
+    });
+  }
+  
+  // End the call
+  async function endCall() {
+    try {
+      // Stop call timer
+      clearInterval(callTimer);
+      
+      // Close peer connection
+      if (peerConnection) {
+        peerConnection.close();
+      }
+      
+      // Stop local stream
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+      
+      // Notify server that call has ended
+      const response = await fetch(`/video-calls/${callId}/end`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error ending call:', error);
+      throw error;
+    }
+  }
+  
+  // Start call timer
+  function startCallTimer() {
+    callTimer = setInterval(() => {
+      callDuration++;
+      const minutes = Math.floor(callDuration / 60).toString().padStart(2, '0');
+      const seconds = (callDuration % 60).toString().padStart(2, '0');
+      callTimerElement.textContent = `${minutes}:${seconds}`;
+    }, 1000);
+  }
+  
+  // Show call status modal
+  function showCallStatus(title, message, icon = '<i class="fas fa-spinner fa-spin"></i>') {
+    callStatusIcon.innerHTML = icon;
+    callStatusTitle.textContent = title;
+    callStatusMessage.textContent = message;
+    returnToChatBtn.style.display = 'none';
+    callStatusModal.show();
+  }
+  
+  // Show call error
+  function showCallError(title, message) {
+    callStatusIcon.innerHTML = '<i class="fas fa-exclamation-circle text-danger"></i>';
+    callStatusTitle.textContent = title;
+    callStatusMessage.textContent = message;
+    returnToChatBtn.style.display = 'block';
+    callStatusModal.show();
+  }
+  
+  // Hide call status modal
+  function hideCallStatus() {
+    callStatusModal.hide();
+  }
+  
+  // Handle page unload
+  window.addEventListener('beforeunload', () => {
+    socket.emit('leave video call', callId);
+    cleanup();
+    endCall().catch(console.error);
+  });
+  
+  // Initialize call when page loads
+  document.addEventListener('DOMContentLoaded', initializeCall);
+</script>
+
+<%- include('../partials/footer') %>

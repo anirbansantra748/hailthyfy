@@ -1,0 +1,544 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+    .compare-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .compare-header {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px;
+        margin-bottom: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .compare-header h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+
+    .compare-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .compare-summary {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: 1px solid #e0e6ed;
+    }
+
+    .summary-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        text-align: center;
+        padding: 1.5rem;
+        border-radius: 12px;
+        background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+        border: 1px solid #e0e6ed;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .best-deal-card {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .best-deal-card h3 {
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .best-price {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .best-platform {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 1rem;
+    }
+
+    .view-deal-btn {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: 2px solid white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+
+    .view-deal-btn:hover {
+        background: white;
+        color: #28a745;
+        transform: translateY(-2px);
+    }
+
+    .platforms-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .platform-compare-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        border: 1px solid #e0e6ed;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .platform-compare-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-3px);
+    }
+
+    .platform-compare-header {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .platform-name {
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+
+    .platform-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .platform-content {
+        padding: 1.5rem;
+    }
+
+    .price-comparison {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .price-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 10px;
+        border: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .price-card.best-price-highlight {
+        border-color: #28a745;
+        background: #d4edda;
+    }
+
+    .medicine-name {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .price-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .current-price {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+
+    .price-savings {
+        text-align: right;
+    }
+
+    .original-price {
+        color: #6c757d;
+        text-decoration: line-through;
+        font-size: 0.9rem;
+    }
+
+    .discount-percentage {
+        background: #dc3545;
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .product-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+    }
+
+    .action-btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        text-align: center;
+        flex: 1;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px solid #667eea;
+        color: #667eea;
+    }
+
+    .btn-outline:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .no-products-message {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border: 2px dashed #dee2e6;
+    }
+
+    .back-to-search {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .back-btn {
+        background: #6c757d;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .back-btn:hover {
+        background: #495057;
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .compare-container {
+            padding: 15px;
+        }
+
+        .compare-header {
+            padding: 1.5rem;
+        }
+
+        .compare-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .summary-stats {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+        }
+
+        .best-price {
+            font-size: 2rem;
+        }
+
+        .price-comparison {
+            grid-template-columns: 1fr;
+        }
+
+        .product-actions {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            margin: 0;
+        }
+    }
+</style>
+
+<div class="compare-container">
+    <!-- Back to Search -->
+    <div class="back-to-search">
+        <a href="/medicine-search" class="back-btn">
+            ⬅️ Back to Search
+        </a>
+    </div>
+
+    <!-- Compare Header -->
+    <div class="compare-header">
+        <h1>📊 Price Comparison: <%= medicine %></h1>
+        <p>Detailed comparison across multiple pharmacy platforms</p>
+    </div>
+
+    <% if (results && results.platforms.length > 0) { %>
+    
+    <!-- Compare Summary -->
+    <div class="compare-summary">
+        <div class="summary-stats">
+            <div class="stat-card">
+                <div class="stat-number"><%= results.platforms.length %></div>
+                <div class="stat-label">Platforms Checked</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= results.platforms.filter(p => p.available).length %></div>
+                <div class="stat-label">Available On</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= results.platforms.reduce((sum, p) => sum + (p.prices ? p.prices.length : 0), 0) %></div>
+                <div class="stat-label">Total Products</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= results.searchDuration %>ms</div>
+                <div class="stat-label">Search Time</div>
+            </div>
+        </div>
+
+        <!-- Best Deal Card -->
+        <% if (results.cheapestOption) { %>
+        <div class="best-deal-card">
+            <h3>🎯 Best Deal Found</h3>
+            <div class="best-price">₹<%= results.cheapestOption.price %></div>
+            <div class="best-platform">Available on <%= results.cheapestOption.platform %></div>
+            <a href="<%= results.cheapestOption.productUrl %>" target="_blank" class="view-deal-btn">
+                🛒 View This Deal
+            </a>
+        </div>
+        <% } %>
+    </div>
+
+    <!-- Platform Comparison -->
+    <div class="platforms-grid">
+        <% results.platforms.forEach(platform => { %>
+        <div class="platform-compare-card">
+            <div class="platform-compare-header">
+                <div class="platform-name"><%= platform.platform %></div>
+                <div class="platform-badge">
+                    <% if (platform.available) { %>
+                        ✅ <%= platform.prices ? platform.prices.length : 0 %> Products
+                    <% } else { %>
+                        ❌ Not Available
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="platform-content">
+                <% if (!platform.available) { %>
+                    <div class="no-products-message">
+                        <h4>😔 Not Available</h4>
+                        <p><%= platform.error || 'This medicine is not currently available on this platform.' %></p>
+                        <a href="<%= platform.searchUrl %>" target="_blank" class="action-btn btn-outline">
+                            🔗 Search Manually
+                        </a>
+                    </div>
+                <% } else { %>
+                    <div class="price-comparison">
+                        <% platform.prices.forEach(product => { %>
+                        <% const isBestPrice = results.cheapestOption && 
+                              product.price === results.cheapestOption.price && 
+                              platform.platform === results.cheapestOption.platform %>
+                        
+                        <div class="price-card <%= isBestPrice ? 'best-price-highlight' : '' %>">
+                            <div class="medicine-name">
+                                <%= product.name %>
+                                <% if (isBestPrice) { %>
+                                    <span style="color: #28a745; font-weight: 700;">🏆 BEST PRICE</span>
+                                <% } %>
+                            </div>
+                            
+                            <div class="price-details">
+                                <div class="current-price">₹<%= product.price %></div>
+                                <% if (product.discount > 0) { %>
+                                <div class="price-savings">
+                                    <div class="original-price">₹<%= product.originalPrice %></div>
+                                    <div class="discount-percentage"><%= product.discount %>% OFF</div>
+                                </div>
+                                <% } %>
+                            </div>
+
+                            <div class="product-meta">
+                                <div class="meta-item">
+                                    <span>🏪</span>
+                                    <span><%= product.seller %></span>
+                                </div>
+                                <div class="meta-item">
+                                    <span><%= product.inStock ? '✅' : '❌' %></span>
+                                    <span><%= product.inStock ? 'In Stock' : 'Out of Stock' %></span>
+                                </div>
+                                <div class="meta-item">
+                                    <span>⭐</span>
+                                    <span><%= product.rating %> (<%= product.reviews %>)</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span>📦</span>
+                                    <span><%= product.deliveryTime %></span>
+                                </div>
+                            </div>
+
+                            <div class="product-actions">
+                                <a href="<%= product.productUrl %>" target="_blank" class="action-btn btn-primary">
+                                    🛒 Buy Now
+                                </a>
+                                <button class="action-btn btn-outline" onclick="addToFavorites('<%= product.name %>', '<%= platform.platform %>', <%= product.price %>)">
+                                    ❤️ Save
+                                </button>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1rem; color: #6c757d; font-size: 0.9rem;">
+                        Last updated: <%= new Date(platform.lastUpdated).toLocaleString() %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        <% }); %>
+    </div>
+
+    <% } else { %>
+    <!-- No Results -->
+    <div class="compare-summary">
+        <div style="text-align: center; padding: 3rem;">
+            <h2>😔 No Results Found</h2>
+            <p>We couldn't find any results for "<%= medicine %>". Please try a different search term.</p>
+            <a href="/medicine-search" class="action-btn btn-primary" style="display: inline-block; margin-top: 1rem;">
+                🔍 Search Again
+            </a>
+        </div>
+    </div>
+    <% } %>
+</div>
+
+<script>
+    async function addToFavorites(medicineName, platform, price) {
+        try {
+            const response = await fetch('/medicine-search/favorites', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ medicineName, platform, price })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`✅ ${medicineName} added to your favorites!`);
+            } else {
+                alert(`❌ ${data.message}`);
+            }
+        } catch (error) {
+            console.error('Failed to add to favorites:', error);
+            alert('❌ Failed to add to favorites. Please try again.');
+        }
+    }
+
+    // Add some interactive animations
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.price-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+
+    console.log('📊 Medicine Compare page loaded successfully!');
+</script>

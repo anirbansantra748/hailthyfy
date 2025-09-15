@@ -1,0 +1,578 @@
+<%- include('../partials/header') %>
+
+<style>
+  :root {
+    --healthcare-primary: #10B981;
+    --healthcare-secondary: #059669;
+    --healthcare-light: #ECFDF5;
+    --healthcare-accent: #34D399;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --bg-light: #F9FAFB;
+    --white: #FFFFFF;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+  }
+
+  .posts-header {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    padding: 4rem 0 2rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .posts-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="60" cy="30" r="1.5" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    opacity: 0.3;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .posts-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .posts-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+
+  .search-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+  }
+
+  .search-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .search-form .form-control {
+    border: 2px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    background: #F9FAFB;
+  }
+
+  .search-form .form-control:focus {
+    border-color: var(--healthcare-primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    background: white;
+  }
+
+  .btn-search {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    border: none;
+    border-radius: 12px;
+    padding: 12px 24px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .btn-search:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-create-post {
+    background: linear-gradient(135deg, var(--healthcare-accent) 0%, var(--healthcare-primary) 100%);
+    border: none;
+    border-radius: 15px;
+    padding: 12px 24px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-create-post:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .post-card {
+    background: white;
+    border: none;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    height: 100%;
+    position: relative;
+  }
+
+  .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .post-image {
+    height: 220px;
+    object-fit: cover;
+    width: 100%;
+    transition: transform 0.3s ease;
+  }
+
+  .post-card:hover .post-image {
+    transform: scale(1.05);
+  }
+
+  .post-content {
+    padding: 1.5rem;
+  }
+
+  .post-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-title a {
+    text-decoration: none;
+    color: inherit;
+    transition: color 0.3s ease;
+  }
+
+  .post-title a:hover {
+    color: var(--healthcare-primary);
+  }
+
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+  }
+
+  .author-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--healthcare-light);
+  }
+
+  .post-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .tag-badge {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    color: var(--healthcare-secondary);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .tag-badge:hover {
+    background: linear-gradient(135deg, var(--healthcare-accent) 0%, var(--healthcare-primary) 100%);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #F9FAFB;
+    border-top: 1px solid #F3F4F6;
+  }
+
+  .btn-read-more {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 8px 20px;
+    color: white;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn-read-more:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .post-management {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-edit, .btn-delete {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+  }
+
+  .btn-edit {
+    background: #F59E0B;
+    border: none;
+    color: white;
+  }
+
+  .btn-edit:hover {
+    background: #D97706;
+    transform: translateY(-2px);
+  }
+
+  .btn-delete {
+    background: #EF4444;
+    border: none;
+    color: white;
+  }
+
+  .btn-delete:hover {
+    background: #DC2626;
+    transform: translateY(-2px);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .empty-state-icon {
+    font-size: 4rem;
+    color: var(--healthcare-primary);
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-state h3 {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .empty-state p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+  }
+
+  .category-badge {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .posts-title {
+      font-size: 2rem;
+    }
+
+    .search-form .row > div {
+      margin-bottom: 1rem;
+    }
+
+    .post-card {
+      margin-bottom: 1.5rem;
+    }
+  }
+</style>
+
+<!-- Posts Header -->
+<div class="posts-header">
+  <div class="container">
+    <div class="text-center">
+      <h1 class="posts-title">
+        <i class="fas fa-newspaper me-3"></i>
+        Healthcare Community
+      </h1>
+      <p class="posts-subtitle">Share knowledge, connect with peers, and stay updated on the latest healthcare insights</p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Search and Filter -->
+  <div class="search-card">
+    <div class="card-body p-4">
+      <form method="get" action="/posts" class="search-form">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label fw-semibold text-secondary">
+              <i class="fas fa-search me-2"></i>Search Posts
+            </label>
+            <input
+              type="text"
+              name="q"
+              value="<%= (query && query.q) || '' %>"
+              class="form-control"
+              placeholder="Search by title, content..."
+            />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold text-secondary">
+              <i class="fas fa-tag me-2"></i>Tag
+            </label>
+            <input
+              type="text"
+              name="tag"
+              value="<%= (query && query.tag) || '' %>"
+              class="form-control"
+              placeholder="e.g., cardiology, nutrition"
+            />
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-semibold text-secondary">
+              <i class="fas fa-folder me-2"></i>Category
+            </label>
+            <input
+              type="text"
+              name="category"
+              value="<%= (query && query.category) || '' %>"
+              class="form-control"
+              placeholder="e.g., research, tips"
+            />
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-search w-100">
+              <i class="fas fa-search me-2"></i>Search
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Post Button -->
+  <% if (user) { %>
+  <div class="mb-4 text-end">
+    <a href="/posts/new" class="btn-create-post">
+      <i class="fas fa-plus-circle"></i>
+      Share Your Knowledge
+    </a>
+  </div>
+  <% } %>
+
+  <!-- Posts Grid -->
+  <% if (posts && posts.length > 0) { %>
+  <div class="row">
+    <% posts.forEach(post => { %>
+    <div class="col-lg-4 col-md-6 mb-4">
+      <article class="post-card">
+        <!-- Post Image -->
+        <div class="position-relative overflow-hidden">
+          <% if (post.images && post.images.length > 0) { %>
+          <img
+            src="<%= post.images[0] %>"
+            class="post-image"
+            alt="<%= post.title %>"
+          />
+          <% } else { %>
+          <div class="post-image d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);">
+            <i class="fas fa-file-medical-alt" style="font-size: 3rem; color: var(--healthcare-primary);"></i>
+          </div>
+          <% } %>
+          
+          <!-- Category Badge -->
+          <% if (post.category) { %>
+          <div class="position-absolute top-0 start-0 m-3">
+            <span class="category-badge">
+              <i class="fas fa-folder-open me-1"></i><%= post.category %>
+            </span>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Post Content -->
+        <div class="post-content">
+          <h2 class="post-title">
+            <a href="/posts/<%= post._id %>"><%= post.title %></a>
+          </h2>
+
+          <!-- Post Meta -->
+          <div class="post-meta">
+            <% if (post.author && post.author.profilePicture) { %>
+            <img
+              src="<%= post.author.profilePicture %>"
+              alt="<%= post.author.name %>"
+              class="author-avatar"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            />
+            <div class="author-avatar" style="display:none; background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%); color: white; font-size: 1rem; align-items: center; justify-content: center;">
+              👨‍⚕️
+            </div>
+            <% } else { %>
+            <div class="author-avatar" style="background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%); color: white; font-size: 1rem; display: flex; align-items: center; justify-content: center;">
+              👨‍⚕️
+            </div>
+            <% } %>
+            <div>
+              <div class="fw-semibold text-dark">
+                <%= (post.author && post.author.name) ? post.author.name : 'Anonymous' %>
+              </div>
+              <div class="small">
+                <i class="fas fa-calendar-alt me-1"></i>
+                <%= new Date(post.createdAt).toLocaleDateString() %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <% if (post.tags && post.tags.length > 0) { %>
+          <div class="post-tags">
+            <% post.tags.slice(0, 3).forEach(tag => { %>
+            <a href="/posts?tag=<%= tag %>" class="tag-badge">
+              #<%= tag %>
+            </a>
+            <% }) %>
+            <% if (post.tags.length > 3) { %>
+            <span class="tag-badge" style="background: #F3F4F6; color: var(--text-secondary);">
+              +<%= post.tags.length - 3 %> more
+            </span>
+            <% } %>
+          </div>
+          <% } %>
+        </div>
+
+        <!-- Post Actions -->
+        <div class="post-actions">
+          <a href="/posts/<%= post._id %>" class="btn-read-more">
+            <i class="fas fa-arrow-right me-2"></i>Read Article
+          </a>
+
+          <!-- Management Actions (for post owner) -->
+          <% if (user && post.author && String(post.author._id) === String(user._id)) { %>
+          <div class="post-management">
+            <a href="/posts/<%= post._id %>/edit" class="btn btn-edit">
+              <i class="fas fa-edit"></i>
+            </a>
+            <form action="/posts/<%= post._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this post?')">
+              <button type="submit" class="btn btn-delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+          <% } %>
+        </div>
+      </article>
+    </div>
+    <% }) %>
+  </div>
+  <% } else { %>
+  <!-- Empty State -->
+  <div class="empty-state">
+    <div class="empty-state-icon">
+      <i class="fas fa-file-medical"></i>
+    </div>
+    <h3>No Posts Found</h3>
+    <p>Be the first to share valuable healthcare insights with the community!</p>
+    <% if (user) { %>
+    <a href="/posts/new" class="btn-create-post">
+      <i class="fas fa-plus-circle me-2"></i>Create Your First Post
+    </a>
+    <% } else { %>
+    <a href="/users/login" class="btn-create-post">
+      <i class="fas fa-sign-in-alt me-2"></i>Login to Share Knowledge
+    </a>
+    <% } %>
+  </div>
+  <% } %>
+</div>
+
+<script>
+  // Add smooth animations on scroll
+  document.addEventListener('DOMContentLoaded', function() {
+    const cards = document.querySelectorAll('.post-card');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+          }, index * 100);
+        }
+      });
+    }, {
+      threshold: 0.1
+    });
+
+    cards.forEach(card => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = 'all 0.6s ease';
+      observer.observe(card);
+    });
+  });
+
+  // Enhanced search functionality
+  document.querySelector('.search-form').addEventListener('submit', function(e) {
+    const inputs = this.querySelectorAll('input[type="text"]');
+    let hasValue = false;
+    
+    inputs.forEach(input => {
+      if (input.value.trim()) {
+        hasValue = true;
+      }
+    });
+    
+    if (!hasValue) {
+      e.preventDefault();
+      alert('Please enter at least one search criteria.');
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>

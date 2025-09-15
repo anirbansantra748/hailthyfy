@@ -1,0 +1,1012 @@
+<% layout('layouts/boilerplate') %>
+
+<!-- Premium Fonts & Libraries -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    /* Premium Medical Color Palette */
+    --medical-primary: #10b981;
+    --medical-secondary: #059669;
+    --medical-dark: #064e3b;
+    --medical-light: #ecfdf5;
+    --medical-accent: #34d399;
+    --medical-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%);
+
+    /* Surface Colors */
+    --surface-primary: #ffffff;
+    --surface-secondary: #f8fafc;
+    --border-light: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 10px 30px -4px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 40px -8px rgba(0, 0, 0, 0.2);
+    --shadow-medical: 0 12px 35px rgba(16, 185, 129, 0.15);
+
+    /* Typography */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-display: 'Poppins', var(--font-primary);
+
+    /* Spacing */
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --space-3xl: 4rem;
+
+    /* Border Radius */
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-2xl: 28px;
+    --radius-full: 9999px;
+
+    /* Transitions */
+    --transition-smooth: 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Global Premium Styles */
+body {
+    font-family: var(--font-primary);
+    background: linear-gradient(135deg, #f0fdf4 0%, #f8fafc 50%, #f1f5f9 100%);
+    color: var(--text-primary);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Premium Hero Section */
+.premium-hero {
+    background: var(--medical-gradient);
+    color: white;
+    position: relative;
+    overflow: hidden;
+    padding: var(--space-3xl) 0;
+    margin-bottom: -3rem;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+}
+
+.hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 900;
+    margin-bottom: var(--space-lg);
+    letter-spacing: -0.03em;
+    text-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hero-subtitle {
+    font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+    font-weight: 400;
+    opacity: 0.95;
+    margin-bottom: var(--space-xl);
+    line-height: 1.6;
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.premium-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-xl);
+    margin-top: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.premium-stat {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    padding: var(--space-lg) var(--space-xl);
+    border-radius: var(--radius-xl);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    text-align: center;
+    min-width: 160px;
+    transition: var(--transition-smooth);
+}
+
+.premium-stat:hover {
+    transform: translateY(-8px) scale(1.05);
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 900;
+    font-family: var(--font-display);
+    margin-bottom: var(--space-sm);
+    color: white;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    opacity: 0.9;
+    color: white;
+}
+
+/* Premium Search Card */
+.premium-search-card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(30px);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid rgba(16, 185, 129, 0.15);
+    position: relative;
+    z-index: 20;
+    overflow: hidden;
+    margin-top: -3rem;
+    transition: var(--transition-smooth);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.premium-search-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medical);
+}
+
+.premium-search-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: var(--medical-gradient);
+}
+
+.premium-search-form {
+    padding: var(--space-2xl);
+    position: relative;
+}
+
+.premium-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+}
+
+.premium-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(16, 185, 129, 0.2);
+    border-radius: var(--radius-full);
+    padding: var(--space-lg) var(--space-xl);
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-sm);
+    width: 100%;
+}
+
+.premium-input::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.premium-input:focus {
+    outline: none;
+    border-color: var(--medical-primary);
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.1), var(--shadow-medical);
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 1);
+}
+
+.premium-search-btn {
+    background: var(--medical-gradient);
+    border: none;
+    border-radius: var(--radius-full);
+    padding: var(--space-lg) var(--space-2xl);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--transition-smooth);
+    box-shadow: var(--shadow-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    cursor: pointer;
+}
+
+.premium-search-btn:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-xl);
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+}
+
+.premium-search-btn i {
+    font-size: 1.1rem;
+    transition: var(--transition-smooth);
+}
+
+.premium-search-btn:hover i {
+    transform: rotate(15deg) scale(1.1);
+}
+
+/* Results Section */
+.premium-results-section {
+    margin-top: var(--space-3xl);
+}
+
+.premium-results-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.premium-results-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    position: relative;
+}
+
+.premium-results-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: var(--medical-gradient);
+    border-radius: var(--radius-full);
+}
+
+.premium-results-meta {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.premium-highlight {
+    color: var(--medical-primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: rgba(16, 185, 129, 0.3);
+    text-underline-offset: 3px;
+}
+
+/* Platform Cards */
+.premium-platform-card {
+    background: var(--surface-primary);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-light);
+    transition: var(--transition-smooth);
+    overflow: hidden;
+    position: relative;
+    height: 100%;
+    margin-bottom: var(--space-lg);
+}
+
+.premium-platform-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-medical);
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.premium-platform-card.best-price {
+    border: 2px solid var(--medical-primary);
+    box-shadow: var(--shadow-medical);
+}
+
+.best-price-badge {
+    position: absolute;
+    top: -12px;
+    left: var(--space-lg);
+    background: var(--medical-gradient);
+    color: white;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    z-index: 10;
+    box-shadow: var(--shadow-lg);
+}
+
+.premium-platform-header {
+    background: var(--medical-gradient);
+    color: white;
+    padding: var(--space-lg);
+    position: relative;
+}
+
+.premium-platform-title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.3rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    justify-content: space-between;
+}
+
+.platform-icon {
+    font-size: 1.5rem;
+}
+
+.availability-badge {
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.available {
+    background: rgba(165, 207, 180, 0.2);
+    color: #b7e4c8;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.unavailable {
+    background: rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.premium-card-body {
+    padding: var(--space-xl);
+}
+
+.premium-product-item {
+    padding: var(--space-lg) 0;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.premium-product-item:last-child {
+    border-bottom: none;
+}
+
+.premium-product-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-display);
+}
+
+.premium-price-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.premium-price {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: var(--medical-primary);
+    font-family: var(--font-display);
+}
+
+.premium-price::before {
+    content: '₹';
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-right: 2px;
+}
+
+.premium-original-price {
+    text-decoration: line-through;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.premium-savings {
+    color: #22c55e;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.premium-discount-badge {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.premium-product-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.premium-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.premium-meta-icon {
+    color: var(--medical-accent);
+}
+
+.premium-action-buttons {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.premium-buy-btn {
+    flex: 1;
+    background: var(--medical-gradient);
+    border: none;
+    color: white;
+    padding: var(--space-md) var(--space-lg);
+    border-radius: var(--radius-full);
+    font-weight: 700;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+}
+
+.premium-buy-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+    color: white;
+    background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+}
+
+.premium-external-btn {
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid var(--medical-primary);
+    color: var(--medical-primary);
+    padding: var(--space-md);
+    border-radius: var(--radius-full);
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    min-width: 50px;
+}
+
+.premium-external-btn:hover {
+    background: var(--medical-primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+.premium-update-time {
+    text-align: center;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border-light);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Alert Styles */
+.premium-alert {
+    background: rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-lg);
+    padding: var(--space-2xl);
+    text-align: center;
+    color: var(--text-primary);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-md);
+    margin: var(--space-2xl) 0;
+}
+
+.premium-alert-icon {
+    color: #3b82f6;
+    font-size: 3rem;
+    margin-bottom: var(--space-lg);
+}
+
+.premium-alert-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: var(--space-sm);
+}
+
+.premium-alert-message {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Trending Section */
+.premium-trending-section {
+    margin-top: var(--space-3xl);
+}
+
+.premium-trending-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.premium-trending-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.premium-trending-title::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--medical-gradient);
+    border-radius: var(--radius-full);
+}
+
+.trending-fire {
+    font-size: 1.5em;
+}
+
+.premium-trending-subtitle {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.premium-trending-card {
+    background: var(--surface-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    transition: var(--transition-smooth);
+    cursor: pointer;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: var(--space-lg);
+}
+
+.premium-trending-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--medical-gradient);
+    transform: scaleX(0);
+    transition: var(--transition-smooth);
+}
+
+.premium-trending-card:hover::before {
+    transform: scaleX(1);
+}
+
+.premium-trending-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.premium-trending-body {
+    padding: var(--space-xl);
+    text-align: center;
+}
+
+.premium-trending-name {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--medical-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.premium-trending-searches {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    color: #22c55e;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: var(--space-sm);
+}
+
+.premium-trending-category {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--medical-dark);
+    padding: 4px 8px;
+    border-radius: var(--radius-full);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .premium-hero {
+        padding: var(--space-2xl) 0;
+    }
+
+    .premium-search-card {
+        margin-top: -2rem;
+    }
+
+    .premium-search-form {
+        padding: var(--space-lg);
+    }
+
+    .premium-stats {
+        gap: var(--space-lg);
+    }
+
+    .premium-stat {
+        min-width: 140px;
+        padding: var(--space-md) var(--space-lg);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+    }
+
+    .premium-product-meta {
+        grid-template-columns: 1fr;
+    }
+
+    .premium-input-group {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+
+    .premium-search-btn {
+        width: 100%;
+    }
+}
+</style>
+
+<div class="container-fluid">
+    <!-- Premium Hero Section -->
+    <div class="premium-hero">
+        <div class="hero-content">
+            <h1 class="hero-title">💊 Medicine Price Comparison</h1>
+            <p class="hero-subtitle">Find the best prices for your medicines across multiple pharmacies with AI-powered search</p>
+
+            <!-- Premium Stats -->
+            <div class="premium-stats">
+                <div class="premium-stat">
+                    <span class="stat-number">50K+</span>
+                    <span class="stat-label">Medicines</span>
+                </div>
+                <div class="premium-stat">
+                    <span class="stat-number">15+</span>
+                    <span class="stat-label">Pharmacies</span>
+                </div>
+                <div class="premium-stat">
+                    <span class="stat-number">85%</span>
+                    <span class="stat-label">Savings</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Premium Search Card -->
+        <div class="premium-search-card">
+            <div class="premium-search-form">
+                <form action="/medicine-search" method="POST" class="premium-form">
+                    <div class="premium-input-group">
+                        <input
+                            type="text"
+                            class="premium-input"
+                            name="medicineName"
+                            placeholder="Enter medicine name (e.g., Paracetamol, Dolo 650...)"
+                            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+                            required
+                            minlength="2"
+                            autocomplete="off"
+                        >
+                        <button class="premium-search-btn" type="submit">
+                            <i class="fas fa-search"></i>
+                            <span>Search</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Premium Search Results -->
+        <% if (typeof searchResults !== 'undefined' && searchResults) { %>
+            <div class="premium-results-section">
+                <div class="premium-results-header">
+                    <h2 class="premium-results-title">Results for "<span class="premium-highlight"><%= searchResults.medicineName %></span>"</h2>
+                    <p class="premium-results-meta">Search completed in <%= searchResults.searchDuration %>ms • <%= searchResults.platforms.length %> platforms checked</p>
+                </div>
+
+                <div class="row">
+                    <%
+                    // Find cheapest option
+                    let cheapestPrice = null;
+                    let cheapestPlatform = null;
+                    searchResults.platforms.forEach(platform => {
+                        if (platform.available && platform.prices && platform.prices.length > 0) {
+                            const platformCheapest = platform.prices[0].price;
+                            if (cheapestPrice === null || platformCheapest < cheapestPrice) {
+                                cheapestPrice = platformCheapest;
+                                cheapestPlatform = platform.platform;
+                            }
+                        }
+                    });
+                    %>
+
+                    <% searchResults.platforms.forEach(function(platform) { %>
+                        <% const isCheapest = platform.available && platform.prices && platform.prices.length > 0 && platform.prices[0].price === cheapestPrice && platform.platform === cheapestPlatform; %>
+
+                        <div class="col-lg-6 col-xl-4 mb-4">
+                            <div class="premium-platform-card <%= isCheapest ? 'best-price' : '' %>">
+                                <% if (isCheapest) { %>
+                                    <div class="best-price-badge">💰 Best Price</div>
+                                <% } %>
+
+                                <div class="premium-platform-header">
+                                    <div class="premium-platform-title">
+                                        <div>
+                                            <span class="platform-icon">
+                                                <% if (platform.platform === '1mg') { %>🏥
+                                                <% } else if (platform.platform === 'PharmEasy') { %>💊
+                                                <% } else if (platform.platform === 'Netmeds') { %>⚕️
+                                                <% } else if (platform.platform === 'Amazon Pharmacy') { %>📦
+                                                <% } else { %>🏪<% } %>
+                                            </span>
+                                            <%= platform.platform %>
+                                        </div>
+                                        <span class="availability-badge <%= platform.available ? 'available' : 'unavailable' %>">
+                                            <%= platform.available ? '✓ Available' : '✗ Unavailable' %>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="premium-card-body">
+                                    <% if (platform.available && platform.prices && platform.prices.length > 0) { %>
+                                        <% platform.prices.forEach(function(product) { %>
+                                            <div class="premium-product-item">
+                                                <h6 class="premium-product-name"><%= product.name %></h6>
+
+                                                <div class="premium-price-container">
+                                                    <div class="premium-price-info">
+                                                        <div class="premium-price"><%= product.price %></div>
+                                                        <% if (product.discount > 0) { %>
+                                                            <div>
+                                                                <span class="premium-original-price">₹<%= product.originalPrice %></span>
+                                                                <span class="premium-savings">Save ₹<%= (product.originalPrice - product.price) %></span>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                    <% if (product.discount > 0) { %>
+                                                        <span class="premium-discount-badge"><%= product.discount %>% OFF</span>
+                                                    <% } %>
+                                                </div>
+
+                                                <div class="premium-product-meta">
+                                                    <div class="premium-meta-item">
+                                                        <i class="fas fa-store premium-meta-icon"></i>
+                                                        <span><%= product.seller %></span>
+                                                    </div>
+                                                    <div class="premium-meta-item">
+                                                        <i class="fas fa-shipping-fast premium-meta-icon"></i>
+                                                        <span><%= product.deliveryTime %></span>
+                                                    </div>
+                                                    <div class="premium-meta-item">
+                                                        <i class="fas fa-star premium-meta-icon" style="color: #fbbf24;"></i>
+                                                        <span><%= product.rating %> (<%= product.reviews %>)</span>
+                                                    </div>
+                                                    <div class="premium-meta-item">
+                                                        <i class="fas fa-box premium-meta-icon"></i>
+                                                        <span class="<%= product.inStock ? 'text-success' : 'text-warning' %> fw-semibold">
+                                                            <%= product.inStock ? 'In Stock' : 'Out of Stock' %>
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="premium-action-buttons">
+                                                    <a href="<%= product.productUrl %>" target="_blank" class="premium-buy-btn">
+                                                        <i class="fas fa-shopping-cart"></i>
+                                                        <span>Buy Now</span>
+                                                    </a>
+                                                    <a href="<%= product.productUrl %>" target="_blank" class="premium-external-btn">
+                                                        <i class="fas fa-external-link-alt"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        <% }) %>
+
+                                        <div class="premium-update-time">
+                                            <i class="fas fa-clock"></i>
+                                            Last updated: <%= new Date(platform.lastUpdated).toLocaleString() %>
+                                        </div>
+                                    <% } else { %>
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-exclamation-circle" style="font-size: 2rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                                            <p class="text-muted mb-3 fw-semibold">Medicine not available on this platform</p>
+                                            <a href="<%= platform.searchUrl %>" target="_blank" class="premium-external-btn" style="display: inline-flex;">
+                                                <i class="fas fa-external-link-alt" style="margin-right: 0.5rem;"></i>
+                                                <span>Search on <%= platform.platform %></span>
+                                            </a>
+                                        </div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } else if (typeof searchQuery !== 'undefined' && searchQuery && (typeof searchResults === 'undefined' || searchResults === null)) { %>
+            <div class="premium-alert">
+                <i class="fas fa-info-circle premium-alert-icon"></i>
+                <h4 class="premium-alert-title">No Results Found</h4>
+                <p class="premium-alert-message">We couldn't find any results for "<strong><%= searchQuery %></strong>". Please try a different medicine name or check your spelling.</p>
+            </div>
+        <% } %>
+
+        <!-- Premium Trending Medicines -->
+        <% if (typeof trending !== 'undefined' && trending && trending.length > 0) { %>
+            <div class="premium-trending-section">
+                <div class="premium-trending-header">
+                    <h2 class="premium-trending-title">
+                        <span class="trending-fire">🔥</span>
+                        Trending Medicines
+                    </h2>
+                    <p class="premium-trending-subtitle">Popular searches by other users</p>
+                </div>
+
+                <div class="row">
+                    <% trending.forEach(function(medicine, index) { %>
+                        <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+                            <div class="premium-trending-card" onclick="searchMedicine('<%= medicine.name %>')">
+                                <div class="premium-trending-body">
+                                    <h6 class="premium-trending-name"><%= medicine.name %></h6>
+                                    <p class="premium-trending-searches">
+                                        <i class="fas fa-chart-line"></i>
+                                        <span><%= medicine.searches %> searches</span>
+                                    </p>
+                                    <span class="premium-trending-category"><%= medicine.category %></span>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+// Premium functionality
+function searchMedicine(name) {
+    const input = document.querySelector('.premium-input');
+    if (input) {
+        input.value = name;
+        input.style.transform = 'scale(1.02)';
+        input.style.borderColor = 'var(--medical-primary)';
+
+        setTimeout(() => {
+            document.querySelector('.premium-form').submit();
+        }, 300);
+    }
+}
+
+// Premium loading state
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.premium-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const button = this.querySelector('.premium-search-btn');
+            if (button) {
+                button.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                        <span>Searching...</span>
+                    </div>
+                `;
+                button.disabled = true;
+                button.style.background = 'var(--medical-secondary)';
+
+                const searchCard = document.querySelector('.premium-search-card');
+                if (searchCard) {
+                    searchCard.style.transform = 'translateY(-8px) scale(1.02)';
+                    searchCard.style.boxShadow = 'var(--shadow-medical)';
+                }
+            }
+        });
+    }
+
+    // Premium input focus effects
+    const premiumInput = document.querySelector('.premium-input');
+    if (premiumInput) {
+        premiumInput.addEventListener('focus', function() {
+            if (this.parentElement) {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            }
+        });
+
+        premiumInput.addEventListener('blur', function() {
+            if (this.parentElement) {
+                this.parentElement.style.transform = 'translateY(0)';
+            }
+        });
+    }
+
+    // Platform card hover effects
+    const platformCards = document.querySelectorAll('.premium-platform-card');
+    platformCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Premium button interactions
+    const buyButtons = document.querySelectorAll('.premium-buy-btn');
+    buyButtons.forEach(btn => {
+        btn.addEventListener('mousedown', function() {
+            this.style.transform = 'scale(0.98)';
+        });
+
+        btn.addEventListener('mouseup', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+
+    // Trending card click animation
+    const trendingCards = document.querySelectorAll('.premium-trending-card');
+    trendingCards.forEach(card => {
+        card.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    });
+});
+
+// Error handling
+window.addEventListener('error', function(e) {
+    console.warn('Premium Medicine Search: Error caught:', e.error);
+});
+</script>

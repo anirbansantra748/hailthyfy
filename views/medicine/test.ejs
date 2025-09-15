@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Search Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .platform {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Medicine Search Test</h1>
+    <p>Simple test interface to debug the medicine search functionality.</p>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Enter medicine name (e.g., Paracetamol)">
+        <button onclick="testSearch()" id="searchBtn">Search</button>
+    </div>
+
+    <div class="loading" id="loading">Searching...</div>
+    <div class="results" id="results"></div>
+
+    <script>
+        console.log('Test page loaded');
+
+        async function testSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            
+            const medicineName = searchInput.value.trim();
+            
+            console.log('Search initiated for:', medicineName);
+            
+            if (!medicineName) {
+                alert('Please enter a medicine name');
+                return;
+            }
+
+            // Show loading
+            loading.style.display = 'block';
+            results.innerHTML = '';
+            searchBtn.disabled = true;
+            searchBtn.textContent = 'Searching...';
+
+            try {
+                console.log('Making API request to:', '/medicine-search/search');
+                
+                const response = await fetch('/medicine-search/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ medicineName })
+                });
+
+                console.log('Response status:', response.status);
+                
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success) {
+                    displayResults(data.data);
+                } else {
+                    results.innerHTML = `<div style="color: red;">Error: ${data.message}</div>`;
+                }
+
+            } catch (error) {
+                console.error('Search error:', error);
+                results.innerHTML = `<div style="color: red;">Network error: ${error.message}</div>`;
+            } finally {
+                loading.style.display = 'none';
+                searchBtn.disabled = false;
+                searchBtn.textContent = 'Search';
+            }
+        }
+
+        function displayResults(data) {
+            const results = document.getElementById('results');
+            
+            let html = `<h2>Results for "${data.medicineName}"</h2>`;
+            html += `<p>Search completed in ${data.searchDuration}ms • ${data.platforms.length} platforms checked</p>`;
+            
+            if (data.cheapestOption) {
+                html += `<div style="background: #d4edda; padding: 15px; margin: 10px 0; border-radius: 5px;">`;
+                html += `<strong>🎯 Best Deal: ₹${data.cheapestOption.price} on ${data.cheapestOption.platform}</strong>`;
+                html += `</div>`;
+            }
+
+            data.platforms.forEach(platform => {
+                html += `<div class="platform">`;
+                html += `<h3>${platform.platform} - ${platform.available ? '✅ Available' : '❌ Not Available'}</h3>`;
+                
+                if (platform.available && platform.prices && platform.prices.length > 0) {
+                    platform.prices.forEach(product => {
+                        html += `<div style="margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px;">`;
+                        html += `<strong>${product.name}</strong><br>`;
+                        html += `Price: <strong style="color: #28a745;">₹${product.price}</strong>`;
+                        if (product.discount > 0) {
+                            html += ` <span style="text-decoration: line-through; color: #6c757d;">₹${product.originalPrice}</span>`;
+                            html += ` <span style="background: #dc3545; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${product.discount}% OFF</span>`;
+                        }
+                        html += `<br>`;
+                        html += `Seller: ${product.seller}<br>`;
+                        html += `Stock: ${product.inStock ? '✅ In Stock' : '❌ Out of Stock'}<br>`;
+                        html += `Rating: ⭐ ${product.rating} (${product.reviews} reviews)<br>`;
+                        html += `Delivery: ${product.deliveryTime}<br>`;
+                        html += `<a href="${product.productUrl}" target="_blank" style="background: #007bff; color: white; padding: 5px 10px; text-decoration: none; border-radius: 3px; font-size: 12px;">View Product</a>`;
+                        html += `</div>`;
+                    });
+                } else if (!platform.available) {
+                    html += `<p style="color: #6c757d;">${platform.error || 'Medicine not available on this platform'}</p>`;
+                    html += `<a href="${platform.searchUrl}" target="_blank" style="color: #007bff;">Search manually on ${platform.platform}</a>`;
+                }
+                
+                html += `</div>`;
+            });
+
+            results.innerHTML = html;
+        }
+
+        // Test suggestions endpoint
+        async function testSuggestions() {
+            try {
+                const response = await fetch('/medicine-search/suggestions?q=par');
+                const data = await response.json();
+                console.log('Suggestions test:', data);
+            } catch (error) {
+                console.error('Suggestions test error:', error);
+            }
+        }
+
+        // Test trending endpoint  
+        async function testTrending() {
+            try {
+                const response = await fetch('/medicine-search/trending');
+                const data = await response.json();
+                console.log('Trending test:', data);
+            } catch (error) {
+                console.error('Trending test error:', error);
+            }
+        }
+
+        // Run tests on load
+        window.addEventListener('load', () => {
+            console.log('Running API tests...');
+            testSuggestions();
+            testTrending();
+        });
+
+        // Allow Enter key to trigger search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                testSearch();
+            }
+        });
+    </script>
+</body>
+</html>

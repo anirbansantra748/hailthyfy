@@ -1,0 +1,570 @@
+<!-- Keyboard Shortcuts System -->
+<style>
+.shortcuts-help-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.shortcuts-help-modal.active {
+    display: flex;
+}
+
+.shortcuts-content {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s ease;
+}
+
+.shortcuts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.shortcuts-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.close-shortcuts {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.close-shortcuts:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.shortcuts-section {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shortcut-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    background: #f8fafc;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.shortcut-item:hover {
+    background: #e5e7eb;
+    transform: translateX(3px);
+}
+
+.shortcut-description {
+    color: #374151;
+    font-weight: 500;
+}
+
+.shortcut-keys {
+    display: flex;
+    gap: 5px;
+}
+
+.key {
+    background: #374151;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+    min-width: 24px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.key.modifier {
+    background: #10b981;
+}
+
+.shortcuts-tip {
+    background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 20px;
+    color: #1e40af;
+    font-size: 0.9rem;
+}
+
+.shortcuts-tip i {
+    margin-right: 8px;
+    color: #3b82f6;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to { 
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Shortcut indicator */
+.shortcut-indicator {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.shortcut-indicator.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .shortcuts-content {
+        margin: 20px;
+        padding: 20px;
+        width: auto;
+        max-width: none;
+    }
+    
+    .shortcuts-title {
+        font-size: 1.3rem;
+    }
+    
+    .shortcut-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        text-align: left;
+    }
+    
+    .shortcut-keys {
+        align-self: flex-end;
+    }
+}
+</style>
+
+<!-- Shortcuts Help Modal -->
+<div class="shortcuts-help-modal" id="shortcutsModal">
+    <div class="shortcuts-content">
+        <div class="shortcuts-header">
+            <h2 class="shortcuts-title">
+                <i class="fas fa-keyboard"></i>
+                Keyboard Shortcuts
+            </h2>
+            <button class="close-shortcuts" id="closeShortcuts">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="shortcuts-section">
+            <div class="section-title">
+                <i class="fas fa-chart-line"></i>
+                Analytics Navigation
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Analytics Home</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">A</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Overview Dashboard</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">O</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Patient Journey</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">J</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Full Dashboard</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">D</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="shortcuts-section">
+            <div class="section-title">
+                <i class="fas fa-brain"></i>
+                AI Tools
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">AI Health Predictions</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">P</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Drug Interaction Checker</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">I</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">AI Assistant</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">C</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="shortcuts-section">
+            <div class="section-title">
+                <i class="fas fa-tools"></i>
+                General
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Medicine Search</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">M</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Find Doctors</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">F</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">User Dashboard</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Alt</span>
+                    <span class="key">U</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="shortcuts-section">
+            <div class="section-title">
+                <i class="fas fa-cog"></i>
+                Interface
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Toggle Quick Access Sidebar</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Ctrl</span>
+                    <span class="key">S</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Toggle FAB Menu</span>
+                <div class="shortcut-keys">
+                    <span class="key modifier">Ctrl</span>
+                    <span class="key">Q</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Show Shortcuts Help</span>
+                <div class="shortcut-keys">
+                    <span class="key">?</span>
+                </div>
+            </div>
+            <div class="shortcut-item">
+                <span class="shortcut-description">Close Modal/Menu</span>
+                <div class="shortcut-keys">
+                    <span class="key">Esc</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="shortcuts-tip">
+            <i class="fas fa-lightbulb"></i>
+            <strong>Pro Tip:</strong> Hold down any shortcut key to see a visual indicator at the bottom of the screen!
+        </div>
+    </div>
+</div>
+
+<!-- Shortcut Indicator -->
+<div class="shortcut-indicator" id="shortcutIndicator"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('shortcutsModal');
+    const closeBtn = document.getElementById('closeShortcuts');
+    const indicator = document.getElementById('shortcutIndicator');
+    
+    // Define all shortcuts
+    const shortcuts = {
+        // Analytics Navigation
+        'alt+a': { url: '/analytics', name: 'Analytics Home' },
+        'alt+o': { url: '/analytics/overview', name: 'Overview Dashboard' },
+        'alt+j': { url: '/analytics/patient-journey', name: 'Patient Journey' },
+        'alt+d': { url: '/analytics/dashboard', name: 'Full Dashboard' },
+        
+        // AI Tools
+        'alt+p': { url: '/health-analytics/health-predictions', name: 'AI Health Predictions' },
+        'alt+i': { url: '/health-analytics/drug-interaction-checker', name: 'Drug Interactions' },
+        'alt+c': { url: '/ai', name: 'AI Assistant' },
+        
+        // General
+        'alt+m': { url: '/medicine-search', name: 'Medicine Search' },
+        'alt+f': { url: '/doctors', name: 'Find Doctors' },
+        'alt+u': { url: '/users/dashboard', name: 'User Dashboard' },
+        
+        // Interface controls
+        'ctrl+s': { action: 'toggleSidebar', name: 'Toggle Sidebar' },
+        'ctrl+q': { action: 'toggleFAB', name: 'Toggle FAB Menu' },
+        '?': { action: 'showHelp', name: 'Show Help' },
+        'escape': { action: 'closeModal', name: 'Close Modal' }
+    };
+    
+    let pressedKeys = new Set();
+    let keyTimeout;
+    
+    // Handle keydown events
+    document.addEventListener('keydown', function(e) {
+        const key = e.key.toLowerCase();
+        const combo = [];
+        
+        if (e.ctrlKey) combo.push('ctrl');
+        if (e.altKey) combo.push('alt');
+        if (e.shiftKey) combo.push('shift');
+        combo.push(key);
+        
+        const shortcutKey = combo.join('+');
+        pressedKeys.add(key);
+        
+        // Show indicator for modifier keys
+        if (['alt', 'ctrl', 'shift'].includes(key)) {
+            showShortcutIndicator(`Press additional key... (${combo.join('+')})`);
+            clearTimeout(keyTimeout);
+            keyTimeout = setTimeout(hideShortcutIndicator, 2000);
+        }
+        
+        // Execute shortcut if found
+        if (shortcuts[shortcutKey]) {
+            e.preventDefault();
+            executeShortcut(shortcuts[shortcutKey]);
+            hideShortcutIndicator();
+        }
+        
+        // Special handling for single key shortcuts
+        if (key === '?' && !e.ctrlKey && !e.altKey) {
+            e.preventDefault();
+            showShortcutsModal();
+        }
+        
+        if (key === 'escape') {
+            closeModalsAndMenus();
+        }
+    });
+    
+    // Handle keyup events
+    document.addEventListener('keyup', function(e) {
+        const key = e.key.toLowerCase();
+        pressedKeys.delete(key);
+        
+        if (['alt', 'ctrl', 'shift'].includes(key) && pressedKeys.size === 0) {
+            hideShortcutIndicator();
+        }
+    });
+    
+    // Execute shortcut action
+    function executeShortcut(shortcut) {
+        if (shortcut.url) {
+            // Navigate to URL
+            showShortcutIndicator(`Navigating to ${shortcut.name}...`);
+            setTimeout(() => {
+                window.location.href = shortcut.url;
+            }, 200);
+        } else if (shortcut.action) {
+            // Execute action
+            switch (shortcut.action) {
+                case 'toggleSidebar':
+                    const sidebarToggle = document.getElementById('sidebarToggle');
+                    if (sidebarToggle) {
+                        sidebarToggle.click();
+                        showShortcutIndicator('Sidebar toggled');
+                    }
+                    break;
+                    
+                case 'toggleFAB':
+                    const fabMain = document.getElementById('fabMain');
+                    if (fabMain) {
+                        fabMain.click();
+                        showShortcutIndicator('FAB menu toggled');
+                    }
+                    break;
+                    
+                case 'showHelp':
+                    showShortcutsModal();
+                    break;
+                    
+                case 'closeModal':
+                    closeModalsAndMenus();
+                    break;
+            }
+            
+            setTimeout(hideShortcutIndicator, 1500);
+        }
+    }
+    
+    // Show shortcuts modal
+    function showShortcutsModal() {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    // Close shortcuts modal
+    function closeShortcutsModal() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Close all modals and menus
+    function closeModalsAndMenus() {
+        // Close shortcuts modal
+        closeShortcutsModal();
+        
+        // Close FAB menu
+        const fabMain = document.getElementById('fabMain');
+        const fabMenu = document.getElementById('fabMenu');
+        if (fabMain && fabMenu && fabMenu.classList.contains('active')) {
+            fabMain.click();
+        }
+        
+        // Close sidebar
+        const sidebar = document.getElementById('quickAccessSidebar');
+        if (sidebar && sidebar.classList.contains('active')) {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle) sidebarToggle.click();
+        }
+        
+        showShortcutIndicator('Closed all menus');
+        setTimeout(hideShortcutIndicator, 1000);
+    }
+    
+    // Show shortcut indicator
+    function showShortcutIndicator(text) {
+        indicator.textContent = text;
+        indicator.classList.add('show');
+    }
+    
+    // Hide shortcut indicator
+    function hideShortcutIndicator() {
+        indicator.classList.remove('show');
+        clearTimeout(keyTimeout);
+    }
+    
+    // Modal event listeners
+    closeBtn.addEventListener('click', closeShortcutsModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeShortcutsModal();
+        }
+    });
+    
+    // Add visual feedback for interactive elements
+    document.addEventListener('keydown', function(e) {
+        if (e.altKey || e.ctrlKey) {
+            document.body.classList.add('shortcuts-active');
+        }
+    });
+    
+    document.addEventListener('keyup', function(e) {
+        if (!e.altKey && !e.ctrlKey) {
+            document.body.classList.remove('shortcuts-active');
+        }
+    });
+    
+    // Add some visual indicators when shortcuts are active
+    const style = document.createElement('style');
+    style.textContent = `
+        body.shortcuts-active [data-shortcut] {
+            position: relative;
+            outline: 2px solid #10b981;
+            outline-offset: 2px;
+        }
+        
+        body.shortcuts-active [data-shortcut]::after {
+            content: attr(data-shortcut);
+            position: absolute;
+            top: -25px;
+            left: 0;
+            background: #10b981;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            z-index: 1000;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    console.log('🚀 Keyboard shortcuts initialized! Press ? for help');
+});
+</script>

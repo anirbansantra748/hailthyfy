@@ -1,0 +1,725 @@
+<%- include('../partials/header') %>
+
+<div class="my-challenges-page">
+    <!-- Hero Section -->
+    <div class="hero-section bg-gradient-info text-white py-5 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-5 font-weight-bold mb-3">
+                        <i class="fas fa-user-check me-3"></i>My Challenges
+                    </h1>
+                    <p class="lead mb-4">Track your progress, manage your goals, and celebrate your achievements!</p>
+                    <div class="quick-stats d-flex flex-wrap gap-4">
+                        <div class="stat-item">
+                            <div class="stat-number" id="activeChallengesCount">-</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="completedChallengesCount">-</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="totalPointsEarned">-</div>
+                            <div class="stat-label">Points</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="currentStreak">-</div>
+                            <div class="stat-label">Streak</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center">
+                    <div class="hero-actions">
+                        <a href="/challenges/create" class="btn btn-outline-light btn-lg mb-3">
+                            <i class="fas fa-plus me-2"></i>Create New Challenge
+                        </a>
+                        <br>
+                        <a href="/challenges" class="btn btn-light text-info">
+                            <i class="fas fa-search me-2"></i>Browse Challenges
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Filters & Controls -->
+        <div class="controls-section mb-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="filter-tabs">
+                        <ul class="nav nav-pills" id="challengeFilter" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="all-tab" data-bs-toggle="pill" 
+                                        data-bs-target="#all" type="button" role="tab">
+                                    <i class="fas fa-list me-1"></i>All Challenges
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="active-tab" data-bs-toggle="pill" 
+                                        data-bs-target="#active" type="button" role="tab">
+                                    <i class="fas fa-play-circle me-1"></i>Active
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="completed-tab" data-bs-toggle="pill" 
+                                        data-bs-target="#completed" type="button" role="tab">
+                                    <i class="fas fa-check-circle me-1"></i>Completed
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="paused-tab" data-bs-toggle="pill" 
+                                        data-bs-target="#paused" type="button" role="tab">
+                                    <i class="fas fa-pause-circle me-1"></i>Paused
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="view-controls">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary active" id="cardView">
+                                <i class="fas fa-th"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="listView">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                        <div class="dropdown d-inline-block ms-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                                    id="sortDropdown" data-bs-toggle="dropdown">
+                                <i class="fas fa-sort me-1"></i>Sort
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="#" data-sort="recent">Most Recent</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="progress">Progress</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="deadline">Deadline</a></li>
+                                <li><a class="dropdown-item" href="#" data-sort="points">Points</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Challenge Content Tabs -->
+        <div class="tab-content" id="challengeTabContent">
+            <!-- All Challenges Tab -->
+            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                <div class="challenges-container" id="allChallenges">
+                    <div class="loading-state text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading challenges...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Loading your challenges...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Challenges Tab -->
+            <div class="tab-pane fade" id="active" role="tabpanel">
+                <div class="challenges-container" id="activeChallenges">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Completed Challenges Tab -->
+            <div class="tab-pane fade" id="completed" role="tabpanel">
+                <div class="challenges-container" id="completedChallenges">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Paused Challenges Tab -->
+            <div class="tab-pane fade" id="paused" role="tabpanel">
+                <div class="challenges-container" id="pausedChallenges">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state text-center py-5 d-none" id="emptyState">
+            <div class="empty-icon mb-4">
+                <i class="fas fa-trophy fa-5x text-muted opacity-50"></i>
+            </div>
+            <h4 class="text-muted">No challenges yet!</h4>
+            <p class="text-muted mb-4">Start your health journey by joining or creating your first challenge.</p>
+            <div class="empty-actions">
+                <a href="/challenges" class="btn btn-primary me-2">
+                    <i class="fas fa-search me-2"></i>Browse Challenges
+                </a>
+                <a href="/challenges/create" class="btn btn-outline-primary">
+                    <i class="fas fa-plus me-2"></i>Create Challenge
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Challenge Card Template -->
+<template id="challengeCardTemplate">
+    <div class="col-lg-4 col-md-6 mb-4 challenge-card">
+        <div class="card h-100 border-0 shadow-sm hover-lift">
+            <div class="card-header border-0 pb-0">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="challenge-badges">
+                        <span class="badge status-badge"></span>
+                        <span class="badge category-badge"></span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item view-details" href="#">
+                                <i class="fas fa-eye me-2"></i>View Details
+                            </a></li>
+                            <li><a class="dropdown-item update-progress" href="#">
+                                <i class="fas fa-plus me-2"></i>Update Progress
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item pause-challenge" href="#">
+                                <i class="fas fa-pause me-2"></i>Pause Challenge
+                            </a></li>
+                            <li><a class="dropdown-item leave-challenge text-danger" href="#">
+                                <i class="fas fa-sign-out-alt me-2"></i>Leave Challenge
+                            </a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title challenge-title"></h5>
+                <p class="card-text challenge-description text-muted small"></p>
+                
+                <!-- Progress Section -->
+                <div class="progress-section mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="progress-label">Progress</span>
+                        <span class="progress-percentage"></span>
+                    </div>
+                    <div class="progress progress-custom">
+                        <div class="progress-bar" role="progressbar"></div>
+                    </div>
+                    <div class="progress-details mt-2">
+                        <small class="text-muted progress-text"></small>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="stats-section">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="stat-value streak-value"></div>
+                            <div class="stat-label">Streak</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value points-value"></div>
+                            <div class="stat-label">Points</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-value days-value"></div>
+                            <div class="stat-label">Days</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted last-updated"></small>
+                    <button class="btn btn-primary btn-sm update-btn">
+                        <i class="fas fa-plus me-1"></i>Update
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- List View Template -->
+<template id="challengeListTemplate">
+    <div class="list-item border-bottom py-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    <div class="challenge-icon me-3">
+                        <i class="fas fa-trophy fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 challenge-title"></h6>
+                        <div class="badges mb-1">
+                            <span class="badge badge-sm status-badge"></span>
+                            <span class="badge badge-sm category-badge"></span>
+                        </div>
+                        <small class="text-muted challenge-description"></small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="progress-info">
+                    <div class="progress progress-sm mb-1">
+                        <div class="progress-bar" role="progressbar"></div>
+                    </div>
+                    <small class="progress-text"></small>
+                </div>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="stats-mini">
+                    <div class="stat-mini">
+                        <span class="points-value"></span> pts
+                    </div>
+                    <div class="stat-mini">
+                        <span class="streak-value"></span> day streak
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1 text-end">
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item view-details" href="#">View Details</a></li>
+                        <li><a class="dropdown-item update-progress" href="#">Update Progress</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Custom Styles -->
+<style>
+.bg-gradient-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.hero-section .stat-item {
+    text-align: center;
+}
+
+.hero-section .stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    display: block;
+}
+
+.hero-section .stat-label {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-tabs .nav-pills .nav-link {
+    border-radius: 25px;
+    margin-right: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+}
+
+.filter-tabs .nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+    color: white;
+}
+
+.challenge-card {
+    transition: transform 0.2s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.status-badge.active { background: #28a745 !important; }
+.status-badge.completed { background: #6c757d !important; }
+.status-badge.paused { background: #ffc107 !important; color: #000 !important; }
+.status-badge.abandoned { background: #dc3545 !important; }
+
+.category-badge {
+    background: #6f42c1 !important;
+}
+
+.progress-custom {
+    height: 8px;
+    border-radius: 10px;
+    background: #e9ecef;
+}
+
+.progress-custom .progress-bar {
+    border-radius: 10px;
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+    transition: width 0.3s ease;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: #495057;
+    font-size: 1.1rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.list-item {
+    transition: background-color 0.2s ease;
+}
+
+.list-item:hover {
+    background: rgba(0, 123, 255, 0.05);
+}
+
+.progress-sm {
+    height: 6px;
+}
+
+.badge-sm {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.empty-icon {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.loading-state {
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+$(document).ready(function() {
+    let currentView = 'card';
+    let currentSort = 'recent';
+    let challenges = [];
+
+    // Initialize
+    loadUserStats();
+    loadChallenges();
+
+    // Tab switching
+    $('button[data-bs-toggle="pill"]').on('shown.bs.tab', function (e) {
+        const targetTab = $(e.target).attr('data-bs-target').substring(1);
+        filterAndDisplayChallenges(targetTab);
+    });
+
+    // View toggle
+    $('#cardView, #listView').on('click', function() {
+        $('.view-controls .btn').removeClass('active');
+        $(this).addClass('active');
+        currentView = $(this).attr('id') === 'cardView' ? 'card' : 'list';
+        const activeTab = $('.nav-pills .nav-link.active').attr('data-bs-target').substring(1);
+        displayChallenges(filterChallenges(activeTab), currentView);
+    });
+
+    // Sort handling
+    $('.dropdown-item[data-sort]').on('click', function(e) {
+        e.preventDefault();
+        currentSort = $(this).data('sort');
+        $('#sortDropdown').html(`<i class="fas fa-sort me-1"></i>${$(this).text()}`);
+        const activeTab = $('.nav-pills .nav-link.active').attr('data-bs-target').substring(1);
+        filterAndDisplayChallenges(activeTab);
+    });
+
+    // Load user statistics
+    function loadUserStats() {
+        fetch('/challenges/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const stats = data.data;
+                    $('#activeChallengesCount').text(stats.activeChallenges || 0);
+                    $('#completedChallengesCount').text(stats.completedChallenges || 0);
+                    $('#totalPointsEarned').text(stats.total_points || 0);
+                    $('#currentStreak').text(`${stats.current_streak || 0}d`);
+                }
+            })
+            .catch(error => console.error('Error loading stats:', error));
+    }
+
+    // Load user challenges
+    function loadChallenges() {
+        fetch('/challenges/api/my-challenges')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    challenges = data.data;
+                    filterAndDisplayChallenges('all');
+                } else {
+                    showError('Failed to load challenges');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading challenges:', error);
+                showError('Failed to load challenges');
+            });
+    }
+
+    // Filter and display challenges
+    function filterAndDisplayChallenges(filter) {
+        const filteredChallenges = filterChallenges(filter);
+        displayChallenges(filteredChallenges, currentView);
+    }
+
+    // Filter challenges by status
+    function filterChallenges(filter) {
+        let filtered = challenges;
+        
+        switch(filter) {
+            case 'active':
+                filtered = challenges.filter(c => c.status === 'active');
+                break;
+            case 'completed':
+                filtered = challenges.filter(c => c.status === 'completed');
+                break;
+            case 'paused':
+                filtered = challenges.filter(c => c.status === 'paused');
+                break;
+            case 'all':
+            default:
+                filtered = challenges;
+                break;
+        }
+
+        // Apply sorting
+        return sortChallenges(filtered);
+    }
+
+    // Sort challenges
+    function sortChallenges(challengeList) {
+        return challengeList.sort((a, b) => {
+            switch(currentSort) {
+                case 'progress':
+                    return b.progress.percentage - a.progress.percentage;
+                case 'deadline':
+                    if (!a.challenge?.duration?.end) return 1;
+                    if (!b.challenge?.duration?.end) return -1;
+                    return new Date(a.challenge.duration.end) - new Date(b.challenge.duration.end);
+                case 'points':
+                    return b.rewards.pointsEarned - a.rewards.pointsEarned;
+                case 'recent':
+                default:
+                    return new Date(b.timestamps.lastUpdatedAt) - new Date(a.timestamps.lastUpdatedAt);
+            }
+        });
+    }
+
+    // Display challenges
+    function displayChallenges(challengeList, view) {
+        const containers = ['#allChallenges', '#activeChallenges', '#completedChallenges', '#pausedChallenges'];
+        
+        containers.forEach(container => {
+            $(container).empty();
+        });
+
+        if (challengeList.length === 0) {
+            $('#emptyState').removeClass('d-none');
+            return;
+        } else {
+            $('#emptyState').addClass('d-none');
+        }
+
+        const activeTab = $('.nav-pills .nav-link.active').attr('data-bs-target');
+        const container = $(activeTab + ' .challenges-container');
+
+        if (view === 'card') {
+            container.addClass('row');
+            challengeList.forEach(challenge => {
+                const cardHtml = createChallengeCard(challenge);
+                container.append(cardHtml);
+            });
+        } else {
+            container.removeClass('row');
+            challengeList.forEach(challenge => {
+                const listHtml = createChallengeListItem(challenge);
+                container.append(listHtml);
+            });
+        }
+
+        // Attach event handlers
+        attachEventHandlers();
+    }
+
+    // Create challenge card
+    function createChallengeCard(challenge) {
+        const template = $('#challengeCardTemplate').html();
+        const card = $(template);
+        
+        // Populate data
+        card.find('.challenge-title').text(challenge.challenge?.title || 'Challenge');
+        card.find('.challenge-description').text(challenge.challenge?.description || '');
+        
+        // Status badge
+        const statusBadge = card.find('.status-badge');
+        statusBadge.addClass(challenge.status).text(challenge.status.charAt(0).toUpperCase() + challenge.status.slice(1));
+        
+        // Category badge
+        card.find('.category-badge').text(challenge.challenge?.category?.replace('-', ' ') || 'General');
+        
+        // Progress
+        const percentage = Math.round(challenge.progress?.percentage || 0);
+        card.find('.progress-percentage').text(`${percentage}%`);
+        card.find('.progress-bar').css('width', `${percentage}%`);
+        card.find('.progress-text').text(`${challenge.progress?.current || 0} / ${challenge.progress?.target || 0} ${challenge.progress?.unit || ''}`);
+        
+        // Stats
+        card.find('.streak-value').text(challenge.streak?.current || 0);
+        card.find('.points-value').text(challenge.rewards?.pointsEarned || 0);
+        card.find('.days-value').text(challenge.daysActive || 0);
+        
+        // Last updated
+        const lastUpdated = new Date(challenge.timestamps?.lastUpdatedAt || challenge.createdAt);
+        card.find('.last-updated').text(`Updated ${lastUpdated.toLocaleDateString()}`);
+        
+        // Data attributes
+        card.attr('data-challenge-id', challenge._id);
+        card.attr('data-progress-id', challenge._id);
+        
+        return card;
+    }
+
+    // Create list item
+    function createChallengeListItem(challenge) {
+        const template = $('#challengeListTemplate').html();
+        const item = $(template);
+        
+        // Populate similar to card but in list format
+        item.find('.challenge-title').text(challenge.challenge?.title || 'Challenge');
+        item.find('.challenge-description').text(challenge.challenge?.description || '');
+        
+        const statusBadge = item.find('.status-badge');
+        statusBadge.addClass(challenge.status).text(challenge.status.charAt(0).toUpperCase() + challenge.status.slice(1));
+        
+        item.find('.category-badge').text(challenge.challenge?.category || 'General');
+        
+        const percentage = Math.round(challenge.progress?.percentage || 0);
+        item.find('.progress-bar').css('width', `${percentage}%`);
+        item.find('.progress-text').text(`${percentage}% complete`);
+        
+        item.find('.streak-value').text(challenge.streak?.current || 0);
+        item.find('.points-value').text(challenge.rewards?.pointsEarned || 0);
+        
+        item.attr('data-challenge-id', challenge._id);
+        item.attr('data-progress-id', challenge._id);
+        
+        return item;
+    }
+
+    // Attach event handlers
+    function attachEventHandlers() {
+        // Update progress buttons
+        $('.update-btn, .update-progress').off('click').on('click', function(e) {
+            e.preventDefault();
+            const challengeId = $(this).closest('[data-challenge-id]').data('challenge-id');
+            showUpdateProgressModal(challengeId);
+        });
+
+        // View details
+        $('.view-details').off('click').on('click', function(e) {
+            e.preventDefault();
+            const challengeId = $(this).closest('[data-challenge-id]').data('challenge-id');
+            window.location.href = `/challenges/challenge/${challengeId}`;
+        });
+
+        // Pause challenge
+        $('.pause-challenge').off('click').on('click', function(e) {
+            e.preventDefault();
+            const progressId = $(this).closest('[data-progress-id]').data('progress-id');
+            pauseChallenge(progressId);
+        });
+
+        // Leave challenge
+        $('.leave-challenge').off('click').on('click', function(e) {
+            e.preventDefault();
+            const challengeId = $(this).closest('[data-challenge-id]').data('challenge-id');
+            if (confirm('Are you sure you want to leave this challenge?')) {
+                leaveChallenge(challengeId);
+            }
+        });
+    }
+
+    // Show update progress modal
+    function showUpdateProgressModal(challengeId) {
+        // This would open a modal for updating progress
+        // For now, redirect to challenge details page
+        window.location.href = `/challenges/progress/${challengeId}`;
+    }
+
+    // Pause challenge
+    function pauseChallenge(progressId) {
+        // Implementation for pausing a challenge
+        showToast('Info', 'Challenge paused successfully', 'info');
+        setTimeout(() => loadChallenges(), 1000);
+    }
+
+    // Leave challenge
+    function leaveChallenge(challengeId) {
+        fetch(`/challenges/api/challenges/${challengeId}/leave`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Success', 'Left challenge successfully', 'success');
+                loadChallenges();
+                loadUserStats();
+            } else {
+                throw new Error(data.error || 'Failed to leave challenge');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error', error.message, 'error');
+        });
+    }
+
+    // Utility functions
+    function showToast(title, message, type) {
+        const alertClass = type === 'success' ? 'alert-success' : type === 'error' ? 'alert-danger' : 'alert-info';
+        const alert = $(`
+            <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                 style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                <strong>${title}:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `);
+        $('body').append(alert);
+        
+        setTimeout(() => {
+            alert.alert('close');
+        }, 5000);
+    }
+
+    function showError(message) {
+        $('.loading-state').html(`
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                ${message}
+            </div>
+        `);
+    }
+});
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title || 'Healthcare Analytics Overview | Healthfy' %></title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- D3.js -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-color: #10b981;
+            --primary-dark: #059669;
+            --secondary-color: #6366f1;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #3b82f6;
+            --light-bg: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --card-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95), rgba(99, 102, 241, 0.95));
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)" /></svg>');
+            opacity: 0.3;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            font-weight: 300;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .main-content {
+            margin-top: -30px;
+            position: relative;
+            z-index: 10;
+            background: var(--light-bg);
+            border-radius: 20px 20px 0 0;
+            min-height: calc(100vh - 200px);
+            padding: 40px 0;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            border: none;
+            overflow: hidden;
+        }
+
+        .analytics-card:hover {
+            box-shadow: var(--card-hover);
+            transform: translateY(-2px);
+        }
+
+        .stat-card {
+            padding: 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, white 0%, #f8fafc 100%);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-icon.patients { background: linear-gradient(135deg, var(--primary-color), var(--primary-dark)); }
+        .stat-icon.consultations { background: linear-gradient(135deg, var(--info-color), #2563eb); }
+        .stat-icon.satisfaction { background: linear-gradient(135deg, var(--success-color), #16a34a); }
+        .stat-icon.alerts { background: linear-gradient(135deg, var(--warning-color), #d97706); }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .stat-change.positive { color: var(--success-color); }
+        .stat-change.negative { color: var(--danger-color); }
+        .stat-change.neutral { color: #6b7280; }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            padding: 1.5rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding: 0 1rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            flex-direction: column;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            border-color: var(--primary-color);
+            border-right-color: transparent;
+        }
+
+        .breadcrumb {
+            background: transparent;
+            padding: 1rem 0;
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .breadcrumb-item a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+        }
+
+        .breadcrumb-item.active {
+            color: white;
+        }
+
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border: none;
+            margin: 3rem 0;
+            border-radius: 1px;
+        }
+
+        .insight-card {
+            border-left: 4px solid var(--primary-color);
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .insight-icon {
+            color: var(--info-color);
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .main-content { margin-top: -20px; }
+            .chart-container { height: 300px; }
+            .stat-number { font-size: 2rem; }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.6s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center">
+                    <li class="breadcrumb-item"><a href="/"><i class="fas fa-home me-1"></i>Home</a></li>
+                    <li class="breadcrumb-item"><a href="/analytics/dashboard">Analytics</a></li>
+                    <li class="breadcrumb-item active">Overview</li>
+                </ol>
+            </nav>
+            
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <i class="fas fa-chart-line me-3"></i>
+                    Healthcare Analytics Overview
+                </h1>
+                <p class="hero-subtitle">
+                    Comprehensive insights into your healthcare system performance
+                </p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <div class="badge bg-light text-dark px-3 py-2 fs-6">
+                        <i class="fas fa-users me-2"></i>Real-time Patient Data
+                    </div>
+                    <div class="badge bg-light text-dark px-3 py-2 fs-6">
+                        <i class="fas fa-heartbeat me-2"></i>Live Health Metrics
+                    </div>
+                    <div class="badge bg-light text-dark px-3 py-2 fs-6">
+                        <i class="fas fa-brain me-2"></i>AI-Powered Insights
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <!-- Key Performance Indicators -->
+            <div class="row g-4 mb-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card stat-card fade-in" style="animation-delay: 0.1s;">
+                        <div class="stat-icon patients">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-number pulse" id="totalPatientsCount">-</div>
+                        <div class="stat-label">Total Patients</div>
+                        <div class="stat-change" id="patientsChange">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card stat-card fade-in" style="animation-delay: 0.2s;">
+                        <div class="stat-icon consultations">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <div class="stat-number pulse" id="activeConsultationsCount">-</div>
+                        <div class="stat-label">Active Consultations</div>
+                        <div class="stat-change" id="consultationsChange">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card stat-card fade-in" style="animation-delay: 0.3s;">
+                        <div class="stat-icon satisfaction">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        <div class="stat-number pulse" id="avgSatisfactionScore">-</div>
+                        <div class="stat-label">Avg Satisfaction</div>
+                        <div class="stat-change" id="satisfactionChange">Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card stat-card fade-in" style="animation-delay: 0.4s;">
+                        <div class="stat-icon alerts">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-number pulse" id="criticalAlertsCount">-</div>
+                        <div class="stat-label">Critical Alerts</div>
+                        <div class="stat-change" id="alertsChange">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- Charts Section -->
+            <div class="row g-4 mb-5">
+                <!-- Patient Flow Chart -->
+                <div class="col-lg-8">
+                    <div class="analytics-card fade-in" style="animation-delay: 0.5s;">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-chart-line me-2 text-primary"></i>
+                                Patient Flow Trends
+                            </h3>
+                            <div class="chart-controls">
+                                <button class="btn btn-outline-primary btn-sm" id="patientFlow7d">7D</button>
+                                <button class="btn btn-outline-primary btn-sm active" id="patientFlow30d">30D</button>
+                                <button class="btn btn-outline-primary btn-sm" id="patientFlow90d">90D</button>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="patientFlowChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Health Conditions Distribution -->
+                <div class="col-lg-4">
+                    <div class="analytics-card fade-in" style="animation-delay: 0.6s;">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-heartbeat me-2 text-danger"></i>
+                                Health Conditions
+                            </h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="conditionsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <!-- Response Time Metrics -->
+                <div class="col-lg-6">
+                    <div class="analytics-card fade-in" style="animation-delay: 0.7s;">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-clock me-2 text-warning"></i>
+                                Response Time Analysis
+                            </h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="responseTimeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medication Adherence -->
+                <div class="col-lg-6">
+                    <div class="analytics-card fade-in" style="animation-delay: 0.8s;">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-pills me-2 text-success"></i>
+                                Medication Adherence
+                            </h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="adherenceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights Section -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="analytics-card fade-in" style="animation-delay: 0.9s;">
+                        <div class="chart-header">
+                            <h3 class="chart-title">
+                                <i class="fas fa-brain me-2 text-info"></i>
+                                AI-Generated Insights
+                            </h3>
+                            <button class="btn btn-outline-primary btn-sm" id="refreshInsights">
+                                <i class="fas fa-sync-alt me-1"></i>Refresh
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <div id="aiInsightsContainer">
+                                <div class="loading-spinner">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading insights...</span>
+                                    </div>
+                                    <p class="mt-3 text-muted">Generating AI insights...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="analytics-card fade-in" style="animation-delay: 1s;">
+                        <div class="p-4">
+                            <h3 class="mb-4">
+                                <i class="fas fa-bolt me-2 text-warning"></i>
+                                Quick Actions
+                            </h3>
+                            <div class="row g-3">
+                                <div class="col-md-3 col-sm-6">
+                                    <a href="/analytics/patient-journey" class="btn btn-outline-primary w-100 py-3">
+                                        <i class="fas fa-route d-block mb-2 fs-4"></i>
+                                        Patient Journey
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <a href="/analytics/medical-trends" class="btn btn-outline-success w-100 py-3">
+                                        <i class="fas fa-chart-bar d-block mb-2 fs-4"></i>
+                                        Medical Trends
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <a href="/analytics/doctor-performance" class="btn btn-outline-info w-100 py-3">
+                                        <i class="fas fa-user-md d-block mb-2 fs-4"></i>
+                                        Doctor Performance
+                                    </a>
+                                </div>
+                                <div class="col-md-3 col-sm-6">
+                                    <button class="btn btn-outline-warning w-100 py-3" id="exportData">
+                                        <i class="fas fa-download d-block mb-2 fs-4"></i>
+                                        Export Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Components -->
+    <%- include('../partials/quick-access-fab') %>
+    <%- include('../partials/quick-access-sidebar') %>
+    <%- include('../partials/keyboard-shortcuts') %>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Analytics JavaScript -->
+    <script>
+        // Global variables
+        let charts = {};
+        let analyticsData = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadAnalyticsData();
+            setupEventListeners();
+            generateAIInsights();
+        });
+
+        // Initialize all charts
+        function initializeCharts() {
+            // Patient Flow Chart
+            const patientFlowCtx = document.getElementById('patientFlowChart').getContext('2d');
+            charts.patientFlow = new Chart(patientFlowCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily Patients',
+                        data: [],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            borderColor: '#10b981',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // Health Conditions Chart
+            const conditionsCtx = document.getElementById('conditionsChart').getContext('2d');
+            charts.conditions = new Chart(conditionsCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#10b981', '#6366f1', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+
+            // Response Time Chart
+            const responseTimeCtx = document.getElementById('responseTimeChart').getContext('2d');
+            charts.responseTime = new Chart(responseTimeCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Response Time (minutes)',
+                        data: [],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#22c55e'],
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            title: { display: true, text: 'Minutes' }
+                        }
+                    }
+                }
+            });
+
+            // Medication Adherence Chart
+            const adherenceCtx = document.getElementById('adherenceChart').getContext('2d');
+            charts.adherence = new Chart(adherenceCtx, {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: ['#22c55e', '#3b82f6', '#f59e0b', '#ef4444'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        // Load analytics data from API
+        async function loadAnalyticsData() {
+            try {
+                showLoadingState();
+                const response = await fetch('/api/analytics/overview');
+                const result = await response.json();
+                
+                if (result.success) {
+                    analyticsData = result.data;
+                    updateAllMetrics();
+                    updateAllCharts();
+                } else {
+                    throw new Error(result.message);
+                }
+                
+                hideLoadingState();
+            } catch (error) {
+                console.error('Error loading analytics data:', error);
+                showErrorMessage('Failed to load analytics data');
+                hideLoadingState();
+            }
+        }
+
+        // Update all metrics
+        function updateAllMetrics() {
+            document.getElementById('totalPatientsCount').textContent = 
+                analyticsData.totalPatients?.toLocaleString() || '0';
+            document.getElementById('activeConsultationsCount').textContent = 
+                analyticsData.activeConsultations || '0';
+            document.getElementById('avgSatisfactionScore').textContent = 
+                analyticsData.avgSatisfaction?.toFixed(1) || '0.0';
+            document.getElementById('criticalAlertsCount').textContent = 
+                analyticsData.criticalAlerts || '0';
+            
+            // Update change indicators
+            updateChangeIndicator('patientsChange', analyticsData.changes?.patients, 'this month');
+            updateChangeIndicator('consultationsChange', analyticsData.changes?.consultations, 'this week');
+            updateChangeIndicator('satisfactionChange', analyticsData.changes?.satisfaction, 'this month');
+            updateChangeIndicator('alertsChange', analyticsData.changes?.alerts, 'this week', 'alerts');
+        }
+
+        // Update change indicator
+        function updateChangeIndicator(elementId, change, period, suffix = '%') {
+            const element = document.getElementById(elementId);
+            if (!element || change === undefined) return;
+            
+            const isPositive = change > 0;
+            const isAlerts = suffix === 'alerts';
+            const className = isAlerts ? 
+                (change > 0 ? 'negative' : change < 0 ? 'positive' : 'neutral') :
+                (isPositive ? 'positive' : change < 0 ? 'negative' : 'neutral');
+            
+            const sign = change > 0 ? '+' : '';
+            const displaySuffix = suffix === 'alerts' ? '' : suffix;
+            
+            element.className = `stat-change ${className}`;
+            element.textContent = `${sign}${change.toFixed(1)}${displaySuffix} ${period}`;
+        }
+
+        // Update all charts
+        function updateAllCharts() {
+            // Update patient flow chart
+            if (analyticsData.patientFlow && charts.patientFlow) {
+                const labels = analyticsData.patientFlow.map(d => 
+                    new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                );
+                const data = analyticsData.patientFlow.map(d => d.value);
+                
+                charts.patientFlow.data.labels = labels;
+                charts.patientFlow.data.datasets[0].data = data;
+                charts.patientFlow.update();
+            }
+
+            // Update conditions chart
+            if (analyticsData.conditions && charts.conditions) {
+                charts.conditions.data.labels = Object.keys(analyticsData.conditions);
+                charts.conditions.data.datasets[0].data = Object.values(analyticsData.conditions);
+                charts.conditions.update();
+            }
+
+            // Update response time chart
+            if (analyticsData.responseTime && charts.responseTime) {
+                charts.responseTime.data.labels = Object.keys(analyticsData.responseTime);
+                charts.responseTime.data.datasets[0].data = Object.values(analyticsData.responseTime);
+                charts.responseTime.update();
+            }
+
+            // Update adherence chart
+            if (analyticsData.medicationAdherence && charts.adherence) {
+                charts.adherence.data.labels = Object.keys(analyticsData.medicationAdherence);
+                charts.adherence.data.datasets[0].data = Object.values(analyticsData.medicationAdherence);
+                charts.adherence.update();
+            }
+        }
+
+        // Generate AI insights
+        async function generateAIInsights() {
+            const container = document.getElementById('aiInsightsContainer');
+            
+            // Simulate AI processing delay
+            setTimeout(() => {
+                const insights = [
+                    {
+                        type: 'trend',
+                        icon: 'fas fa-trending-up',
+                        color: 'success',
+                        title: 'Patient Volume Increasing',
+                        description: 'Patient registrations have increased by 12.5% this month, indicating growing trust in the platform.'
+                    },
+                    {
+                        type: 'optimization',
+                        icon: 'fas fa-lightbulb',
+                        color: 'warning',
+                        title: 'Response Time Optimization',
+                        description: 'Emergency response times can be improved by 15% with optimal staff scheduling during peak hours.'
+                    },
+                    {
+                        type: 'alert',
+                        icon: 'fas fa-exclamation-circle',
+                        color: 'info',
+                        title: 'Medication Adherence Focus',
+                        description: '8% of patients show poor medication adherence. Consider implementing automated reminders.'
+                    },
+                    {
+                        type: 'prediction',
+                        icon: 'fas fa-crystal-ball',
+                        color: 'primary',
+                        title: 'Seasonal Health Trends',
+                        description: 'Respiratory conditions are expected to increase by 20% in the next 4 weeks based on seasonal patterns.'
+                    }
+                ];
+                
+                const insightsHtml = insights.map(insight => `
+                    <div class="insight-card mb-3">
+                        <div class="d-flex align-items-start">
+                            <div class="insight-icon text-${insight.color}">
+                                <i class="${insight.icon}"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-2">${insight.title}</h5>
+                                <p class="mb-0 text-muted">${insight.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                container.innerHTML = insightsHtml;
+            }, 2000);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Time range controls
+            document.getElementById('patientFlow7d')?.addEventListener('click', () => updateTimeRange('7d'));
+            document.getElementById('patientFlow30d')?.addEventListener('click', () => updateTimeRange('30d'));
+            document.getElementById('patientFlow90d')?.addEventListener('click', () => updateTimeRange('90d'));
+            
+            // Refresh insights
+            document.getElementById('refreshInsights')?.addEventListener('click', generateAIInsights);
+            
+            // Export data
+            document.getElementById('exportData')?.addEventListener('click', exportAnalyticsData);
+        }
+
+        // Update time range
+        function updateTimeRange(range) {
+            document.querySelectorAll('.chart-controls .btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`patientFlow${range}`).classList.add('active');
+            
+            // Reload data with new range
+            loadAnalyticsData();
+        }
+
+        // Export analytics data
+        function exportAnalyticsData() {
+            const dataStr = JSON.stringify(analyticsData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `healthcare-analytics-overview-${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Utility functions
+        function showLoadingState() {
+            // Add loading spinners to stat cards
+            document.querySelectorAll('.pulse').forEach(el => {
+                el.textContent = '...';
+                el.classList.add('text-muted');
+            });
+        }
+
+        function hideLoadingState() {
+            document.querySelectorAll('.pulse').forEach(el => {
+                el.classList.remove('text-muted');
+            });
+        }
+
+        function showErrorMessage(message) {
+            const alertHtml = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('afterbegin', alertHtml);
+        }
+    </script>
+</body>
+</html>

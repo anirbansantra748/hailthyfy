@@ -1,0 +1,643 @@
+<%- include('../partials/header') %>
+
+<div class="container-fluid py-4">
+  <!-- Doctor Header Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <div class="row align-items-center">
+            <!-- Profile Image -->
+            <div class="col-md-3 text-center mb-3 mb-md-0">
+              <% if (doctor.user && doctor.user.profileImage) { %>
+              <img
+                src="<%= doctor.user.profileImage %>"
+                alt="<%= doctor.fullName %>"
+                class="rounded-circle shadow-lg"
+                style="width: 150px; height: 150px; object-fit: cover"
+              />
+              <% } else { %>
+              <div
+                class="bg-primary rounded-circle shadow-lg d-flex align-items-center justify-content-center text-white mx-auto"
+                style="width: 150px; height: 150px"
+              >
+                <i class="fas fa-user-md fa-4x"></i>
+              </div>
+              <% } %>
+            </div>
+
+            <!-- Basic Info -->
+            <div class="col-md-6 mb-3 mb-md-0">
+              <h1 class="h2 mb-2"><%= doctor.fullName %></h1>
+              <p class="text-primary mb-2 fs-5 fw-bold">
+                <%= doctor.specialization %>
+              </p>
+
+              <!-- Rating -->
+              <div class="d-flex align-items-center mb-3">
+                <div class="text-warning me-2">
+                  <% for (let i = 0; i < 5; i++) { %> <% if (i <
+                  Math.floor(doctor.averageRating)) { %>
+                  <i class="fas fa-star fa-lg"></i>
+                  <% } else if (i === Math.floor(doctor.averageRating) &&
+                  doctor.averageRating % 1 > 0) { %>
+                  <i class="fas fa-star-half-alt fa-lg"></i>
+                  <% } else { %>
+                  <i class="far fa-star fa-lg"></i>
+                  <% } %> <% } %>
+                </div>
+                <span class="fs-5 fw-bold text-muted"
+                  >(<%= doctor.averageRating %>)</span
+                >
+                <span class="ms-3 text-muted"
+                  >• <%= doctor.reviews ? doctor.reviews.length : 0 %>
+                  reviews</span
+                >
+              </div>
+
+              <!-- Quick Stats -->
+              <div class="row g-3">
+                <div class="col-4">
+                  <div class="text-center">
+                    <div class="h4 text-primary mb-1">
+                      <%= doctor.experienceYears %>+
+                    </div>
+                    <small class="text-muted">Years Experience</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="text-center">
+                    <div class="h4 text-success mb-1">
+                      <%= doctor.totalPatientsTreated.toLocaleString() %>
+                    </div>
+                    <small class="text-muted">Patients Treated</small>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="text-center">
+                    <div class="h4 text-info mb-1">
+                      $<%= doctor.consultationFee %>
+                    </div>
+                    <small class="text-muted">Consultation Fee</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-3 text-center">
+              <% if (user && !user.isDoctor) { %>
+              <a href="/chat/start/<%= doctor._id %>" class="btn btn-primary btn-lg w-100 mb-2">
+                <i class="fas fa-comments me-2"></i>Chat with Doctor
+              </a>
+              <% } %>
+
+              <a href="/doctors" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-arrow-left me-2"></i>Back to Doctors
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row">
+    <!-- Left Column - Doctor Details -->
+    <div class="col-lg-8">
+      <!-- About Section -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>About Doctor
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-4">
+            <!-- Sub-specializations -->
+            <% if (doctor.subSpecializations && doctor.subSpecializations.length
+            > 0) { %>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Sub-specializations</h6>
+              <div class="d-flex flex-wrap gap-2">
+                <% doctor.subSpecializations.forEach(function(subSpec) { %>
+                <span class="badge bg-primary"><%= subSpec %></span>
+                <% }); %>
+              </div>
+            </div>
+            <% } %>
+
+            <!-- Languages -->
+            <% if (doctor.languages && doctor.languages.length > 0) { %>
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Languages Spoken</h6>
+              <div class="d-flex flex-wrap gap-2">
+                <% doctor.languages.forEach(function(lang) { %>
+                <span class="badge bg-info"><%= lang %></span>
+                <% }); %>
+              </div>
+            </div>
+            <% } %>
+
+            <!-- Consultation Modes -->
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">Consultation Modes</h6>
+              <div class="d-flex flex-wrap gap-2">
+                <% doctor.consultationMode.forEach(function(mode) { %>
+                <span class="badge bg-success"
+                  ><%= mode.replace('_', ' ') %></span
+                >
+                <% }); %>
+              </div>
+            </div>
+
+            <!-- License Status -->
+            <div class="col-md-6">
+              <h6 class="text-muted mb-2">License Status</h6>
+              <% if (doctor.licenseVerificationStatus === 'verified') { %>
+              <span class="badge bg-success">
+                <i class="fas fa-check-circle me-1"></i>Verified
+              </span>
+              <% } else if (doctor.licenseVerificationStatus === 'pending') { %>
+              <span class="badge bg-warning">
+                <i class="fas fa-clock me-1"></i>Pending
+              </span>
+              <% } else { %>
+              <span class="badge bg-danger">
+                <i class="fas fa-times-circle me-1"></i>Rejected
+              </span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Qualifications Section -->
+      <% if (doctor.qualifications && doctor.qualifications.length > 0) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-graduation-cap me-2"></i>Qualifications
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <% doctor.qualifications.forEach(function(qual) { %>
+            <div class="col-md-6">
+              <div class="border rounded p-3">
+                <h6 class="fw-bold text-primary mb-1"><%= qual.degree %></h6>
+                <p class="mb-1"><%= qual.university %></p>
+                <small class="text-muted">Graduated: <%= qual.year %></small>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Hospital Affiliations -->
+      <% if (doctor.hospitalAffiliations && doctor.hospitalAffiliations.length >
+      0) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-hospital me-2"></i>Hospital Affiliations
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <% doctor.hospitalAffiliations.forEach(function(hospital) { %>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-hospital text-primary me-3 fa-lg"></i>
+                <span class="fw-bold"><%= hospital %></span>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Availability Section -->
+      <% if (doctor.availability && doctor.availability.length > 0) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>Availability
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <% doctor.availability.forEach(function(day) { %>
+            <div class="col-md-6">
+              <div class="border rounded p-3">
+                <h6 class="fw-bold text-primary mb-2"><%= day.day %></h6>
+                <% if (day.slots && day.slots.length > 0) { %> <%
+                day.slots.forEach(function(slot) { %>
+                <span class="badge bg-success me-2">
+                  <%= slot.start %> - <%= slot.end %>
+                </span>
+                <% }); %> <% } else { %>
+                <span class="text-muted">No slots available</span>
+                <% } %>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Research & Publications -->
+      <% if (doctor.researchPapers && doctor.researchPapers.length > 0) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-microscope me-2"></i>Research & Publications
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <% doctor.researchPapers.forEach(function(paper) { %>
+            <div class="col-12">
+              <div class="border rounded p-3">
+                <h6 class="fw-bold text-primary mb-1"><%= paper.title %></h6>
+                <p class="mb-1 text-muted"><%= paper.journal %></p>
+                <div class="d-flex justify-content-between align-items-center">
+                  <small class="text-muted">Published: <%= paper.year %></small>
+                  <% if (paper.link) { %>
+                  <a
+                    href="<%= paper.link %>"
+                    target="_blank"
+                    class="btn btn-sm btn-outline-primary"
+                  >
+                    <i class="fas fa-external-link-alt me-1"></i>View Paper
+                  </a>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Achievements -->
+      <% if (doctor.achievements && doctor.achievements.length > 0) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-trophy me-2"></i>Achievements & Awards
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <% doctor.achievements.forEach(function(achievement) { %>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-medal text-warning me-3 fa-lg"></i>
+                <span class="fw-bold"><%= achievement %></span>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Reviews Section -->
+      <% if (doctor.reviews && doctor.reviews.length > 0) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-gradient-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-star me-2"></i>Patient Reviews</h5>
+        </div>
+        <div class="card-body p-4">
+          <% doctor.reviews.slice(0, 5).forEach(function(review) { %>
+          <div class="border-bottom pb-3 mb-3">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <div class="d-flex align-items-center">
+                <% if (review.patient && review.patient.profileImage) { %>
+                <img
+                  src="<%= review.patient.profileImage %>"
+                  alt="Patient"
+                  class="rounded-circle me-2"
+                  style="width: 40px; height: 40px; object-fit: cover"
+                />
+                <% } else { %>
+                <div
+                  class="bg-secondary rounded-circle me-2 d-flex align-items-center justify-content-center text-white"
+                  style="width: 40px; height: 40px"
+                >
+                  <i class="fas fa-user"></i>
+                </div>
+                <% } %>
+                <div>
+                  <h6 class="mb-0">
+                    <%= review.patient ? review.patient.name : 'Anonymous' %>
+                  </h6>
+                  <div class="text-warning">
+                    <% for (let i = 0; i < 5; i++) { %> <% if (i <
+                    review.rating) { %>
+                    <i class="fas fa-star"></i>
+                    <% } else { %>
+                    <i class="far fa-star"></i>
+                    <% } %> <% } %>
+                  </div>
+                </div>
+              </div>
+              <small class="text-muted"
+                ><%= new Date(review.createdAt).toLocaleDateString() %></small
+              >
+            </div>
+            <% if (review.comment) { %>
+            <p class="mb-0"><%= review.comment %></p>
+            <% } %>
+          </div>
+          <% }); %> <% if (doctor.reviews.length > 5) { %>
+          <div class="text-center">
+            <a href="#" class="btn btn-outline-primary"
+              >View All <%= doctor.reviews.length %> Reviews</a
+            >
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Right Column - Sidebar -->
+    <div class="col-lg-4">
+      <!-- Quick Contact Card -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0"><i class="fas fa-phone me-2"></i>Quick Contact</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="d-grid gap-3">
+            <% if (user && !user.isDoctor) { %>
+            <a href="/chat/start/<%= doctor._id %>" class="btn btn-primary btn-lg">
+              <i class="fas fa-comments me-2"></i>Chat with Doctor
+            </a>
+            <% } %>
+
+            <div class="text-center">
+              <p class="text-muted mb-2">Consultation Fee</p>
+              <h3 class="text-success mb-0">$<%= doctor.consultationFee %></h3>
+              <small class="text-muted">per session</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Similar Doctors -->
+      <% if (similarDoctors && similarDoctors.length > 0) { %>
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0"><i class="fas fa-users me-2"></i>Similar Doctors</h5>
+        </div>
+        <div class="card-body p-4">
+          <% similarDoctors.forEach(function(similarDoctor) { %>
+          <div class="d-flex align-items-center mb-3">
+            <div class="flex-shrink-0 me-3">
+              <% if (similarDoctor.user && similarDoctor.user.profileImage) { %>
+              <img
+                src="<%= similarDoctor.user.profileImage %>"
+                alt="<%= similarDoctor.fullName %>"
+                class="rounded-circle"
+                style="width: 50px; height: 50px; object-fit: cover"
+              />
+              <% } else { %>
+              <div
+                class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
+                style="width: 50px; height: 50px"
+              >
+                <i class="fas fa-user-md"></i>
+              </div>
+              <% } %>
+            </div>
+            <div class="flex-grow-1">
+              <h6 class="mb-1">
+                <a
+                  href="/doctors/profile/<%= similarDoctor._id %>"
+                  class="text-decoration-none"
+                >
+                  <%= similarDoctor.fullName %>
+                </a>
+              </h6>
+              <p class="text-muted mb-0 small">
+                <%= similarDoctor.specialization %>
+              </p>
+              <div class="text-warning small">
+                <% for (let i = 0; i < 5; i++) { %> <% if (i <
+                Math.floor(similarDoctor.averageRating)) { %>
+                <i class="fas fa-star"></i>
+                <% } else if (i === Math.floor(similarDoctor.averageRating) &&
+                similarDoctor.averageRating % 1 > 0) { %>
+                <i class="fas fa-star-half-alt"></i>
+                <% } else { %>
+                <i class="far fa-star"></i>
+                <% } %> <% } %>
+                <span class="text-muted ms-1"
+                  >(<%= similarDoctor.averageRating %>)</span
+                >
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Verification Badge -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 text-center">
+          <div class="mb-3">
+            <i class="fas fa-shield-alt fa-3x text-success"></i>
+          </div>
+          <h6 class="fw-bold">Verified Doctor</h6>
+          <p class="text-muted small mb-0">
+            This doctor's credentials have been verified by our team
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="chatRequestModalLabel">
+          <i class="fas fa-comments me-2"></i>Request Consultation with Dr. <%=
+          doctor.fullName %>
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form id="chatRequestForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="consultationType" class="form-label"
+                >Consultation Type *</label
+              >
+              <select
+                class="form-select"
+                id="consultationType"
+                name="consultationType"
+                required
+              >
+                <option value="">Select type</option>
+                <option value="general">General Consultation</option>
+                <option value="xray_consultation">X-ray Consultation</option>
+                <option value="follow_up">Follow-up</option>
+                <option value="emergency">Emergency</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label for="urgency" class="form-label">Urgency Level</label>
+              <select class="form-select" id="urgency" name="urgency">
+                <option value="low">Low</option>
+                <option value="medium" selected>Medium</option>
+                <option value="high">High</option>
+                <option value="emergency">Emergency</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="reason" class="form-label"
+                >Reason for Consultation *</label
+              >
+              <textarea
+                class="form-control"
+                id="reason"
+                name="reason"
+                rows="3"
+                placeholder="Please describe your symptoms or reason for consultation..."
+                required
+              ></textarea>
+            </div>
+            <div class="col-md-6">
+              <label for="symptoms" class="form-label"
+                >Symptoms (comma separated)</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="symptoms"
+                name="symptoms"
+                placeholder="e.g., fever, cough, headache"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="currentMedications" class="form-label"
+                >Current Medications</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="currentMedications"
+                name="currentMedications"
+                placeholder="e.g., aspirin, vitamin D"
+              />
+            </div>
+            <div class="col-12">
+              <label for="allergies" class="form-label">Allergies</label>
+              <input
+                type="text"
+                class="form-control"
+                id="allergies"
+                name="allergies"
+                placeholder="e.g., penicillin, peanuts"
+              />
+            </div>
+            <div class="col-12">
+              <label for="preferredTimeSlots" class="form-label"
+                >Preferred Time Slots</label
+              >
+              <div class="row g-2" id="timeSlotsContainer">
+                <div class="col-md-6">
+                  <select class="form-select" name="preferredTimeSlots[0][day]">
+                    <option value="">Select day</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Friday">Friday</option>
+                    <option value="Saturday">Saturday</option>
+                    <option value="Sunday">Sunday</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="preferredTimeSlots[0][time]"
+                    placeholder="e.g., 10:00-12:00"
+                  />
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn btn-sm btn-outline-secondary mt-2"
+                onclick="addTimeSlot()"
+              >
+                <i class="fas fa-plus me-1"></i>Add Another Time
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onclick="submitChatRequest()"
+        >
+          <i class="fas fa-paper-plane me-2"></i>Send Request
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  }
+
+  .card {
+    transition: transform 0.2s ease-in-out;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+  }
+
+  .badge {
+    font-size: 0.875rem;
+  }
+
+  .text-warning .fas.fa-star,
+  .text-warning .fas.fa-star-half-alt {
+    color: #ffc107 !important;
+  }
+
+  .text-warning .far.fa-star {
+    color: #dee2e6 !important;
+  }
+</style>
+
+
+<%- include('../partials/footer') %>

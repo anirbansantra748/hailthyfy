@@ -1,0 +1,267 @@
+<%- include('../partials/header') %>
+
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-0">Video Calls</h2>
+      <p class="text-muted">Manage your video consultations</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <% if (calls && calls.length > 0) { %>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Participant</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% calls.forEach(call => { %>
+                    <% 
+                      // Find the other participant
+                      const otherParticipant = call.participants.find(p => 
+                        p._id.toString() !== user._id.toString()
+                      ) || {};
+                      
+                      // Format date
+                      const callDate = new Date(call.createdAt);
+                      const formattedDate = callDate.toLocaleDateString();
+                      const formattedTime = callDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                      
+                      // Format duration
+                      let durationText = 'N/A';
+                      if (call.duration) {
+                        const minutes = Math.floor(call.duration / 60);
+                        const seconds = call.duration % 60;
+                        durationText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                      }
+                      
+                      // Status badge class
+                      let statusBadgeClass = 'bg-secondary';
+                      switch(call.status) {
+                        case 'active':
+                          statusBadgeClass = 'bg-success';
+                          break;
+                        case 'ended':
+                          statusBadgeClass = 'bg-primary';
+                          break;
+                        case 'missed':
+                          statusBadgeClass = 'bg-warning';
+                          break;
+                        case 'cancelled':
+                          statusBadgeClass = 'bg-danger';
+                          break;
+                        case 'pending':
+                          statusBadgeClass = 'bg-info';
+                          break;
+                      }
+                    %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (otherParticipant.profileImage) { %>
+                            <img src="<%= otherParticipant.profileImage %>" alt="<%= otherParticipant.name %>" 
+                                class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover">
+                          <% } else { %>
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-2"
+                                style="width: 40px; height: 40px">
+                              <i class="fas fa-user"></i>
+                            </div>
+                          <% } %>
+                          <div>
+                            <h6 class="mb-0"><%= otherParticipant.name || 'Unknown User' %></h6>
+                            <small class="text-muted">Chat #<%= call.chat %></small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge <%= statusBadgeClass %> rounded-pill">
+                          <%= call.status.charAt(0).toUpperCase() + call.status.slice(1) %>
+                        </span>
+                      </td>
+                      <td>
+                        <div><%= formattedDate %></div>
+                        <small class="text-muted"><%= formattedTime %></small>
+                      </td>
+                      <td><%= durationText %></td>
+                      <td>
+                        <% if (call.status === 'active') { %>
+                          <a href="/video/<%= call._id %>" class="btn btn-sm btn-success">
+                            <i class="fas fa-video me-1"></i> Join
+                          </a>
+                        <% } else if (call.status === 'ended') { %>
+                          <button class="btn btn-sm btn-outline-secondary" disabled>
+                            <i class="fas fa-check-circle me-1"></i> Completed
+                          </button>
+                        <% } else if (call.status === 'pending') { %>
+                          <a href="/video/<%= call._id %>" class="btn btn-sm btn-primary">
+                            <i class="fas fa-video me-1"></i> Answer
+                          </a>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="text-center py-5">
+              <div class="mb-4">
+                <i class="fas fa-video fa-4x text-muted"></i>
+              </div>
+              <h4 class="text-muted">No Video Calls Yet</h4>
+              <p class="text-muted mb-4">You haven't had any video consultations yet.</p>
+              <a href="/chat" class="btn btn-primary">
+                <i class="fas fa-comments me-2"></i> Go to Chats
+              </a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<div class="container py-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-0">Video Calls</h2>
+      <p class="text-muted">Manage your video consultations</p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          <% if (calls && calls.length > 0) { %>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th scope="col">Participant</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Duration</th>
+                    <th scope="col">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% calls.forEach(call => { %>
+                    <% 
+                      // Find the other participant
+                      const otherParticipant = call.participants.find(p => 
+                        p._id.toString() !== user._id.toString()
+                      ) || {};
+                      
+                      // Format date
+                      const callDate = new Date(call.createdAt);
+                      const formattedDate = callDate.toLocaleDateString();
+                      const formattedTime = callDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                      
+                      // Format duration
+                      let durationText = 'N/A';
+                      if (call.duration) {
+                        const minutes = Math.floor(call.duration / 60);
+                        const seconds = call.duration % 60;
+                        durationText = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                      }
+                      
+                      // Status badge class
+                      let statusBadgeClass = 'bg-secondary';
+                      switch(call.status) {
+                        case 'active':
+                          statusBadgeClass = 'bg-success';
+                          break;
+                        case 'ended':
+                          statusBadgeClass = 'bg-primary';
+                          break;
+                        case 'missed':
+                          statusBadgeClass = 'bg-warning';
+                          break;
+                        case 'cancelled':
+                          statusBadgeClass = 'bg-danger';
+                          break;
+                        case 'pending':
+                          statusBadgeClass = 'bg-info';
+                          break;
+                      }
+                    %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (otherParticipant.profileImage) { %>
+                            <img src="<%= otherParticipant.profileImage %>" alt="<%= otherParticipant.name %>" 
+                                class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover">
+                          <% } else { %>
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-2"
+                                style="width: 40px; height: 40px">
+                              <i class="fas fa-user"></i>
+                            </div>
+                          <% } %>
+                          <div>
+                            <h6 class="mb-0"><%= otherParticipant.name || 'Unknown User' %></h6>
+                            <small class="text-muted">Chat #<%= call.chat %></small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge <%= statusBadgeClass %> rounded-pill">
+                          <%= call.status.charAt(0).toUpperCase() + call.status.slice(1) %>
+                        </span>
+                      </td>
+                      <td>
+                        <div><%= formattedDate %></div>
+                        <small class="text-muted"><%= formattedTime %></small>
+                      </td>
+                      <td><%= durationText %></td>
+                      <td>
+                        <% if (call.status === 'active') { %>
+                          <a href="/video-calls/<%= call.callId %>" class="btn btn-sm btn-success">
+                            <i class="fas fa-video me-1"></i> Join
+                          </a>
+                        <% } else if (call.status === 'pending' && call.initiator.toString() !== user._id.toString()) { %>
+                          <a href="/video-calls/<%= call.callId %>" class="btn btn-sm btn-primary">
+                            <i class="fas fa-phone-alt me-1"></i> Answer
+                          </a>
+                        <% } else if (call.status === 'ended') { %>
+                          <a href="/chat/<%= call.chat %>" class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-comment me-1"></i> Chat
+                          </a>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+          <% } else { %>
+            <div class="text-center py-5">
+              <div class="mb-3">
+                <i class="fas fa-video fa-3x text-muted"></i>
+              </div>
+              <h5>No video calls yet</h5>
+              <p class="text-muted">Your video call history will appear here</p>
+              <a href="/doctors" class="btn btn-primary mt-2">
+                <i class="fas fa-user-md me-1"></i> Find Doctors
+              </a>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

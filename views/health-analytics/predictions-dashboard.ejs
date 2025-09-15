@@ -1,0 +1,1101 @@
+<%- include('../partials/header') %>
+
+<style>
+  :root {
+    /* Clean Healthcare Color Palette - White & Green */
+    --healthcare-primary: #10b981;
+    --healthcare-secondary: #059669;
+    --healthcare-light: #ecfdf5;
+    --healthcare-accent: #34d399;
+    --healthcare-success: #22c55e;
+    --healthcare-warning: #f59e0b;
+    --healthcare-danger: #ef4444;
+    --healthcare-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --healthcare-glow: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+    
+    /* Premium Text Colors */
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --text-light: #94a3b8;
+    
+    /* Clean White Backgrounds */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-gradient: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+    --surface-elevation: rgba(255, 255, 255, 0.95);
+    
+    /* Clean Glass Effect */
+    --glass-bg: rgba(255, 255, 255, 0.9);
+    --glass-border: rgba(16, 185, 129, 0.1);
+    --glass-shadow: 0 4px 20px 0 rgba(16, 185, 129, 0.1);
+    
+    /* Clean Green-Themed Shadows */
+    --shadow-sm: 0 1px 3px 0 rgba(16, 185, 129, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(16, 185, 129, 0.1), 0 2px 4px -2px rgba(16, 185, 129, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(16, 185, 129, 0.1), 0 4px 6px -4px rgba(16, 185, 129, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(16, 185, 129, 0.1), 0 8px 10px -6px rgba(16, 185, 129, 0.04);
+    --shadow-2xl: 0 25px 50px -12px rgba(16, 185, 129, 0.15);
+    --shadow-glow: 0 0 30px rgba(16, 185, 129, 0.2);
+    
+    /* Animation Variables */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(52, 211, 153, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 40% 60%, rgba(34, 197, 94, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .dashboard-header {
+    background: var(--healthcare-gradient);
+    color: white;
+    padding: 4rem 0 3rem;
+    margin-bottom: 3rem;
+    border-radius: 0 0 3rem 3rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-2xl);
+  }
+
+  .dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.15) 2px, transparent 2px),
+      radial-gradient(circle at 75% 25%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      radial-gradient(circle at 50% 75%, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+    background-size: 60px 60px, 40px 40px, 50px 50px, 100% 100%;
+    opacity: 0.7;
+    animation: headerFloat 20s ease-in-out infinite;
+  }
+
+  .dashboard-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: floatBubble 15s ease-in-out infinite alternate;
+  }
+
+  @keyframes headerFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+  }
+
+  @keyframes floatBubble {
+    0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+    100% { transform: translate(-30px, -20px) scale(1.1); opacity: 0.1; }
+  }
+
+  .prediction-card {
+    background: var(--surface-elevation);
+    backdrop-filter: blur(10px);
+    border-radius: 28px;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: var(--transition-slow);
+    position: relative;
+  }
+
+  .prediction-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--healthcare-gradient);
+    opacity: 0;
+    transition: var(--transition-normal);
+  }
+
+  .prediction-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-2xl), var(--shadow-glow);
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+
+  .prediction-card:hover::before {
+    opacity: 1;
+  }
+
+  .prediction-card-header {
+    background: var(--healthcare-glow);
+    padding: 2.5rem;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prediction-card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .prediction-card:hover .prediction-card-header::before {
+    left: 100%;
+  }
+
+  .prediction-card-body {
+    padding: 2.5rem;
+    position: relative;
+  }
+
+  .data-completeness-ring {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .data-completeness-ring::before {
+    content: '';
+    position: absolute;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+    animation: ringPulse 3s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.2; }
+  }
+
+  .data-completeness-ring svg {
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 8px 16px rgba(16, 185, 129, 0.3));
+    transition: filter var(--transition-normal);
+  }
+
+  .prediction-card:hover .data-completeness-ring svg {
+    filter: drop-shadow(0 12px 24px rgba(16, 185, 129, 0.4));
+  }
+
+  .data-completeness-ring .progress-ring {
+    stroke-width: 14;
+    fill: transparent;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    filter: url(#glow);
+  }
+
+  .data-completeness-ring .progress-ring-bg {
+    stroke: var(--border-light);
+    stroke-width: 12;
+    fill: transparent;
+  }
+
+  .completeness-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+  }
+
+  .completeness-score {
+    font-size: 3rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    background: var(--healthcare-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: scoreGlow 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes scoreGlow {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(1.2); }
+  }
+
+  .completeness-label {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .disease-risk-card {
+    background: var(--surface-elevation);
+    backdrop-filter: blur(12px);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--glass-border);
+    transition: var(--transition-slow);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .disease-risk-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: var(--healthcare-gradient);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .disease-risk-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: var(--transition-slow);
+    border-radius: 50%;
+  }
+
+  .disease-risk-card:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: var(--shadow-2xl), 0 0 30px rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+  }
+
+  .disease-risk-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .disease-risk-card:hover::after {
+    opacity: 1;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+  }
+
+  .risk-indicator {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: white;
+    margin: 0 auto 1.5rem;
+    position: relative;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2), inset 0 2px 10px rgba(255, 255, 255, 0.2);
+    transition: var(--transition-normal);
+    cursor: pointer;
+  }
+
+  .risk-indicator::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.3;
+    z-index: -1;
+    filter: blur(8px);
+  }
+
+  .disease-risk-card:hover .risk-indicator {
+    transform: scale(1.1);
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.3), inset 0 2px 10px rgba(255, 255, 255, 0.3);
+    animation: riskPulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes riskPulse {
+    0%, 100% { transform: scale(1.1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .risk-high { background: linear-gradient(135deg, #EF4444, #DC2626); }
+  .risk-moderate { background: linear-gradient(135deg, #F59E0B, #D97706); }
+  .risk-low { background: linear-gradient(135deg, #22C55E, #16A34A); }
+
+  .generate-btn {
+    background: var(--healthcare-gradient);
+    border: none;
+    border-radius: 20px;
+    color: white;
+    padding: 20px 40px;
+    font-weight: 800;
+    font-size: 1.2rem;
+    transition: var(--transition-slow);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 2px solid transparent;
+  }
+
+  .generate-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .generate-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .generate-btn:hover {
+    color: white;
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: var(--shadow-2xl), var(--shadow-glow);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .generate-btn:hover::before {
+    left: 100%;
+  }
+
+  .generate-btn:hover::after {
+    width: 300px;
+    height: 300px;
+  }
+
+  .generate-btn:active {
+    transform: translateY(-3px) scale(1.02);
+  }
+
+  .generate-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  .generate-btn:disabled:hover {
+    transform: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  .missing-data-item {
+    background: var(--healthcare-light);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid var(--healthcare-primary);
+  }
+
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .loading-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface-elevation);
+    backdrop-filter: blur(20px);
+    padding: 4rem;
+    border-radius: 32px;
+    text-align: center;
+    box-shadow: var(--shadow-2xl), var(--glass-shadow);
+    min-width: 450px;
+    border: 1px solid var(--glass-border);
+    animation: slideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translate(-50%, -40%) scale(0.9); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  .loading-spinner {
+    border: 5px solid rgba(16, 185, 129, 0.2);
+    border-top: 5px solid var(--healthcare-primary);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    animation: spin 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    margin: 0 auto 2.5rem;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); filter: hue-rotate(0deg); }
+    100% { transform: rotate(360deg); filter: hue-rotate(360deg); }
+  }
+
+  .prediction-history {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .history-item {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--healthcare-primary);
+    transition: all 0.3s ease;
+  }
+
+  .history-item:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Modern Badges and Alerts */
+  .alert {
+    border-radius: 16px;
+    border: none;
+    padding: 1.5rem;
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .alert::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: currentColor;
+  }
+
+  .badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: var(--shadow-sm);
+    border: none;
+  }
+
+  .btn {
+    border-radius: 16px;
+    font-weight: 600;
+    transition: var(--transition-normal);
+    border: 2px solid transparent;
+    backdrop-filter: blur(10px);
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Enhanced Mobile Responsiveness */
+  @media (max-width: 768px) {
+    .dashboard-header {
+      padding: 2rem 0;
+      margin-bottom: 2rem;
+      border-radius: 0 0 2rem 2rem;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2rem !important;
+    }
+
+    .dashboard-header p {
+      font-size: 1rem !important;
+    }
+
+    .prediction-card {
+      margin: 0 0.5rem 1.5rem;
+      border-radius: 20px;
+    }
+
+    .prediction-card-header,
+    .prediction-card-body {
+      padding: 1.5rem;
+    }
+
+    .data-completeness-ring {
+      width: 180px;
+      height: 180px;
+    }
+
+    .completeness-score {
+      font-size: 2.5rem;
+    }
+
+    .disease-risk-card {
+      padding: 1.5rem;
+      border-radius: 20px;
+    }
+
+    .risk-indicator {
+      width: 100px;
+      height: 100px;
+      font-size: 1.8rem;
+    }
+
+    .generate-btn {
+      padding: 16px 32px;
+      font-size: 1rem;
+      border-radius: 16px;
+    }
+
+    .loading-content {
+      min-width: 320px;
+      padding: 2.5rem;
+      margin: 0 1rem;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      padding: 0;
+    }
+
+    .dashboard-header {
+      border-radius: 0;
+    }
+
+    .prediction-card {
+      margin: 0 0 1.5rem;
+      border-radius: 0;
+    }
+
+    .prediction-card-header,
+    .prediction-card-body {
+      padding: 1rem;
+    }
+
+    .generate-btn {
+      width: 100%;
+      padding: 18px;
+    }
+  }
+
+  /* Accessibility Improvements */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Dark Mode Support */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --surface-elevation: rgba(15, 23, 42, 0.8);
+    }
+  }
+</style>
+
+<!-- SVG Definitions for Effects -->
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="dashboard-header">
+  <div class="container">
+    <div class="text-center">
+      <h1 class="mb-3" style="font-size: 2.5rem; font-weight: 700; position: relative; z-index: 1;">
+        🧠 AI Health Predictions
+      </h1>
+      <p class="mb-0" style="font-size: 1.2rem; opacity: 0.9; position: relative; z-index: 1;">
+        Advanced health risk analysis powered by artificial intelligence
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-8">
+      <!-- Data Completeness Section -->
+      <div class="prediction-card">
+        <div class="prediction-card-header">
+          <h3 class="mb-2" style="color: var(--healthcare-primary); font-weight: 700;">
+            <i class="fas fa-database me-2"></i>Health Data Completeness
+          </h3>
+          <p class="text-muted mb-0">Your health profile completeness affects prediction accuracy</p>
+        </div>
+        <div class="prediction-card-body">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <div class="data-completeness-ring">
+                <svg width="200" height="200">
+                  <circle cx="100" cy="100" r="86" class="progress-ring-bg"></circle>
+                  <circle cx="100" cy="100" r="86" class="progress-ring" 
+                          stroke="<%= dataCompleteness.score >= 80 ? '#22C55E' : dataCompleteness.score >= 60 ? '#0EA5E9' : dataCompleteness.score >= 40 ? '#F59E0B' : '#EF4444' %>"
+                          stroke-dasharray="540.4" 
+                          stroke-dashoffset="<%= 540.4 - (540.4 * dataCompleteness.score) / 100 %>">
+                  </circle>
+                </svg>
+                <div class="completeness-center">
+                  <div class="completeness-score" style="color: <%= dataCompleteness.score >= 80 ? '#22C55E' : dataCompleteness.score >= 60 ? '#0EA5E9' : dataCompleteness.score >= 40 ? '#F59E0B' : '#EF4444' %>;">
+                    <%= dataCompleteness.score %>%
+                  </div>
+                  <div class="completeness-label"><%= dataCompleteness.level %></div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h5 class="mb-3">Completion Status</h5>
+              <% if (dataCompleteness.score >= 60) { %>
+                <div class="alert alert-success">
+                  <i class="fas fa-check-circle me-2"></i>
+                  <strong>Ready for AI Analysis!</strong><br>
+                  You have sufficient health data for accurate predictions.
+                </div>
+              <% } else { %>
+                <div class="alert alert-warning">
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                  <strong>More Data Needed</strong><br>
+                  Add more health information to improve prediction accuracy.
+                </div>
+              <% } %>
+              
+              <% if (dataCompleteness.missing && dataCompleteness.missing.length > 0) { %>
+              <h6 class="mt-3 mb-2">Missing Information:</h6>
+              <% dataCompleteness.missing.forEach(function(item) { %>
+              <div class="missing-data-item">
+                <small class="fw-bold text-primary">
+                  <%= item.field.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) %>
+                  <% if (item.required) { %>
+                    <span class="badge bg-danger ms-1">Required</span>
+                  <% } %>
+                </small>
+              </div>
+              <% }); %>
+              
+              <div class="mt-3">
+                <a href="/users/update-profile" class="btn btn-outline-primary">
+                  <i class="fas fa-edit me-2"></i>Complete Profile
+                </a>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Risk Scores -->
+      <% if (riskScores && Object.keys(riskScores).length > 0) { %>
+      <div class="prediction-card">
+        <div class="prediction-card-header">
+          <h3 class="mb-2" style="color: var(--healthcare-primary); font-weight: 700;">
+            <i class="fas fa-chart-line me-2"></i>Current Risk Analysis
+          </h3>
+          <p class="text-muted mb-0">Your current health risk scores based on latest analysis</p>
+        </div>
+        <div class="prediction-card-body">
+          <div class="row g-4">
+            <% Object.entries(riskScores).forEach(function([disease, score]) { %>
+            <div class="col-md-6">
+              <div class="disease-risk-card">
+                <div class="risk-indicator <%= score >= 60 ? 'risk-high' : score >= 40 ? 'risk-moderate' : 'risk-low' %>">
+                  <%= Math.round(score) %>%
+                </div>
+                <h5 class="text-center mb-2">
+                  <%= disease.charAt(0).toUpperCase() + disease.slice(1).replace(/([A-Z])/g, ' $1') %>
+                </h5>
+                <div class="text-center">
+                  <% if (score >= 60) { %>
+                    <span class="badge bg-danger">High Risk</span>
+                  <% } else if (score >= 40) { %>
+                    <span class="badge bg-warning">Moderate Risk</span>
+                  <% } else { %>
+                    <span class="badge bg-success">Low Risk</span>
+                  <% } %>
+                </div>
+                <div class="mt-3 text-center">
+                  <small class="text-muted">
+                    <% if (score >= 60) { %>
+                      Schedule medical consultation
+                    <% } else if (score >= 40) { %>
+                      Monitor and maintain healthy lifestyle
+                    <% } else { %>
+                      Continue current health practices
+                    <% } %>
+                  </small>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Generate New Prediction -->
+      <div class="prediction-card">
+        <div class="prediction-card-header">
+          <h3 class="mb-2" style="color: var(--healthcare-primary); font-weight: 700;">
+            <i class="fas fa-brain me-2"></i>Generate New Analysis
+          </h3>
+          <p class="text-muted mb-0">Get updated health risk predictions based on your current data</p>
+        </div>
+        <div class="prediction-card-body text-center">
+          <div class="mb-4">
+            <i class="fas fa-robot" style="font-size: 4rem; color: var(--healthcare-primary); opacity: 0.7;"></i>
+          </div>
+          <h5 class="mb-3">Ready for AI Analysis</h5>
+          <p class="text-muted mb-4">
+            Our AI will analyze your health data including BMI, blood pressure, blood sugar, 
+            cholesterol levels, lifestyle factors, and medical history to predict your risk 
+            for various health conditions.
+          </p>
+          <button 
+            class="generate-btn" 
+            onclick="generatePrediction()" 
+            <%= !canGeneratePrediction ? 'disabled' : '' %>
+          >
+            <i class="fas fa-play me-2"></i>
+            Generate Health Analysis
+          </button>
+          <% if (!canGeneratePrediction) { %>
+          <div class="mt-3">
+            <small class="text-warning">
+              <i class="fas fa-info-circle me-1"></i>
+              Complete at least 60% of your profile to generate predictions
+            </small>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Latest Prediction Summary -->
+      <% if (latestPrediction) { %>
+      <div class="prediction-card">
+        <div class="prediction-card-header">
+          <h4 class="mb-1" style="color: var(--healthcare-primary); font-weight: 700;">
+            <i class="fas fa-history me-2"></i>Latest Analysis
+          </h4>
+          <small class="text-muted">
+            <%= new Date(latestPrediction.date).toLocaleDateString('en-US', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            }) %>
+          </small>
+        </div>
+        <div class="prediction-card-body">
+          <div class="text-center mb-3">
+            <div class="risk-indicator <%= latestPrediction.score >= 80 ? 'risk-low' : latestPrediction.score >= 60 ? 'risk-moderate' : 'risk-high' %>" style="width: 120px; height: 120px;">
+              <%= latestPrediction.score %>%
+            </div>
+            <h5 class="mt-3">Overall Health Score</h5>
+            <p class="text-muted">
+              <% if (latestPrediction.score >= 80) { %>
+                Excellent health indicators
+              <% } else if (latestPrediction.score >= 60) { %>
+                Good health with room for improvement
+              <% } else { %>
+                Health requires attention
+              <% } %>
+            </p>
+          </div>
+
+          <% if (latestPrediction.details && latestPrediction.details.riskAlerts && latestPrediction.details.riskAlerts.length > 0) { %>
+          <div class="mt-3">
+            <h6 class="text-warning">
+              <i class="fas fa-exclamation-triangle me-1"></i>Active Alerts
+            </h6>
+            <% latestPrediction.details.riskAlerts.slice(0, 3).forEach(function(alert) { %>
+            <div class="alert alert-sm alert-<%= alert.urgency === 'emergency' ? 'danger' : alert.urgency === 'immediate' ? 'warning' : 'info' %> py-2">
+              <small><%= alert.message %></small>
+            </div>
+            <% }); %>
+          </div>
+          <% } %>
+
+          <div class="text-center mt-4">
+            <a href="/health-predictions/detailed/<%= latestPrediction._id %>" class="btn btn-outline-primary btn-sm">
+              <i class="fas fa-eye me-1"></i>View Details
+            </a>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Prediction History -->
+      <% if (user.aiPredictions && user.aiPredictions.length > 0) { %>
+      <div class="prediction-card">
+        <div class="prediction-card-header">
+          <h4 class="mb-1" style="color: var(--healthcare-primary); font-weight: 700;">
+            <i class="fas fa-clock me-2"></i>Prediction History
+          </h4>
+          <small class="text-muted"><%= user.aiPredictions.length %> analyses completed</small>
+        </div>
+        <div class="prediction-card-body">
+          <div class="prediction-history">
+            <% user.aiPredictions.slice(-10).reverse().forEach(function(prediction) { %>
+            <div class="history-item">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h6 class="mb-1"><%= prediction.type || 'Health Analysis' %></h6>
+                  <small class="text-muted">
+                    Score: <%= prediction.score %>% | 
+                    <%= new Date(prediction.date).toLocaleDateString() %>
+                  </small>
+                </div>
+                <span class="badge bg-<%= prediction.score >= 80 ? 'success' : prediction.score >= 60 ? 'warning' : 'danger' %>">
+                  <%= prediction.score %>%
+                </span>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Quick Actions -->
+      <div class="prediction-card">
+        <div class="prediction-card-header">
+          <h4 class="mb-1" style="color: var(--healthcare-primary); font-weight: 700;">
+            <i class="fas fa-bolt me-2"></i>Quick Actions
+          </h4>
+        </div>
+        <div class="prediction-card-body">
+          <div class="d-grid gap-2">
+            <a href="/users/update-profile" class="btn btn-outline-primary">
+              <i class="fas fa-user-edit me-2"></i>Update Health Data
+            </a>
+            <a href="/drug-interaction-checker" class="btn btn-outline-warning">
+              <i class="fas fa-pills me-2"></i>Check Drug Interactions
+            </a>
+            <a href="/medicine-search" class="btn btn-outline-info">
+              <i class="fas fa-search me-2"></i>Search Medicines
+            </a>
+            <a href="/users/profile" class="btn btn-outline-secondary">
+              <i class="fas fa-user me-2"></i>Back to Profile
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <h4 class="mb-3">Analyzing Your Health Data</h4>
+    <p class="text-muted mb-0">
+      Our AI is processing your health information to generate comprehensive predictions. 
+      This may take a few moments...
+    </p>
+  </div>
+</div>
+
+<script>
+async function generatePrediction() {
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const generateButton = document.querySelector('.generate-btn');
+  
+  // Disable button and show loading
+  generateButton.disabled = true;
+  loadingOverlay.style.display = 'block';
+  
+  try {
+    const response = await fetch('/health-predictions/generate', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.success) {
+      // Show success message
+      showNotification('success', 'Health analysis completed successfully! Refreshing page...');
+      
+      // Reload page after 2 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } else {
+      if (data.requiresMoreData) {
+        showNotification('warning', data.message);
+      } else {
+        showNotification('error', data.message || 'Failed to generate predictions');
+      }
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('error', 'Network error: Failed to generate predictions');
+  } finally {
+    // Hide loading overlay
+    loadingOverlay.style.display = 'none';
+    generateButton.disabled = false;
+  }
+}
+
+function showNotification(type, message) {
+  // Remove existing notifications
+  const existing = document.querySelectorAll('.notification-toast');
+  existing.forEach(n => n.remove());
+  
+  // Create notification
+  const notification = document.createElement('div');
+  notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show notification-toast`;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    min-width: 300px;
+    max-width: 500px;
+  `;
+  
+  notification.innerHTML = `
+    <div class="d-flex align-items-center">
+      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'times-circle'} me-2"></i>
+      <div>${message}</div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto-dismiss after 5 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 5000);
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hover effects
+  const cards = document.querySelectorAll('.disease-risk-card, .prediction-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-4px)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0)';
+    });
+  });
+});
+</script>
+
+<%- include('../partials/footer') %>

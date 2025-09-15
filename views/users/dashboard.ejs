@@ -1,0 +1,466 @@
+<%- include('../partials/header') %>
+
+<style>
+  :root {
+    --healthcare-primary: #10B981;
+    --healthcare-secondary: #059669;
+    --healthcare-light: #ECFDF5;
+    --healthcare-accent: #34D399;
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --bg-light: #F9FAFB;
+    --white: #FFFFFF;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+
+  body {
+    background: linear-gradient(135deg, #ECFDF5 0%, #F0FDF4 100%);
+    min-height: 100vh;
+  }
+
+  .dashboard-header {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    padding: 3rem 0 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dashboard-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+    opacity: 0.3;
+  }
+
+  .dashboard-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dashboard-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+
+  .stats-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    border: none;
+    overflow: hidden;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .stats-card .card-body {
+    padding: 2rem;
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow-md);
+    border: none;
+    transition: all 0.3s ease;
+    height: 100%;
+  }
+
+  .action-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .profile-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow-lg);
+    border: none;
+    overflow: hidden;
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    padding: 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: var(--shadow-lg);
+    margin-bottom: 1rem;
+  }
+
+  .profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-role {
+    color: var(--healthcare-secondary);
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+
+  .quick-action-btn {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    padding: 12px 24px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .quick-action-btn:hover {
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .secondary-btn {
+    background: #F3F4F6;
+    color: var(--text-primary);
+    border: 2px solid #E5E7EB;
+  }
+
+  .secondary-btn:hover {
+    background: #E5E7EB;
+    color: var(--text-primary);
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #F3F4F6;
+    transition: background-color 0.3s ease;
+  }
+
+  .info-item:last-child {
+    border-bottom: none;
+  }
+
+  .info-item:hover {
+    background-color: var(--bg-light);
+  }
+
+  .info-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, #D1FAE5 100%);
+    color: var(--healthcare-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+  }
+
+  .info-content h6 {
+    margin: 0;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .info-content p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+</style>
+
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+  <div class="container">
+    <div class="text-center">
+      <h1 class="dashboard-title">
+        <i class="fas fa-tachometer-alt me-3"></i>
+        Welcome, <%= user ? user.name : 'User' %>
+      </h1>
+      <p class="dashboard-subtitle">
+        Your personalized healthcare dashboard - manage your health journey
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="stats-card">
+        <div class="card-body text-center">
+          <div class="stat-number text-primary">15</div>
+          <h6 class="text-muted">Consultations</h6>
+          <small class="text-success"><i class="fas fa-arrow-up"></i> +3 this month</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="stats-card">
+        <div class="card-body text-center">
+          <div class="stat-number text-success">8</div>
+          <h6 class="text-muted">AI Scans</h6>
+          <small class="text-primary"><i class="fas fa-brain"></i> All analyzed</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="stats-card">
+        <div class="card-body text-center">
+          <div class="stat-number text-warning">23</div>
+          <h6 class="text-muted">Community Posts</h6>
+          <small class="text-info"><i class="fas fa-comments"></i> Active member</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+      <div class="stats-card">
+        <div class="card-body text-center">
+          <div class="stat-number text-info">98%</div>
+          <h6 class="text-muted">Health Score</h6>
+          <small class="text-success"><i class="fas fa-heart"></i> Excellent</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Profile Section -->
+    <div class="col-lg-4 mb-4">
+      <div class="profile-card">
+        <div class="profile-header">
+          <img src="<%= user.profilePicture || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name) + '&background=10b981&color=fff' %>" 
+               class="profile-avatar" alt="<%= user.name %>">
+          <h3 class="profile-name"><%= user.name %></h3>
+          <p class="profile-role">
+            <% if (user.isDoctor) { %>
+              <i class="fas fa-user-md me-2"></i>Medical Professional
+            <% } else { %>
+              <i class="fas fa-user me-2"></i>Patient
+            <% } %>
+          </p>
+          <div class="d-flex gap-2 justify-content-center">
+            <a href="/users/profile" class="quick-action-btn">
+              <i class="fas fa-edit"></i> Edit Profile
+            </a>
+          </div>
+        </div>
+        
+        <div class="p-3">
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="info-content">
+              <h6>Email</h6>
+              <p><%= user.email %></p>
+            </div>
+          </div>
+          
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-calendar"></i>
+            </div>
+            <div class="info-content">
+              <h6>Member Since</h6>
+              <p><%= new Date(user.createdAt).toLocaleDateString() %></p>
+            </div>
+          </div>
+          
+          <% if (user.phone) { %>
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="info-content">
+              <h6>Phone</h6>
+              <p><%= user.phone %></p>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-8 mb-4">
+      <div class="row">
+        <!-- Role-specific Actions -->
+        <% if (user.isDoctor) { %>
+        <div class="col-12 mb-4">
+          <div class="action-card">
+            <div class="card-body">
+              <h5 class="card-title mb-3">
+                <i class="fas fa-stethoscope me-2 text-primary"></i>
+                Doctor Dashboard
+              </h5>
+              <p class="card-text text-muted mb-4">
+                Access your professional tools and manage patient consultations.
+              </p>
+              <div class="d-flex gap-3 flex-wrap">
+                <a href="/doctors/dashboard" class="quick-action-btn">
+                  <i class="fas fa-hospital"></i> Doctor Panel
+                </a>
+                <a href="/doctors/chat-requests" class="quick-action-btn secondary-btn">
+                  <i class="fas fa-bell"></i> Chat Requests
+                </a>
+                <a href="/doctors/profile" class="quick-action-btn secondary-btn">
+                  <i class="fas fa-id-badge"></i> Update Profile
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } else { %>
+        <div class="col-md-6 mb-4">
+          <div class="action-card">
+            <div class="card-body">
+              <h5 class="card-title mb-3">
+                <i class="fas fa-user-md me-2 text-success"></i>
+                Become a Doctor
+              </h5>
+              <p class="card-text text-muted mb-3">
+                Join our medical professionals and help patients worldwide.
+              </p>
+              <a href="/doctors/register" class="quick-action-btn">
+                <i class="fas fa-graduation-cap"></i> Register as Doctor
+              </a>
+            </div>
+          </div>
+        </div>
+        <% } %>
+
+        <div class="col-md-6 mb-4">
+          <div class="action-card">
+            <div class="card-body">
+              <h5 class="card-title mb-3">
+                <i class="fas fa-brain me-2 text-primary"></i>
+                AI Health Analysis
+              </h5>
+              <p class="card-text text-muted mb-3">
+                Get instant AI-powered analysis of your medical images.
+              </p>
+              <a href="/prediction/xray" class="quick-action-btn">
+                <i class="fas fa-x-ray"></i> Start Analysis
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="action-card">
+            <div class="card-body">
+              <h5 class="card-title mb-3">
+                <i class="fas fa-comments me-2 text-info"></i>
+                Community
+              </h5>
+              <p class="card-text text-muted mb-3">
+                Share experiences and connect with the healthcare community.
+              </p>
+              <a href="/posts" class="quick-action-btn">
+                <i class="fas fa-users"></i> Join Discussion
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="action-card">
+            <div class="card-body">
+              <h5 class="card-title mb-3">
+                <i class="fas fa-video me-2 text-warning"></i>
+                Telemedicine
+              </h5>
+              <p class="card-text text-muted mb-3">
+                Start video consultations with certified doctors.
+              </p>
+              <a href="/video-calls" class="quick-action-btn">
+                <i class="fas fa-video"></i> Start Session
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="row">
+    <div class="col-12">
+      <div class="action-card">
+        <div class="card-body">
+          <h5 class="card-title mb-4">
+            <i class="fas fa-clock me-2"></i>
+            Recent Activity
+          </h5>
+          <div class="row">
+            <div class="col-md-4 text-center mb-3">
+              <div class="p-3">
+                <div class="h2 text-primary mb-2">
+                  <i class="fas fa-file-medical"></i>
+                </div>
+                <h6>Last AI Scan</h6>
+                <p class="text-muted small">2 days ago</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center mb-3">
+              <div class="p-3">
+                <div class="h2 text-success mb-2">
+                  <i class="fas fa-comment-dots"></i>
+                </div>
+                <h6>Last Message</h6>
+                <p class="text-muted small">5 hours ago</p>
+              </div>
+            </div>
+            <div class="col-md-4 text-center mb-3">
+              <div class="p-3">
+                <div class="h2 text-info mb-2">
+                  <i class="fas fa-edit"></i>
+                </div>
+                <h6>Last Post</h6>
+                <p class="text-muted small">1 week ago</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,205 @@
+<!-- Floating Chat Bubble Button -->
+<div class="floating-chat-bubble" id="chatBubble">
+    <a href="/ai" class="chat-bubble-link" title="Chat with HealthyAI Assistant">
+        <div class="bubble-icon">
+            <i class="fas fa-comment-medical"></i>
+        </div>
+        <div class="bubble-notification" id="chatNotification" style="display: none;">
+            <span>Chat with AI</span>
+        </div>
+    </a>
+</div>
+
+<style>
+/* Floating Chat Bubble Styles - Fixed to Top-Right Under Navbar */
+.floating-chat-bubble {
+    position: fixed;
+    top: 90px; /* Under navbar (navbar height ~80px + 10px spacing) */
+    right: 20px; /* Fixed to right of viewport */
+    z-index: 9999;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* Always visible under navbar - never moves with scroll */
+    bottom: auto;
+    left: auto;
+    transform: none; /* Remove any transforms */
+}
+
+.floating-chat-bubble:hover {
+    transform: translateY(-5px); /* Move up slightly from bottom position */
+    filter: drop-shadow(0 8px 20px rgba(102, 126, 234, 0.4));
+}
+
+.chat-bubble-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    position: relative;
+}
+
+.bubble-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    animation: pulse 2s infinite;
+}
+
+.bubble-icon:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
+}
+
+.bubble-icon i {
+    animation: bounce 2s infinite;
+}
+
+.bubble-notification {
+    position: absolute;
+    right: 70px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    color: #2d3748;
+    padding: 10px 16px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border: 2px solid #667eea;
+}
+
+.bubble-notification::after {
+    content: '';
+    position: absolute;
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid #667eea;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+}
+
+.floating-chat-bubble:hover .bubble-notification {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-50%) translateX(-10px);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.6), 0 0 0 10px rgba(102, 126, 234, 0.1);
+    }
+    100% {
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-3px);
+    }
+    60% {
+        transform: translateY(-1px);
+    }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .floating-chat-bubble {
+        top: 80px; /* Under navbar on mobile (navbar ~70px + 10px) */
+        right: 15px;
+        transform: none; /* No transforms needed */
+        bottom: auto; /* Override any bottom positioning */
+    }
+    
+    .bubble-icon {
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
+    }
+    
+    .bubble-notification {
+        display: none !important; /* Hide tooltip on mobile */
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .bubble-notification {
+        background: #2d3748;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .bubble-notification::after {
+        border-left-color: #667eea;
+    }
+}
+</style>
+
+<script>
+// Chat bubble functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const chatBubble = document.getElementById('chatBubble');
+    const chatNotification = document.getElementById('chatNotification');
+    
+    // Show notification after a delay (first visit)
+    if (!localStorage.getItem('chatBubbleShown')) {
+        setTimeout(() => {
+            if (chatNotification) {
+                chatNotification.style.display = 'block';
+                chatNotification.style.opacity = '1';
+                chatNotification.style.visibility = 'visible';
+                chatNotification.style.transform = 'translateY(-50%) translateX(-10px)';
+                
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    chatNotification.style.opacity = '0';
+                    chatNotification.style.visibility = 'hidden';
+                    chatNotification.style.transform = 'translateY(-50%)';
+                }, 3000);
+                
+                // Mark as shown
+                localStorage.setItem('chatBubbleShown', 'true');
+            }
+        }, 2000);
+    }
+    
+    // Add click analytics (optional)
+    if (chatBubble) {
+        chatBubble.addEventListener('click', function() {
+            console.log('🤖 Chat bubble clicked - navigating to AI chat');
+            
+            // Optional: Add analytics tracking here
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'click', {
+                    event_category: 'Chat Bubble',
+                    event_label: 'AI Chat Access'
+                });
+            }
+        });
+    }
+});
+</script>

@@ -1,0 +1,326 @@
+<!-- Healthcare-themed Navbar -->
+<style>
+:root {
+  --healthcare-primary: #10b981;
+  --healthcare-secondary: #059669;
+  --healthcare-dark: #047857;
+  --healthcare-light: #d1fae5;
+  --healthcare-accent: #34d399;
+}
+
+.healthcare-navbar {
+  background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.healthcare-navbar .navbar-brand {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: white !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.healthcare-navbar .nav-link {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.healthcare-navbar .nav-link:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.healthcare-navbar .dropdown-menu {
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  background: white;
+  padding: 0.75rem 0;
+}
+
+.healthcare-navbar .dropdown-item {
+  padding: 0.75rem 1.5rem;
+  color: #374151;
+  font-weight: 500;
+  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+.healthcare-navbar .dropdown-item:hover {
+  background: var(--healthcare-light);
+  color: var(--healthcare-dark);
+  transform: translateX(5px);
+}
+
+.btn-healthcare-primary {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-weight: 600;
+  border-radius: 25px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-healthcare-primary:hover {
+  background: white;
+  color: var(--healthcare-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-healthcare-secondary {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid white;
+  color: var(--healthcare-primary);
+  font-weight: 600;
+  border-radius: 25px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-healthcare-secondary:hover {
+  background: white;
+  color: var(--healthcare-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 991.98px) {
+  .healthcare-navbar .navbar-collapse {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  .healthcare-navbar .navbar-collapse .nav-link {
+    color: var(--healthcare-primary) !important;
+    margin: 0.25rem 0;
+  }
+  
+  .healthcare-navbar .navbar-collapse .nav-link:hover {
+    background: var(--healthcare-light);
+    color: var(--healthcare-dark) !important;
+  }
+}
+</style>
+
+<nav class="navbar navbar-expand-lg healthcare-navbar sticky-top">
+  <div class="container-fluid px-3 px-md-5">
+    <!-- Brand -->
+    <a class="navbar-brand" href="/home">
+      <i class="fas fa-heartbeat me-2"></i>Healthfy
+    </a>
+
+    <!-- Mobile toggle button -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="color: white;">
+      <i class="fas fa-bars" style="color: white;"></i>
+    </button>
+
+    <!-- Navigation Links -->
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/home">
+            <i class="fas fa-home me-1"></i>Home
+          </a>
+        </li>
+        
+        <% if (typeof user !== 'undefined' && user) { %>
+        <!-- AI Tools Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="aiDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-robot me-1"></i>AI Tools
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="aiDropdown">
+            <li><a class="dropdown-item" href="/ai">
+              <i class="fas fa-robot me-2"></i>AI Health Assistant
+            </a></li>
+            <li><a class="dropdown-item" href="/prediction/xray">
+              <i class="fas fa-x-ray me-2"></i>X-ray Analysis
+            </a></li>
+            <li><a class="dropdown-item" href="/prediction">
+              <i class="fas fa-chart-line me-2"></i>Prediction Dashboard
+            </a></li>
+          </ul>
+        </li>
+
+        <!-- Medical Services Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="medicalDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-pills me-1"></i>Medical
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="medicalDropdown">
+            <li><a class="dropdown-item" href="/medicine-search">
+              <i class="fas fa-pills me-2"></i>Medicine Search
+            </a></li>
+            <li><a class="dropdown-item" href="/doctors">
+              <i class="fas fa-user-md me-2"></i>Find Doctors
+            </a></li>
+          </ul>
+        </li>
+
+        <!-- Analytics Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-chart-line me-1"></i>Analytics
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="analyticsDropdown">
+            <li><a class="dropdown-item" href="/analytics">
+              <i class="fas fa-home me-2"></i>Analytics Home
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/analytics/overview">
+              <i class="fas fa-chart-pie me-2"></i>Overview Dashboard
+            </a></li>
+            <li><a class="dropdown-item" href="/analytics/patient-journey">
+              <i class="fas fa-route me-2"></i>Patient Journey
+            </a></li>
+            <li><a class="dropdown-item" href="/analytics/dashboard">
+              <i class="fas fa-tachometer-alt me-2"></i>Full Dashboard
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/health-analytics/health-predictions">
+              <i class="fas fa-brain me-2"></i>AI Predictions
+            </a></li>
+            <li><a class="dropdown-item" href="/health-analytics/drug-interaction-checker">
+              <i class="fas fa-pills me-2"></i>Drug Interactions
+            </a></li>
+          </ul>
+        </li>
+
+        <!-- Health Challenges Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="challengesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-trophy me-1"></i>Challenges
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="challengesDropdown">
+            <li><a class="dropdown-item" href="/challenges">
+              <i class="fas fa-home me-2"></i>Challenge Hub
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/challenges/my-challenges">
+              <i class="fas fa-user me-2"></i>My Challenges
+            </a></li>
+            <li><a class="dropdown-item" href="/challenges/create">
+              <i class="fas fa-plus me-2"></i>Create Challenge
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/challenges/leaderboard">
+              <i class="fas fa-crown me-2"></i>Global Leaderboard
+            </a></li>
+            <li><a class="dropdown-item" href="/challenges/badges">
+              <i class="fas fa-medal me-2"></i>Badges Gallery
+            </a></li>
+            <li><a class="dropdown-item" href="/challenges/achievements">
+              <i class="fas fa-trophy me-2"></i>Achievements
+            </a></li>
+            <li><a class="dropdown-item" href="/challenges/profile">
+              <i class="fas fa-chart-bar me-2"></i>My Progress
+            </a></li>
+          </ul>
+        </li>
+
+        <!-- Connect Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="connectDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-comments me-1"></i>Connect
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="connectDropdown">
+            <li><a class="dropdown-item" href="/chat">
+              <i class="fas fa-comments me-2"></i>My Chats
+            </a></li>
+            <li><a class="dropdown-item" href="/video-calls">
+              <i class="fas fa-video me-2"></i>Video Calls
+            </a></li>
+            <li><a class="dropdown-item" href="/posts">
+              <i class="fas fa-users me-2"></i>Community Posts
+            </a></li>
+          </ul>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link" href="/users/dashboard">
+            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+          </a>
+        </li>
+        <% } else { %>
+        <!-- Quick Access for Non-logged Users -->
+        <li class="nav-item">
+          <a class="nav-link" href="/ai">
+            <i class="fas fa-robot me-1"></i>AI Assistant
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/medicine-search">
+            <i class="fas fa-pills me-1"></i>Medicine Search
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/challenges">
+            <i class="fas fa-trophy me-1"></i>Challenges
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/posts">
+            <i class="fas fa-users me-1"></i>Community
+          </a>
+        </li>
+        <% } %>
+      </ul>
+
+      <!-- Right side buttons -->
+      <div class="navbar-nav ms-auto">
+        <% if (typeof user !== 'undefined' && user) { %>
+        <% if (user.isDoctor) { %>
+        <a href="/doctors/register" class="btn btn-healthcare-primary me-2">
+          <i class="fas fa-user-md me-1"></i>Doctor Panel
+        </a>
+        <% } else { %>
+        <a href="/doctors/register" class="nav-link">
+          <i class="fas fa-stethoscope me-1"></i>Become a Doctor
+        </a>
+        <% } %>
+        <a href="/users/logout" class="nav-link text-warning">
+          <i class="fas fa-sign-out-alt me-1"></i>Logout
+        </a>
+        <% } else { %>
+        <a href="/users/login" class="btn btn-healthcare-primary me-2">
+          <i class="fas fa-sign-in-alt me-1"></i>Login
+        </a>
+        <a href="/users/signup" class="btn btn-healthcare-secondary">
+          <i class="fas fa-user-plus me-1"></i>Sign Up
+        </a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Bootstrap dropdowns work automatically with Bootstrap JS -->
+<script>
+// Additional navbar enhancements
+document.addEventListener('DOMContentLoaded', function() {
+  // Add smooth scroll behavior for better UX
+  document.documentElement.style.scrollBehavior = 'smooth';
+  
+  // Add active state to current page nav link
+  const currentPath = window.location.pathname;
+  const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+  
+  navLinks.forEach(link => {
+    if (link.getAttribute('href') === currentPath) {
+      link.style.background = 'rgba(255, 255, 255, 0.2)';
+      link.style.borderRadius = '8px';
+    }
+  });
+});
+</script>

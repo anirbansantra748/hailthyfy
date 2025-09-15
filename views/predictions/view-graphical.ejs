@@ -1,0 +1,594 @@
+<%- include('../partials/header') %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    color: #333;
+  }
+
+  .main-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    margin: 2rem auto;
+    max-width: 1200px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.2);
+    overflow: hidden;
+  }
+
+  .header-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .header-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+    opacity: 0.3;
+  }
+
+  .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255,255,255,0.2);
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
+    margin: 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .predictions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+  }
+
+  .prediction-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    border-left: 5px solid;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .prediction-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+
+  .prediction-card:hover::before {
+    transform: translateX(100%);
+  }
+
+  .prediction-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+  }
+
+  .prediction-card.critical {
+    border-left-color: #e74c3c;
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  }
+
+  .prediction-card.high {
+    border-left-color: #f39c12;
+    background: linear-gradient(135deg, #fffbf0 0%, #fff 100%);
+  }
+
+  .prediction-card.medium {
+    border-left-color: #f1c40f;
+    background: linear-gradient(135deg, #fffef0 0%, #fff 100%);
+  }
+
+  .prediction-card.low {
+    border-left-color: #27ae60;
+    background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
+  }
+
+  .condition-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .confidence-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .confidence-percentage {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .confidence-bar {
+    width: 100%;
+    height: 12px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0.5rem 0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .confidence-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 2s ease-out;
+    background: linear-gradient(90deg, #27ae60, #f1c40f, #f39c12, #e74c3c);
+  }
+
+  .risk-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .risk-critical { background: #e74c3c; color: white; }
+  .risk-high { background: #f39c12; color: white; }
+  .risk-medium { background: #f1c40f; color: #333; }
+  .risk-low { background: #27ae60; color: white; }
+
+  .chart-section {
+    padding: 2rem;
+    background: #f8f9fa;
+  }
+
+  .chart-container {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+  }
+
+  .chart-wrapper {
+    height: 400px;
+    position: relative;
+  }
+
+  .stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    padding: 2rem;
+    background: #f8f9fa;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  }
+
+  .stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .action-buttons {
+    padding: 2rem;
+    text-align: center;
+    background: white;
+  }
+
+  .action-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50px;
+    color: white;
+    padding: 1rem 2rem;
+    margin: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+  }
+
+  .action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+
+  .action-btn.success { background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%); }
+  .action-btn.warning { background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); }
+  .action-btn.danger { background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); }
+
+  .severity-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem;
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    margin: 1rem 0;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  .legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
+
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 2rem;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    z-index: 9999;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+  }
+
+  .notification.show { transform: translateX(0); }
+  .notification.success { background: #27ae60; }
+  .notification.error { background: #e74c3c; }
+  .notification.info { background: #3498db; }
+
+  @media (max-width: 768px) {
+    .main-container { margin: 1rem; border-radius: 20px; }
+    .header-section { padding: 2rem 1rem; }
+    .predictions-grid { grid-template-columns: 1fr; padding: 1rem; }
+    .stats-overview { grid-template-columns: repeat(2, 1fr); padding: 1rem; }
+  }
+
+  @media print {
+    .action-buttons, .notification { display: none !important; }
+    .main-container { box-shadow: none; margin: 0; }
+    .prediction-card { page-break-inside: avoid; }
+  }
+</style>
+
+<div class="main-container">
+  <!-- Header Section -->
+  <div class="header-section">
+    <h1 class="display-4 fw-bold mb-3">
+      <i class="fas fa-heartbeat me-3"></i>
+      X-ray Analysis Report
+    </h1>
+    <p class="lead mb-4">AI-Powered Medical Imaging Analysis</p>
+    
+    <div class="status-indicator">
+      <% if (xray.status === 'completed') { %>
+      <i class="fas fa-check-circle fs-4"></i>
+      <span>Analysis Completed Successfully</span>
+      <% } else if (xray.status === 'processing') { %>
+      <i class="fas fa-spinner fa-spin fs-4"></i>
+      <span>Analysis in Progress</span>
+      <% } else if (xray.status === 'failed') { %>
+      <i class="fas fa-exclamation-triangle fs-4"></i>
+      <span>Analysis Failed</span>
+      <% } %>
+    </div>
+
+    <div class="severity-legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #e74c3c;"></div>
+        <span>Critical (70%+)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #f39c12;"></div>
+        <span>High (50-69%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #f1c40f;"></div>
+        <span>Medium (30-49%)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #27ae60;"></div>
+        <span>Low (&lt;30%)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="stats-overview">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-clipboard-list"></i>
+      </div>
+      <h6 class="text-muted mb-2">Conditions Analyzed</h6>
+      <h3 class="fw-bold">
+        <%= xray.predictions ? Object.keys(xray.predictions).length : 0 %>
+      </h3>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h6 class="text-muted mb-2">High Risk Findings</h6>
+      <h3 class="fw-bold text-danger">
+        <%= xray.predictions ? Object.values(xray.predictions).filter(v => v >= 0.7).length : 0 %>
+      </h3>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-brain"></i>
+      </div>
+      <h6 class="text-muted mb-2">AI Model</h6>
+      <h3 class="fw-bold">
+        <%= xray.model_version || 'v1.0' %>
+      </h3>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <h6 class="text-muted mb-2">Processing Time</h6>
+      <h3 class="fw-bold">
+        <%= xray.inference_time_ms ? `${(xray.inference_time_ms/1000).toFixed(1)}s` : 'N/A' %>
+      </h3>
+    </div>
+  </div>
+
+  <% if (xray.status === 'completed' && xray.predictions) { %>
+  <!-- Predictions Grid -->
+  <div class="predictions-grid">
+    <% 
+    const predictions = xray.predictions || {};
+    const sortedPredictions = Object.entries(predictions).sort(([,a], [,b]) => b - a);
+    %>
+    
+    <% sortedPredictions.forEach(([condition, confidence], index) => { %>
+    <%
+    const percentage = (confidence * 100).toFixed(1);
+    const riskLevel = confidence >= 0.7 ? 'critical' : confidence >= 0.5 ? 'high' : confidence >= 0.3 ? 'medium' : 'low';
+    const riskLabel = confidence >= 0.7 ? 'Critical' : confidence >= 0.5 ? 'High' : confidence >= 0.3 ? 'Medium' : 'Low';
+    const conditionName = condition.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const icon = index === 0 ? 'fas fa-trophy' : index === 1 ? 'fas fa-medal' : index === 2 ? 'fas fa-award' : 'fas fa-stethoscope';
+    %>
+    
+    <div class="prediction-card <%= riskLevel %>" data-aos="fade-up" data-aos-delay="<%= index * 100 %>">
+      <div class="condition-name">
+        <i class="<%= icon %> text-primary"></i>
+        <%= conditionName %>
+      </div>
+      
+      <div class="confidence-display">
+        <div class="confidence-percentage"><%= percentage %>%</div>
+        <div class="risk-badge risk-<%= riskLevel %>"><%= riskLabel %> Risk</div>
+      </div>
+      
+      <div class="confidence-bar">
+        <div class="confidence-fill" style="width: <%= percentage %>%"></div>
+      </div>
+      
+      <div class="d-flex justify-content-between text-muted small">
+        <span>Confidence Level</span>
+        <span>Rank: #<%= index + 1 %></span>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="chart-section">
+    <div class="chart-container" data-aos="fade-up">
+      <h4 class="text-center mb-4">
+        <i class="fas fa-chart-pie me-2"></i>
+        Prediction Distribution Analysis
+      </h4>
+      <div class="chart-wrapper">
+        <canvas id="predictionChart"></canvas>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <a href="/prediction/xray" class="action-btn">
+      <i class="fas fa-list"></i>Back to List
+    </a>
+    <a href="/prediction/xray/upload" class="action-btn">
+      <i class="fas fa-plus"></i>Upload Another
+    </a>
+    <% if (xray.status === 'completed') { %>
+    <a href="/prediction/xray/<%= xray._id %>/download" class="action-btn success">
+      <i class="fas fa-download"></i>Download Report
+    </a>
+    <a href="/prediction/xray/<%= xray._id %>/export" class="action-btn warning">
+      <i class="fas fa-file-export"></i>Export Data
+    </a>
+    <button class="action-btn danger" onclick="printResults()">
+      <i class="fas fa-print"></i>Print Report
+    </button>
+    <% } %>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+<script>
+// Initialize AOS animations
+AOS.init({
+  duration: 800,
+  once: true,
+  offset: 50
+});
+
+// Chart initialization
+document.addEventListener('DOMContentLoaded', function() {
+  const predictions = <%- JSON.stringify(xray.predictions || {}) %>;
+  
+  if (Object.keys(predictions).length > 0) {
+    const ctx = document.getElementById('predictionChart');
+    if (ctx) {
+      const labels = Object.keys(predictions).map(label => 
+        label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+      );
+      const data = Object.values(predictions).map(v => (v * 100).toFixed(1));
+      
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: data,
+            backgroundColor: [
+              'rgba(231, 76, 60, 0.8)',   // Red
+              'rgba(243, 156, 18, 0.8)',  // Orange
+              'rgba(241, 196, 15, 0.8)',  // Yellow
+              'rgba(39, 174, 96, 0.8)',   // Green
+              'rgba(52, 152, 219, 0.8)',  // Blue
+              'rgba(155, 89, 182, 0.8)',  // Purple
+              'rgba(26, 188, 156, 0.8)',  // Teal
+              'rgba(230, 126, 34, 0.8)',  // Dark Orange
+              'rgba(192, 57, 43, 0.8)',   // Dark Red
+              'rgba(142, 68, 173, 0.8)',  // Dark Purple
+              'rgba(22, 160, 133, 0.8)',  // Dark Teal
+              'rgba(211, 84, 0, 0.8)',    // Burnt Orange
+              'rgba(189, 195, 199, 0.8)', // Light Gray
+              'rgba(52, 73, 94, 0.8)'     // Dark Gray
+            ],
+            borderWidth: 3,
+            borderColor: '#fff',
+            hoverBorderWidth: 5
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: {
+                  size: 12,
+                  weight: '600'
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0,0,0,0.8)',
+              titleColor: 'white',
+              bodyColor: 'white',
+              borderColor: 'rgba(255,255,255,0.2)',
+              borderWidth: 2,
+              cornerRadius: 10,
+              callbacks: {
+                label: function(context) {
+                  return context.label + ': ' + context.raw + '%';
+                }
+              }
+            }
+          },
+          animation: {
+            duration: 2000,
+            easing: 'easeInOutQuart'
+          }
+        }
+      });
+    }
+  }
+});
+
+// Notification system
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle me-2"></i>
+    ${message}
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => notification.classList.add('show'), 100);
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => document.body.removeChild(notification), 300);
+  }, 3000);
+}
+
+// Print function
+function printResults() {
+  showNotification('Preparing report for printing...', 'info');
+  setTimeout(() => window.print(), 500);
+}
+
+// Animate confidence bars on load
+window.addEventListener('load', function() {
+  const bars = document.querySelectorAll('.confidence-fill');
+  bars.forEach((bar, index) => {
+    setTimeout(() => {
+      bar.style.transition = 'width 1.5s ease-out';
+      bar.style.width = bar.style.width;
+    }, index * 200);
+  });
+});
+</script>
+
+<%- include('../partials/footer') %>

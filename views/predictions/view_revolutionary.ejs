@@ -1,0 +1,1566 @@
+<%- include('../partials/header') %>
+
+<style>
+    /* Revolutionary Medical Analysis Platform - World's Most Professional Design */
+    :root {
+        /* Advanced Medical Color System */
+        --medical-primary: #0066cc;
+        --medical-secondary: #4d94ff;
+        --medical-accent: #0052a3;
+        --medical-light: #e6f2ff;
+        --medical-dark: #003d7a;
+        
+        /* Health Status Colors */
+        --health-excellent: #10b981;
+        --health-good: #22c55e;
+        --health-moderate: #f59e0b;
+        --health-concerning: #f97316;
+        --health-critical: #ef4444;
+        --health-severe: #dc2626;
+        
+        /* Professional Grays */
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        
+        /* Medical Gradients */
+        --gradient-medical: linear-gradient(135deg, var(--medical-primary) 0%, var(--medical-secondary) 100%);
+        --gradient-health-good: linear-gradient(135deg, var(--health-excellent) 0%, var(--health-good) 100%);
+        --gradient-health-warning: linear-gradient(135deg, var(--health-moderate) 0%, var(--health-concerning) 100%);
+        --gradient-health-critical: linear-gradient(135deg, var(--health-critical) 0%, var(--health-severe) 100%);
+        --gradient-surface: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.98) 100%);
+        --gradient-glass: linear-gradient(145deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+        
+        /* Professional Shadows */
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+        --shadow-medical: 0 20px 25px -5px rgb(0 102 204 / 0.4), 0 8px 10px -6px rgb(0 102 204 / 0.3);
+        --shadow-glow: 0 0 30px rgb(0 102 204 / 0.3);
+        
+        /* Typography Scale */
+        --text-xs: 0.75rem;
+        --text-sm: 0.875rem;
+        --text-base: 1rem;
+        --text-lg: 1.125rem;
+        --text-xl: 1.25rem;
+        --text-2xl: 1.5rem;
+        --text-3xl: 1.875rem;
+        --text-4xl: 2.25rem;
+        --text-5xl: 3rem;
+        
+        /* Spacing System */
+        --space-1: 0.25rem;
+        --space-2: 0.5rem;
+        --space-3: 0.75rem;
+        --space-4: 1rem;
+        --space-5: 1.25rem;
+        --space-6: 1.5rem;
+        --space-8: 2rem;
+        --space-10: 2.5rem;
+        --space-12: 3rem;
+        --space-16: 4rem;
+        --space-20: 5rem;
+        --space-24: 6rem;
+        
+        /* Border Radius */
+        --radius-sm: 0.375rem;
+        --radius: 0.5rem;
+        --radius-md: 0.75rem;
+        --radius-lg: 1rem;
+        --radius-xl: 1.5rem;
+        --radius-2xl: 2rem;
+        --radius-3xl: 3rem;
+        --radius-full: 9999px;
+    }
+
+    /* Global Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        line-height: 1.6;
+        color: var(--gray-800);
+        background: linear-gradient(135deg, var(--medical-light) 0%, var(--gray-50) 50%, white 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Medical Header */
+    .medical-header {
+        background: var(--gradient-medical);
+        color: white;
+        padding: var(--space-12) 0 var(--space-16);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: var(--space-10);
+    }
+
+    .medical-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 25%),
+            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 25%),
+            radial-gradient(circle at 40% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 25%);
+        animation: medicalFloat 20s ease-in-out infinite;
+    }
+
+    @keyframes medicalFloat {
+        0%, 100% { transform: scale(1) rotate(0deg); }
+        33% { transform: scale(1.02) rotate(0.5deg); }
+        66% { transform: scale(0.98) rotate(-0.3deg); }
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .medical-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-full);
+        padding: var(--space-3) var(--space-6);
+        font-size: var(--text-sm);
+        font-weight: 600;
+        margin-bottom: var(--space-8);
+        box-shadow: var(--shadow-lg);
+        animation: fadeInUp 0.8s ease-out;
+    }
+
+    .header-title {
+        font-size: clamp(2rem, 4vw, 3rem);
+        font-weight: 900;
+        line-height: 1.2;
+        margin-bottom: var(--space-4);
+        letter-spacing: -0.02em;
+        animation: fadeInUp 0.8s ease-out 0.1s both;
+    }
+
+    .header-subtitle {
+        font-size: var(--text-xl);
+        color: rgba(255, 255, 255, 0.9);
+        max-width: 42rem;
+        margin: 0 auto var(--space-8);
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .status-display {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-3);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-4) var(--space-8);
+        font-size: var(--text-lg);
+        font-weight: 700;
+        animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+
+    .status-icon {
+        width: 24px;
+        height: 24px;
+        animation: pulse 2s infinite;
+    }
+
+    /* Container */
+    .analysis-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 var(--space-8);
+    }
+
+    /* Main Layout */
+    .analysis-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: var(--space-10);
+        align-items: start;
+        margin-bottom: var(--space-16);
+    }
+
+    /* X-ray Viewer */
+    .xray-viewer-card {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        animation: slideInLeft 0.8s ease-out;
+    }
+
+    .xray-header {
+        background: var(--gradient-medical);
+        color: white;
+        padding: var(--space-6) var(--space-8);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .xray-title {
+        font-size: var(--text-xl);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .scan-type-badge {
+        background: rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: var(--radius-full);
+        padding: var(--space-2) var(--space-4);
+        font-size: var(--text-sm);
+        font-weight: 600;
+    }
+
+    .xray-viewer {
+        position: relative;
+        background: #000;
+        min-height: 600px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .xray-image {
+        max-width: 100%;
+        max-height: 600px;
+        object-fit: contain;
+        cursor: zoom-in;
+        transition: all 0.3s ease;
+        filter: contrast(1.1) brightness(1.05);
+    }
+
+    .xray-image:hover {
+        filter: contrast(1.2) brightness(1.1);
+        transform: scale(1.02);
+    }
+
+    .image-error {
+        text-align: center;
+        color: var(--gray-500);
+        padding: var(--space-20);
+    }
+
+    .image-error-icon {
+        font-size: 4rem;
+        margin-bottom: var(--space-6);
+        color: var(--gray-400);
+    }
+
+    .image-controls {
+        position: absolute;
+        top: var(--space-4);
+        right: var(--space-4);
+        display: flex;
+        gap: var(--space-2);
+    }
+
+    .control-btn {
+        background: rgba(0, 0, 0, 0.7);
+        border: none;
+        border-radius: var(--radius-lg);
+        padding: var(--space-3);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .control-btn:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: scale(1.1);
+    }
+
+    .xray-metadata {
+        padding: var(--space-6) var(--space-8);
+        background: var(--gray-50);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-6);
+    }
+
+    .metadata-item {
+        text-align: center;
+    }
+
+    .metadata-label {
+        font-size: var(--text-sm);
+        color: var(--gray-500);
+        font-weight: 600;
+        margin-bottom: var(--space-2);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .metadata-value {
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--gray-900);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+    }
+
+    .metadata-icon {
+        color: var(--medical-primary);
+    }
+
+    /* Analysis Results */
+    .analysis-results {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+        animation: slideInRight 0.8s ease-out 0.2s both;
+    }
+
+    /* Risk Assessment Card */
+    .risk-assessment-card {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-8);
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .risk-assessment-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-medical);
+    }
+
+    .risk-title {
+        font-size: var(--text-xl);
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: var(--space-6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+    }
+
+    .risk-meter {
+        width: 100%;
+        height: 20px;
+        background: linear-gradient(90deg, 
+            var(--health-excellent) 0%, 
+            var(--health-good) 25%, 
+            var(--health-moderate) 50%, 
+            var(--health-concerning) 75%, 
+            var(--health-critical) 100%);
+        border-radius: var(--radius-full);
+        position: relative;
+        margin: var(--space-6) 0;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .risk-indicator {
+        position: absolute;
+        top: -8px;
+        width: 36px;
+        height: 36px;
+        background: white;
+        border: 4px solid var(--medical-primary);
+        border-radius: 50%;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-md);
+    }
+
+    .risk-level {
+        font-size: var(--text-2xl);
+        font-weight: 900;
+        margin-bottom: var(--space-2);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .risk-description {
+        color: var(--gray-600);
+        font-size: var(--text-base);
+    }
+
+    /* Findings Cards */
+    .findings-card {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .findings-header {
+        background: var(--gradient-health-good);
+        color: white;
+        padding: var(--space-6) var(--space-8);
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .findings-title {
+        font-size: var(--text-xl);
+        font-weight: 700;
+    }
+
+    .findings-list {
+        padding: var(--space-6) var(--space-8);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .finding-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-4);
+        background: white;
+        border-radius: var(--radius-lg);
+        border-left: 4px solid;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .finding-item:hover {
+        transform: translateX(8px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .finding-item.excellent { border-left-color: var(--health-excellent); }
+    .finding-item.good { border-left-color: var(--health-good); }
+    .finding-item.moderate { border-left-color: var(--health-moderate); }
+    .finding-item.concerning { border-left-color: var(--health-concerning); }
+    .finding-item.critical { border-left-color: var(--health-critical); }
+
+    .finding-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+    }
+
+    .finding-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: white;
+    }
+
+    .finding-icon.excellent { background: var(--health-excellent); }
+    .finding-icon.good { background: var(--health-good); }
+    .finding-icon.moderate { background: var(--health-moderate); }
+    .finding-icon.concerning { background: var(--health-concerning); }
+    .finding-icon.critical { background: var(--health-critical); }
+
+    .finding-details h4 {
+        font-size: var(--text-lg);
+        font-weight: 700;
+        color: var(--gray-900);
+        margin-bottom: var(--space-1);
+    }
+
+    .finding-details p {
+        font-size: var(--text-sm);
+        color: var(--gray-600);
+    }
+
+    .confidence-display {
+        text-align: right;
+    }
+
+    .confidence-percentage {
+        font-size: var(--text-2xl);
+        font-weight: 900;
+        margin-bottom: var(--space-1);
+    }
+
+    .confidence-bar {
+        width: 80px;
+        height: 6px;
+        background: var(--gray-200);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+    }
+
+    .confidence-fill {
+        height: 100%;
+        border-radius: var(--radius-full);
+        transition: width 1s ease-out;
+    }
+
+    /* Analysis Charts */
+    .charts-section {
+        margin-top: var(--space-16);
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .chart-card {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-8);
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .chart-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-medical);
+    }
+
+    .chart-header {
+        text-align: center;
+        margin-bottom: var(--space-8);
+    }
+
+    .chart-title {
+        font-size: var(--text-2xl);
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: var(--space-2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+    }
+
+    .chart-subtitle {
+        color: var(--gray-600);
+        font-size: var(--text-base);
+    }
+
+    .chart-container {
+        height: 400px;
+        position: relative;
+    }
+
+    /* Action Buttons */
+    .actions-section {
+        margin-top: var(--space-16);
+        text-align: center;
+        animation: fadeInUp 0.8s ease-out 0.5s both;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: var(--space-4);
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        padding: var(--space-5) var(--space-6);
+        background: var(--gradient-medical);
+        color: white;
+        text-decoration: none;
+        border-radius: var(--radius-xl);
+        font-weight: 700;
+        font-size: var(--text-base);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: var(--shadow-md);
+        border: none;
+        cursor: pointer;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: var(--shadow-medical);
+        color: white;
+    }
+
+    .action-btn.secondary {
+        background: var(--gradient-surface);
+        color: var(--medical-primary);
+        border: 2px solid var(--medical-primary);
+    }
+
+    .action-btn.secondary:hover {
+        background: var(--medical-primary);
+        color: white;
+    }
+
+    .action-btn.success {
+        background: var(--gradient-health-good);
+    }
+
+    .action-btn.warning {
+        background: var(--gradient-health-warning);
+    }
+
+    /* Processing States */
+    .processing-card {
+        background: var(--gradient-surface);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-2xl);
+        padding: var(--space-16);
+        text-align: center;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .processing-spinner {
+        width: 80px;
+        height: 80px;
+        border: 6px solid var(--gray-200);
+        border-top: 6px solid var(--medical-primary);
+        border-radius: 50%;
+        animation: spin 1.5s linear infinite;
+        margin: 0 auto var(--space-8);
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .processing-title {
+        font-size: var(--text-2xl);
+        font-weight: 800;
+        color: var(--gray-900);
+        margin-bottom: var(--space-4);
+    }
+
+    .processing-description {
+        color: var(--gray-600);
+        font-size: var(--text-lg);
+        margin-bottom: var(--space-8);
+    }
+
+    .progress-bar {
+        width: 100%;
+        height: 12px;
+        background: var(--gray-200);
+        border-radius: var(--radius-full);
+        overflow: hidden;
+        margin-bottom: var(--space-6);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: var(--gradient-medical);
+        border-radius: var(--radius-full);
+        transition: width 0.3s ease;
+        animation: progressPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes progressPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-content {
+        max-width: 90vw;
+        max-height: 90vh;
+        border-radius: var(--radius-2xl);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .modal-close {
+        position: absolute;
+        top: var(--space-4);
+        right: var(--space-4);
+        background: rgba(0, 0, 0, 0.7);
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        color: white;
+        font-size: var(--text-xl);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        z-index: 10;
+    }
+
+    .modal-close:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: scale(1.1);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .analysis-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .analysis-results {
+            order: -1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .analysis-container {
+            padding: 0 var(--space-4);
+        }
+        
+        .medical-header {
+            padding: var(--space-8) 0 var(--space-12);
+        }
+        
+        .header-title {
+            font-size: var(--text-3xl);
+        }
+        
+        .xray-viewer {
+            min-height: 400px;
+        }
+        
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .metadata-item {
+            padding: var(--space-4);
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        .medical-header {
+            background: white !important;
+            color: black !important;
+        }
+        
+        .action-btn, .control-btn {
+            display: none !important;
+        }
+        
+        .analysis-layout {
+            grid-template-columns: 1fr;
+        }
+        
+        .chart-container {
+            height: 300px;
+        }
+    }
+</style>
+
+<!-- Medical Header -->
+<section class="medical-header">
+    <div class="analysis-container">
+        <div class="header-content">
+            <div class="medical-badge">
+                <i class="fas fa-microscope"></i>
+                <span>AI-Powered Medical Analysis</span>
+            </div>
+            
+            <h1 class="header-title">
+                X-Ray Analysis Results
+            </h1>
+            
+            <p class="header-subtitle">
+                Advanced artificial intelligence analysis of your medical imaging with comprehensive 
+                diagnostic insights and professional-grade reporting.
+            </p>
+            
+            <div class="status-display">
+                <% if (xray.status === 'completed') { %>
+                    <i class="fas fa-check-circle status-icon" style="color: var(--health-excellent);"></i>
+                    <span>Analysis Complete</span>
+                <% } else if (xray.status === 'processing') { %>
+                    <i class="fas fa-cog fa-spin status-icon" style="color: var(--health-moderate);"></i>
+                    <span>Analysis in Progress</span>
+                <% } else if (xray.status === 'failed') { %>
+                    <i class="fas fa-exclamation-triangle status-icon" style="color: var(--health-critical);"></i>
+                    <span>Analysis Failed</span>
+                <% } else { %>
+                    <i class="fas fa-clock status-icon" style="color: var(--gray-400);"></i>
+                    <span>Pending Analysis</span>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="analysis-container">
+    <div class="analysis-layout">
+        <!-- X-ray Viewer -->
+        <div class="xray-viewer-card">
+            <div class="xray-header">
+                <div class="xray-title">
+                    <i class="fas fa-x-ray"></i>
+                    <span>Medical Image Analysis</span>
+                </div>
+                <div class="scan-type-badge">
+                    <%= xray.scanType ? xray.scanType.toUpperCase() + ' Scan' : 'X-Ray Scan' %>
+                </div>
+            </div>
+            
+            <div class="xray-viewer">
+                <% if (xray.image) { %>
+                    <img 
+                        src="<%= xray.image.startsWith('uploads') ? '/' + xray.image : xray.image %>" 
+                        alt="X-ray Image" 
+                        class="xray-image"
+                        onclick="openFullscreen(this.src)"
+                        onerror="showImageError(this)"
+                    />
+                    <div class="image-controls">
+                        <button class="control-btn" onclick="openFullscreen('<%= xray.image.startsWith('uploads') ? '/' + xray.image : xray.image %>')" title="View Fullscreen">
+                            <i class="fas fa-expand-alt"></i>
+                        </button>
+                        <button class="control-btn" onclick="downloadImage('<%= xray.image.startsWith('uploads') ? '/' + xray.image : xray.image %>')" title="Download Image">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                <% } else { %>
+                    <div class="image-error">
+                        <i class="fas fa-image image-error-icon"></i>
+                        <h3>Image Not Available</h3>
+                        <p>The X-ray image could not be loaded or is not available.</p>
+                    </div>
+                <% } %>
+            </div>
+            
+            <div class="xray-metadata">
+                <div class="metadata-item">
+                    <div class="metadata-label">Upload Date</div>
+                    <div class="metadata-value">
+                        <i class="fas fa-calendar-alt metadata-icon"></i>
+                        <%= new Date(xray.createdAt).toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'short', 
+                            day: 'numeric' 
+                        }) %>
+                    </div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">File Size</div>
+                    <div class="metadata-value">
+                        <i class="fas fa-file-image metadata-icon"></i>
+                        <%= xray.file_size ? (xray.file_size / 1024 / 1024).toFixed(2) + ' MB' : 'N/A' %>
+                    </div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Analysis Time</div>
+                    <div class="metadata-value">
+                        <i class="fas fa-stopwatch metadata-icon"></i>
+                        <%= xray.inference_time_ms ? (xray.inference_time_ms / 1000).toFixed(1) + 's' : 'N/A' %>
+                    </div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Model Version</div>
+                    <div class="metadata-value">
+                        <i class="fas fa-microchip metadata-icon"></i>
+                        <%= xray.model_version || 'v2.1.0' %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Results -->
+        <div class="analysis-results">
+            <% if (xray.status === 'completed' && xray.predictions) { %>
+                <% 
+                const predictions = typeof xray.predictions === 'string' ? JSON.parse(xray.predictions) : xray.predictions;
+                const sortedPredictions = Object.entries(predictions).sort(([,a], [,b]) => b - a);
+                const maxConfidence = sortedPredictions.length > 0 ? sortedPredictions[0][1] : 0;
+                const riskLevel = maxConfidence >= 0.7 ? 'Critical' : maxConfidence >= 0.5 ? 'High' : maxConfidence >= 0.3 ? 'Moderate' : 'Low';
+                const riskColor = maxConfidence >= 0.7 ? 'var(--health-critical)' : 
+                                maxConfidence >= 0.5 ? 'var(--health-concerning)' : 
+                                maxConfidence >= 0.3 ? 'var(--health-moderate)' : 'var(--health-excellent)';
+                %>
+                
+                <!-- Risk Assessment -->
+                <div class="risk-assessment-card">
+                    <h3 class="risk-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Overall Risk Assessment
+                    </h3>
+                    
+                    <div class="risk-meter">
+                        <div class="risk-indicator" style="left: calc(<%= Math.min(95, Math.max(5, maxConfidence * 100)) %>% - 18px); border-color: <%= riskColor %>;"></div>
+                    </div>
+                    
+                    <div class="risk-level" style="color: <%= riskColor %>;">
+                        <%= riskLevel %> Risk Level
+                    </div>
+                    
+                    <div class="risk-description">
+                        Maximum confidence detected: <strong><%= (maxConfidence * 100).toFixed(1) %>%</strong>
+                        <br>
+                        <% if (maxConfidence >= 0.7) { %>
+                            High priority findings detected. Consider consulting with a medical professional immediately.
+                        <% } else if (maxConfidence >= 0.5) { %>
+                            Moderate findings detected. Follow up with healthcare provider recommended.
+                        <% } else if (maxConfidence >= 0.3) { %>
+                            Low to moderate findings. Routine monitoring may be advised.
+                        <% } else { %>
+                            No significant abnormalities detected. Results appear within normal parameters.
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Top Findings -->
+                <div class="findings-card">
+                    <div class="findings-header">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="findings-title">Medical Findings Analysis</span>
+                    </div>
+                    
+                    <div class="findings-list">
+                        <% sortedPredictions.slice(0, 6).forEach(([ condition, confidence ], index) => { 
+                            const percentage = (confidence * 100).toFixed(1);
+                            const level = confidence >= 0.7 ? 'critical' : 
+                                        confidence >= 0.5 ? 'concerning' : 
+                                        confidence >= 0.3 ? 'moderate' : 
+                                        confidence >= 0.15 ? 'good' : 'excellent';
+                            const conditionName = condition.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                            const rankIcon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1);
+                        %>
+                        <div class="finding-item <%= level %>">
+                            <div class="finding-info">
+                                <div class="finding-icon <%= level %>">
+                                    <%= typeof rankIcon === 'string' && rankIcon.length > 1 ? rankIcon : rankIcon %>
+                                </div>
+                                <div class="finding-details">
+                                    <h4><%= conditionName %></h4>
+                                    <p>
+                                        <% if (confidence >= 0.7) { %>
+                                            High confidence detection - requires immediate attention
+                                        <% } else if (confidence >= 0.5) { %>
+                                            Moderate confidence - medical consultation recommended
+                                        <% } else if (confidence >= 0.3) { %>
+                                            Low-moderate confidence - routine monitoring suggested
+                                        <% } else { %>
+                                            Low confidence - within normal parameters
+                                        <% } %>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="confidence-display">
+                                <div class="confidence-percentage" style="color: <%= 
+                                    confidence >= 0.7 ? 'var(--health-critical)' : 
+                                    confidence >= 0.5 ? 'var(--health-concerning)' : 
+                                    confidence >= 0.3 ? 'var(--health-moderate)' : 'var(--health-excellent)' 
+                                %>;">
+                                    <%= percentage %>%
+                                </div>
+                                <div class="confidence-bar">
+                                    <div class="confidence-fill" 
+                                         style="width: <%= percentage %>%; background: <%= 
+                                            confidence >= 0.7 ? 'var(--health-critical)' : 
+                                            confidence >= 0.5 ? 'var(--health-concerning)' : 
+                                            confidence >= 0.3 ? 'var(--health-moderate)' : 'var(--health-excellent)' 
+                                         %>;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                    </div>
+                </div>
+
+            <% } else if (xray.status === 'processing') { %>
+                <!-- Processing State -->
+                <div class="processing-card">
+                    <div class="processing-spinner"></div>
+                    <h3 class="processing-title">AI Analysis in Progress</h3>
+                    <p class="processing-description">
+                        Our advanced AI system is analyzing your X-ray image. 
+                        This process typically takes 15-45 seconds.
+                    </p>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%;" id="progressBar"></div>
+                    </div>
+                    
+                    <div class="actions-grid">
+                        <button class="action-btn" onclick="location.reload()">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Refresh Status</span>
+                        </button>
+                    </div>
+                </div>
+
+            <% } else if (xray.status === 'failed') { %>
+                <!-- Failed State -->
+                <div class="processing-card">
+                    <div style="font-size: 4rem; color: var(--health-critical); margin-bottom: var(--space-6);">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3 class="processing-title">Analysis Failed</h3>
+                    <p class="processing-description">
+                        <%= xray.error_message || 'An error occurred during the AI analysis process. Please try uploading the image again or contact support if the issue persists.' %>
+                    </p>
+                    
+                    <div class="actions-grid">
+                        <button class="action-btn warning" onclick="retryAnalysis()">
+                            <i class="fas fa-redo"></i>
+                            <span>Retry Analysis</span>
+                        </button>
+                        <a href="/prediction/xray/upload" class="action-btn secondary">
+                            <i class="fas fa-upload"></i>
+                            <span>Upload New Image</span>
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <% if (xray.status === 'completed' && xray.predictions) { %>
+    <div class="charts-section">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">
+                    <i class="fas fa-chart-pie"></i>
+                    Comprehensive Analysis Distribution
+                </h3>
+                <p class="chart-subtitle">
+                    Visual representation of all analyzed medical conditions with confidence percentages
+                </p>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="analysisChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <!-- Actions Section -->
+    <div class="actions-section">
+        <div class="actions-grid">
+            <a href="/prediction/xray" class="action-btn secondary">
+                <i class="fas fa-list"></i>
+                <span>View All Scans</span>
+            </a>
+            <a href="/prediction/xray/upload" class="action-btn secondary">
+                <i class="fas fa-plus"></i>
+                <span>Upload New Scan</span>
+            </a>
+            <% if (xray.status === 'completed') { %>
+            <button class="action-btn success" onclick="downloadReport()">
+                <i class="fas fa-download"></i>
+                <span>Download Report</span>
+            </button>
+            <button class="action-btn" onclick="shareResults()">
+                <i class="fas fa-share-alt"></i>
+                <span>Share Results</span>
+            </button>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Fullscreen Image -->
+<div class="modal-overlay" id="imageModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeModal()">
+            <i class="fas fa-times"></i>
+        </button>
+        <img id="modalImage" src="" alt="Fullscreen X-ray" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Revolutionary JavaScript -->
+<script>
+    // Chart initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        <% if (xray.status === 'completed' && xray.predictions) { %>
+        const predictions = <%= JSON.stringify(typeof xray.predictions === 'string' ? JSON.parse(xray.predictions) : xray.predictions) %>;
+        initializeChart(predictions);
+        animateConfidenceBars();
+        <% } %>
+        
+        <% if (xray.status === 'processing') { %>
+        startProgressAnimation();
+        // Auto-refresh after 10 seconds
+        setTimeout(() => {
+            location.reload();
+        }, 10000);
+        <% } %>
+    });
+
+    function initializeChart(predictions) {
+        const ctx = document.getElementById('analysisChart');
+        if (!ctx) return;
+
+        const entries = Object.entries(predictions)
+            .sort(([,a], [,b]) => b - a)
+            .map(([label, confidence]) => ({
+                label: label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+                value: (confidence * 100).toFixed(1)
+            }));
+
+        const colors = entries.map((_, index) => {
+            const hue = (index * 360 / entries.length) % 360;
+            return `hsla(${hue}, 70%, 60%, 0.8)`;
+        });
+
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: entries.map(e => e.label),
+                datasets: [{
+                    data: entries.map(e => e.value),
+                    backgroundColor: colors,
+                    borderColor: colors.map(color => color.replace('0.8', '1')),
+                    borderWidth: 3,
+                    hoverBorderWidth: 5,
+                    cutout: '60%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                size: 14,
+                                weight: '600'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: 'white',
+                        bodyColor: 'white',
+                        borderColor: 'rgba(255,255,255,0.2)',
+                        borderWidth: 2,
+                        cornerRadius: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+    }
+
+    function animateConfidenceBars() {
+        const bars = document.querySelectorAll('.confidence-fill');
+        bars.forEach((bar, index) => {
+            setTimeout(() => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            }, index * 200);
+        });
+    }
+
+    function startProgressAnimation() {
+        const progressBar = document.getElementById('progressBar');
+        if (!progressBar) return;
+
+        let progress = 75;
+        const interval = setInterval(() => {
+            progress += Math.random() * 5;
+            if (progress > 95) progress = 95;
+            progressBar.style.width = progress + '%';
+        }, 500);
+
+        // Clean up after 10 seconds
+        setTimeout(() => {
+            clearInterval(interval);
+        }, 10000);
+    }
+
+    // Image functions
+    function openFullscreen(imageSrc) {
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        modalImage.src = imageSrc;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('imageModal');
+        modal.classList.remove('active');
+    }
+
+    function showImageError(img) {
+        const container = img.parentElement;
+        container.innerHTML = `
+            <div class="image-error">
+                <i class="fas fa-exclamation-triangle image-error-icon"></i>
+                <h3>Image Loading Error</h3>
+                <p>The X-ray image could not be displayed. Please check the file path or try refreshing the page.</p>
+                <button class="action-btn" onclick="location.reload()">
+                    <i class="fas fa-refresh"></i>
+                    <span>Refresh Page</span>
+                </button>
+            </div>
+        `;
+    }
+
+    function downloadImage(imageSrc) {
+        const link = document.createElement('a');
+        link.href = imageSrc;
+        link.download = 'xray-image-<%= xray._id %>.jpg';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showNotification('Image download started', 'success');
+    }
+
+    function downloadReport() {
+        showNotification('Generating comprehensive medical report...', 'info');
+        
+        const reportData = {
+            analysisId: '<%= xray._id %>',
+            timestamp: new Date().toISOString(),
+            patient: {
+                scanType: '<%= xray.scanType || "X-ray" %>',
+                uploadDate: '<%= xray.createdAt %>',
+                fileName: '<%= xray.file_name || "Unknown" %>'
+            },
+            analysis: {
+                status: '<%= xray.status %>',
+                modelVersion: '<%= xray.model_version || "v2.1.0" %>',
+                processingTime: '<%= xray.inference_time_ms || 0 %>ms',
+                <% if (xray.predictions) { %>
+                findings: <%= JSON.stringify(xray.predictions) %>
+                <% } %>
+            },
+            recommendations: generateRecommendations()
+        };
+
+        const reportContent = generateMedicalReport(reportData);
+        
+        const blob = new Blob([reportContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `healthfy-medical-report-<%= xray._id %>.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotification('Medical report downloaded successfully!', 'success');
+    }
+
+    function shareResults() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'HealthFy - X-ray Analysis Results',
+                text: 'Check out my AI-powered medical imaging analysis results!',
+                url: window.location.href
+            }).then(() => {
+                showNotification('Results shared successfully!', 'success');
+            }).catch(() => {
+                copyToClipboard();
+            });
+        } else {
+            copyToClipboard();
+        }
+    }
+
+    function copyToClipboard() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showNotification('Results link copied to clipboard!', 'success');
+        }).catch(() => {
+            showNotification('Unable to copy link. Please copy manually.', 'error');
+        });
+    }
+
+    function retryAnalysis() {
+        showNotification('Retrying analysis...', 'info');
+        
+        fetch(`/prediction/xray/<%= xray._id %>/retry`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Analysis restarted successfully!', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showNotification('Retry failed: ' + (data.message || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            showNotification('Error: ' + error.message, 'error');
+        });
+    }
+
+    function generateRecommendations() {
+        <% if (xray.status === 'completed' && xray.predictions) { %>
+        const predictions = <%= JSON.stringify(typeof xray.predictions === 'string' ? JSON.parse(xray.predictions) : xray.predictions) %>;
+        const maxConfidence = Math.max(...Object.values(predictions));
+        
+        if (maxConfidence >= 0.7) {
+            return "High priority findings detected. Immediate medical consultation recommended.";
+        } else if (maxConfidence >= 0.5) {
+            return "Moderate findings detected. Schedule follow-up with healthcare provider.";
+        } else if (maxConfidence >= 0.3) {
+            return "Low to moderate findings. Routine monitoring may be advised.";
+        } else {
+            return "No significant abnormalities detected. Continue routine care.";
+        }
+        <% } else { %>
+        return "Analysis incomplete. Please wait for processing to finish.";
+        <% } %>
+    }
+
+    function generateMedicalReport(data) {
+        return `
+HEALTHFY - MEDICAL IMAGING ANALYSIS REPORT
+==========================================
+
+ANALYSIS OVERVIEW
+-----------------
+Report ID: ${data.analysisId}
+Generated: ${new Date(data.timestamp).toLocaleString()}
+Analysis Status: ${data.analysis.status.toUpperCase()}
+
+IMAGING DETAILS
+---------------
+Scan Type: ${data.patient.scanType}
+Upload Date: ${new Date(data.patient.uploadDate).toLocaleString()}
+File Name: ${data.patient.fileName}
+
+AI ANALYSIS PARAMETERS
+----------------------
+Model Version: ${data.analysis.modelVersion}
+Processing Time: ${data.analysis.processingTime}
+Analysis Engine: HealthFy Advanced Medical AI
+
+${data.analysis.findings ? `
+MEDICAL FINDINGS
+----------------
+${Object.entries(data.analysis.findings)
+    .sort(([,a], [,b]) => b - a)
+    .map(([condition, confidence], index) => 
+        `${index + 1}. ${condition.replace(/_/g, ' ').toUpperCase()}: ${(confidence * 100).toFixed(1)}%`
+    ).join('\n')}
+` : ''}
+
+CLINICAL RECOMMENDATIONS
+------------------------
+${data.recommendations}
+
+IMPORTANT DISCLAIMER
+--------------------
+This analysis is generated by artificial intelligence and is intended for informational purposes only. 
+Results should NOT be used as a substitute for professional medical diagnosis or treatment. 
+Please consult with a qualified healthcare provider for proper medical interpretation and care.
+
+For questions or concerns, please contact your healthcare provider or HealthFy support.
+
+==========================================
+Generated by HealthFy Medical AI Platform
+        `.trim();
+    }
+
+    function showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? 'var(--health-excellent)' : 
+                           type === 'error' ? 'var(--health-critical)' : 
+                           'var(--medical-primary)'};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        `;
+        
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                               type === 'error' ? 'exclamation-triangle' : 
+                               'info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+        
+        setTimeout(() => {
+            notification.style.transform = 'translateX(400px)';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeModal();
+        }
+    });
+
+    // Close modal on background click
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Auto-refresh for processing status
+    <% if (xray.status === 'processing') { %>
+    // Check status every 5 seconds
+    setInterval(() => {
+        fetch(`/prediction/xray/<%= xray._id %>/status`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status !== 'processing') {
+                    location.reload();
+                }
+            })
+            .catch(console.error);
+    }, 5000);
+    <% } %>
+</script>
+
+<%- include('../partials/footer') %>

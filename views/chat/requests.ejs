@@ -1,0 +1,671 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="text-primary">My Chat Requests</h2>
+      <p class="text-muted">
+        Track the status of your chat requests to doctors
+      </p>
+    </div>
+  </div>
+
+  <% if (chatRequests.length === 0) { %>
+  <div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i> You haven't made any chat requests
+    yet. Visit the <a href="/doctors/list">Doctors</a> page to find a doctor and
+    request a chat.
+  </div>
+  <% } else { %>
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <ul
+            class="nav nav-tabs card-header-tabs"
+            id="requestTabs"
+            role="tablist"
+          >
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="all-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#all"
+                type="button"
+                role="tab"
+                aria-controls="all"
+                aria-selected="true"
+              >
+                All Requests
+                <span class="badge bg-secondary rounded-pill ms-1"
+                  ><%= chatRequests.length %></span
+                >
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="pending-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#pending"
+                type="button"
+                role="tab"
+                aria-controls="pending"
+                aria-selected="false"
+              >
+                Pending
+                <span
+                  class="badge bg-primary rounded-pill ms-1"
+                  id="pendingCount"
+                ></span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="accepted-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#accepted"
+                type="button"
+                role="tab"
+                aria-controls="accepted"
+                aria-selected="false"
+              >
+                Accepted
+                <span
+                  class="badge bg-success rounded-pill ms-1"
+                  id="acceptedCount"
+                ></span>
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="rejected-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#rejected"
+                type="button"
+                role="tab"
+                aria-controls="rejected"
+                aria-selected="false"
+              >
+                Rejected
+                <span
+                  class="badge bg-danger rounded-pill ms-1"
+                  id="rejectedCount"
+                ></span>
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content" id="requestTabsContent">
+            <!-- All Requests Tab -->
+            <div
+              class="tab-pane fade show active"
+              id="all"
+              role="tabpanel"
+              aria-labelledby="all-tab"
+            >
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Doctor</th>
+                      <th>Request Date</th>
+                      <th>Consultation Type</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% chatRequests.forEach(request => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (request.doctor.user && request.doctor.user !== null && request.doctor.user.profileImage) { %>
+                          <img
+                            src="<%= request.doctor.user.profileImage %>"
+                            alt="<%= request.doctor.fullName %>"
+                            class="rounded-circle me-2"
+                            width="40"
+                            height="40"
+                          />
+                          <% } else { %>
+                          <div
+                            class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                            style="width: 40px; height: 40px"
+                          >
+                            <%= request.doctor.fullName.charAt(0).toUpperCase()
+                            %>
+                          </div>
+                          <% } %>
+                          <div>
+                            <h6 class="mb-0"><%= request.doctor.fullName %></h6>
+                            <small class="text-muted"
+                              ><%= request.doctor.specialization %></small
+                            >
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <%= new Date(request.createdAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <span class="badge bg-info text-dark"
+                          ><%= request.consultationType %></span
+                        >
+                      </td>
+                      <td>
+                        <% if (request.status === 'pending') { %>
+                        <span class="badge bg-primary">Pending</span>
+                        <% } else if (request.status === 'accepted') { %>
+                        <span class="badge bg-success">Accepted</span>
+                        <% } else if (request.status === 'rejected') { %>
+                        <span class="badge bg-danger">Rejected</span>
+                        <% } else { %>
+                        <span class="badge bg-secondary">Expired</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <% if (request.status === 'pending') { %>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#requestDetailsModal<%= request._id %>"
+                        >
+                          View Details
+                        </button>
+                        <% } else if (request.status === 'accepted' &&
+                        request.chatId) { %>
+                        <a
+                          href="/chat/<%= request.chatId %>"
+                          class="btn btn-primary btn-sm"
+                        >
+                          <i class="fas fa-comments me-1"></i> Open Chat
+                        </a>
+                        <% } else if (request.status === 'rejected') { %>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#rejectionDetailsModal<%= request._id %>"
+                        >
+                          View Reason
+                        </button>
+                        <% } %>
+                      </td>
+                    </tr>
+
+                    <!-- Request Details Modal -->
+                    <div
+                      class="modal fade"
+                      id="requestDetailsModal<%= request._id %>"
+                      tabindex="-1"
+                      aria-labelledby="requestDetailsModalLabel<%= request._id %>"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5
+                              class="modal-title"
+                              id="requestDetailsModalLabel<%= request._id %>"
+                            >
+                              Request Details
+                            </h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="row">
+                              <div class="col-md-6">
+                                <h6>Doctor Information</h6>
+                                <p>
+                                  <strong>Name:</strong> <%=
+                                  request.doctor.fullName %>
+                                </p>
+                                <p>
+                                  <strong>Specialization:</strong> <%=
+                                  request.doctor.specialization %>
+                                </p>
+                              </div>
+                              <div class="col-md-6">
+                                <h6>Request Information</h6>
+                                <p>
+                                  <strong>Date:</strong> <%= new
+                                  Date(request.createdAt).toLocaleString() %>
+                                </p>
+                                <p>
+                                  <strong>Consultation Type:</strong> <%=
+                                  request.consultationType %>
+                                </p>
+                                <p>
+                                  <strong>Urgency:</strong> <%= request.urgency
+                                  %>
+                                </p>
+                                <p>
+                                  <strong>Status:</strong>
+                                  <% if (request.status === 'pending') { %>
+                                  <span class="badge bg-primary">Pending</span>
+                                  <% } else if (request.status === 'accepted') {
+                                  %>
+                                  <span class="badge bg-success">Accepted</span>
+                                  <% } else if (request.status === 'rejected') {
+                                  %>
+                                  <span class="badge bg-danger">Rejected</span>
+                                  <% } else { %>
+                                  <span class="badge bg-secondary"
+                                    >Expired</span
+                                  >
+                                  <% } %>
+                                </p>
+                              </div>
+                            </div>
+                            <hr />
+                            <h6>Reason for Consultation</h6>
+                            <p><%= request.reason %></p>
+
+                            <% if (request.symptoms && request.symptoms.length >
+                            0) { %>
+                            <h6>Symptoms</h6>
+                            <ul>
+                              <% request.symptoms.forEach(symptom => { %>
+                              <li><%= symptom %></li>
+                              <% }) %>
+                            </ul>
+                            <% } %> <% if (request.currentMedications &&
+                            request.currentMedications.length > 0) { %>
+                            <h6>Current Medications</h6>
+                            <ul>
+                              <% request.currentMedications.forEach(medication
+                              => { %>
+                              <li><%= medication %></li>
+                              <% }) %>
+                            </ul>
+                            <% } %> <% if (request.allergies &&
+                            request.allergies.length > 0) { %>
+                            <h6>Allergies</h6>
+                            <ul>
+                              <% request.allergies.forEach(allergy => { %>
+                              <li><%= allergy %></li>
+                              <% }) %>
+                            </ul>
+                            <% } %>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Rejection Details Modal -->
+                    <% if (request.status === 'rejected') { %>
+                    <div
+                      class="modal fade"
+                      id="rejectionDetailsModal<%= request._id %>"
+                      tabindex="-1"
+                      aria-labelledby="rejectionDetailsModalLabel<%= request._id %>"
+                      aria-hidden="true"
+                    >
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5
+                              class="modal-title"
+                              id="rejectionDetailsModalLabel<%= request._id %>"
+                            >
+                              Rejection Details
+                            </h5>
+                            <button
+                              type="button"
+                              class="btn-close"
+                              data-bs-dismiss="modal"
+                              aria-label="Close"
+                            ></button>
+                          </div>
+                          <div class="modal-body">
+                            <h6>Doctor</h6>
+                            <p><%= request.doctor.fullName %></p>
+
+                            <h6>Rejected On</h6>
+                            <p>
+                              <%= new Date(request.rejectedAt).toLocaleString()
+                              %>
+                            </p>
+
+                            <h6>Reason for Rejection</h6>
+                            <% if (request.rejectedReason) { %>
+                            <p><%= request.rejectedReason %></p>
+                            <% } else { %>
+                            <p class="text-muted">No reason provided</p>
+                            <% } %>
+                          </div>
+                          <div class="modal-footer">
+                            <button
+                              type="button"
+                              class="btn btn-secondary"
+                              data-bs-dismiss="modal"
+                            >
+                              Close
+                            </button>
+                            <a
+                              href="/doctors/profile/<%= request.doctor._id %>"
+                              class="btn btn-primary"
+                            >
+                              <i class="fas fa-user-md me-1"></i> View Doctor
+                              Profile
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <% } %> <% }) %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Pending Requests Tab -->
+            <div
+              class="tab-pane fade"
+              id="pending"
+              role="tabpanel"
+              aria-labelledby="pending-tab"
+            >
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Doctor</th>
+                      <th>Request Date</th>
+                      <th>Consultation Type</th>
+                      <th>Urgency</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% chatRequests.filter(req => req.status ===
+                    'pending').forEach(request => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (request.doctor.user &&
+                          request.doctor.user.profileImage) { %>
+                          <img
+                            src="<%= request.doctor.user.profileImage %>"
+                            alt="<%= request.doctor.fullName %>"
+                            class="rounded-circle me-2"
+                            width="40"
+                            height="40"
+                          />
+                          <% } else { %>
+                          <div
+                            class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                            style="width: 40px; height: 40px"
+                          >
+                            <%= request.doctor.fullName.charAt(0).toUpperCase()
+                            %>
+                          </div>
+                          <% } %>
+                          <div>
+                            <h6 class="mb-0"><%= request.doctor.fullName %></h6>
+                            <small class="text-muted"
+                              ><%= request.doctor.specialization %></small
+                            >
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <%= new Date(request.createdAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <span class="badge bg-info text-dark"
+                          ><%= request.consultationType %></span
+                        >
+                      </td>
+                      <td>
+                        <% if (request.urgency === 'high') { %>
+                        <span class="badge bg-danger">High</span>
+                        <% } else if (request.urgency === 'medium') { %>
+                        <span class="badge bg-warning text-dark">Medium</span>
+                        <% } else { %>
+                        <span class="badge bg-success">Low</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#requestDetailsModal<%= request._id %>"
+                        >
+                          View Details
+                        </button>
+                      </td>
+                    </tr>
+                    <% }) %> <% if (chatRequests.filter(req => req.status ===
+                    'pending').length === 0) { %>
+                    <tr>
+                      <td colspan="5" class="text-center py-4">
+                        <p class="text-muted mb-0">No pending chat requests</p>
+                      </td>
+                    </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Accepted Requests Tab -->
+            <div
+              class="tab-pane fade"
+              id="accepted"
+              role="tabpanel"
+              aria-labelledby="accepted-tab"
+            >
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Doctor</th>
+                      <th>Request Date</th>
+                      <th>Accepted Date</th>
+                      <th>Consultation Type</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% chatRequests.filter(req => req.status ===
+                    'accepted').forEach(request => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (request.doctor.user &&
+                          request.doctor.user.profileImage) { %>
+                          <img
+                            src="<%= request.doctor.user.profileImage %>"
+                            alt="<%= request.doctor.fullName %>"
+                            class="rounded-circle me-2"
+                            width="40"
+                            height="40"
+                          />
+                          <% } else { %>
+                          <div
+                            class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                            style="width: 40px; height: 40px"
+                          >
+                            <%= request.doctor.fullName.charAt(0).toUpperCase()
+                            %>
+                          </div>
+                          <% } %>
+                          <div>
+                            <h6 class="mb-0"><%= request.doctor.fullName %></h6>
+                            <small class="text-muted"
+                              ><%= request.doctor.specialization %></small
+                            >
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <%= new Date(request.createdAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <%= new Date(request.acceptedAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <span class="badge bg-info text-dark"
+                          ><%= request.consultationType %></span
+                        >
+                      </td>
+                      <td>
+                        <a
+                          href="/chat/<%= request.chatId %>"
+                          class="btn btn-primary btn-sm"
+                        >
+                          <i class="fas fa-comments me-1"></i> Open Chat
+                        </a>
+                      </td>
+                    </tr>
+                    <% }) %> <% if (chatRequests.filter(req => req.status ===
+                    'accepted').length === 0) { %>
+                    <tr>
+                      <td colspan="5" class="text-center py-4">
+                        <p class="text-muted mb-0">No accepted chat requests</p>
+                      </td>
+                    </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Rejected Requests Tab -->
+            <div
+              class="tab-pane fade"
+              id="rejected"
+              role="tabpanel"
+              aria-labelledby="rejected-tab"
+            >
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Doctor</th>
+                      <th>Request Date</th>
+                      <th>Rejected Date</th>
+                      <th>Consultation Type</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% chatRequests.filter(req => req.status ===
+                    'rejected').forEach(request => { %>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <% if (request.doctor.user &&
+                          request.doctor.user.profileImage) { %>
+                          <img
+                            src="<%= request.doctor.user.profileImage %>"
+                            alt="<%= request.doctor.fullName %>"
+                            class="rounded-circle me-2"
+                            width="40"
+                            height="40"
+                          />
+                          <% } else { %>
+                          <div
+                            class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center me-2"
+                            style="width: 40px; height: 40px"
+                          >
+                            <%= request.doctor.fullName.charAt(0).toUpperCase()
+                            %>
+                          </div>
+                          <% } %>
+                          <div>
+                            <h6 class="mb-0"><%= request.doctor.fullName %></h6>
+                            <small class="text-muted"
+                              ><%= request.doctor.specialization %></small
+                            >
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <%= new Date(request.createdAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <%= new Date(request.rejectedAt).toLocaleDateString() %>
+                      </td>
+                      <td>
+                        <span class="badge bg-info text-dark"
+                          ><%= request.consultationType %></span
+                        >
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-secondary"
+                          data-bs-toggle="modal"
+                          data-bs-target="#rejectionDetailsModal<%= request._id %>"
+                        >
+                          View Reason
+                        </button>
+                      </td>
+                    </tr>
+                    <% }) %> <% if (chatRequests.filter(req => req.status ===
+                    'rejected').length === 0) { %>
+                    <tr>
+                      <td colspan="5" class="text-center py-4">
+                        <p class="text-muted mb-0">No rejected chat requests</p>
+                      </td>
+                    </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+</div>
+
+<script>
+  // Update tab counts
+  document.addEventListener("DOMContentLoaded", function () {
+    const pendingCount = document.getElementById("pendingCount");
+    const acceptedCount = document.getElementById("acceptedCount");
+    const rejectedCount = document.getElementById("rejectedCount");
+
+    const pendingRequests = JSON.parse(
+      "<%= JSON.stringify(chatRequests.filter(req => req.status === 'pending').length) %>"
+    );
+    const acceptedRequests = JSON.parse(
+      "<%= JSON.stringify(chatRequests.filter(req => req.status === 'accepted').length) %>"
+    );
+    const rejectedRequests = JSON.parse(
+      "<%= JSON.stringify(chatRequests.filter(req => req.status === 'rejected').length) %>"
+    );
+
+    pendingCount.textContent = pendingRequests;
+    acceptedCount.textContent = acceptedRequests;
+    rejectedCount.textContent = rejectedRequests;
+  });
+</script>
+
+<%- include('../partials/footer') %>

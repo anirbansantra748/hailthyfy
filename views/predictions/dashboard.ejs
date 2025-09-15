@@ -1,0 +1,434 @@
+<%- include('../partials/header') %>
+
+<div class="container mt-4">
+  <!-- Welcome Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card bg-gradient-primary text-white">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col-md-8">
+              <h2 class="mb-2">
+                <i class="fas fa-brain me-3"></i>AI-Powered X-ray Analysis
+              </h2>
+              <p class="mb-0 opacity-75">
+                Welcome back, <%= user.username || user.email %>! Upload X-ray
+                images and get instant AI-powered medical insights.
+              </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+              <a href="/prediction/xray/upload" class="btn btn-light btn-lg">
+                <i class="fas fa-upload me-2"></i>Upload New X-ray
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 bg-primary text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-1" id="totalScans">0</h3>
+              <p class="mb-0 opacity-75">Total Scans</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-x-ray fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 bg-success text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-1" id="completedScans">0</h3>
+              <p class="mb-0 opacity-75">Completed</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-check-circle fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 bg-warning text-dark h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-1" id="processingScans">0</h3>
+              <p class="mb-0 opacity-75">Processing</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-cog fa-spin fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card border-0 bg-info text-white h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h3 class="mb-1" id="successRate">0%</h3>
+              <p class="mb-0 opacity-75">Success Rate</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-chart-line fa-2x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity and Quick Actions -->
+  <div class="row">
+    <!-- Recent X-rays -->
+    <div class="col-lg-8 mb-4">
+      <div class="card h-100">
+        <div
+          class="card-header d-flex justify-content-between align-items-center"
+        >
+          <h5 class="mb-0">
+            <i class="fas fa-history me-2"></i>Recent X-ray Scans
+          </h5>
+          <a href="/prediction/xray" class="btn btn-outline-primary btn-sm">
+            View All
+          </a>
+        </div>
+        <div class="card-body">
+          <div id="recentXrays">
+            <div class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <p class="mt-2 text-muted">Loading recent scans...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-lg-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-3">
+            <a href="/prediction/xray/upload" class="btn btn-primary">
+              <i class="fas fa-upload me-2"></i>Upload New X-ray
+            </a>
+
+            <a href="/prediction/xray" class="btn btn-outline-secondary">
+              <i class="fas fa-list me-2"></i>View All Scans
+            </a>
+
+            <button class="btn btn-outline-info" onclick="checkMLService()">
+              <i class="fas fa-heartbeat me-2"></i>Check ML Service
+            </button>
+
+            <a href="/prediction/demo" class="btn btn-outline-warning">
+              <i class="fas fa-eye me-2"></i>View Demo Results
+            </a>
+
+            <button class="btn btn-outline-success" onclick="downloadReport()">
+              <i class="fas fa-download me-2"></i>Download Summary
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ML Service Status -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-server me-2"></i>Service Status</h6>
+        </div>
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-2">
+            <span class="badge bg-success me-2" id="mlStatus">Healthy</span>
+            <small class="text-muted">ML Service</small>
+          </div>
+          <div class="d-flex align-items-center">
+            <span class="badge bg-success me-2" id="nodeStatus">Healthy</span>
+            <small class="text-muted">Node Service</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Insights and Tips -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-lightbulb me-2"></i>Tips for Better Results
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <div class="d-flex">
+                <i class="fas fa-image text-primary me-3 mt-1"></i>
+                <div>
+                  <h6>Image Quality</h6>
+                  <p class="text-muted small mb-0">
+                    Ensure X-ray images are clear, well-lit, and include the
+                    entire area of interest.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="d-flex">
+                <i class="fas fa-stethoscope text-primary me-3 mt-1"></i>
+                <div>
+                  <h6>Scan Type</h6>
+                  <p class="text-muted small mb-0">
+                    Select the correct scan type for more accurate AI analysis
+                    and results.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <div class="d-flex">
+                <i class="fas fa-notes-medical text-primary me-3 mt-1"></i>
+                <div>
+                  <h6>Clinical Notes</h6>
+                  <p class="text-muted small mb-0">
+                    Add relevant clinical information to help interpret the AI
+                    results better.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    loadDashboardData();
+    checkServiceStatus();
+
+    // Refresh data every 30 seconds
+    setInterval(loadDashboardData, 30000);
+    setInterval(checkServiceStatus, 60000);
+  });
+
+  function loadDashboardData() {
+    // Load recent X-rays
+    fetch("/prediction/api/xray")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          updateStats(data.data);
+          updateRecentXrays(data.data.slice(0, 5));
+        }
+      })
+      .catch((error) => {
+        console.error("Error loading dashboard data:", error);
+      });
+  }
+
+  function updateStats(xrays) {
+    const total = xrays.length;
+    const completed = xrays.filter((x) => x.status === "completed").length;
+    const processing = xrays.filter((x) => x.status === "processing").length;
+    const successRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    document.getElementById("totalScans").textContent = total;
+    document.getElementById("completedScans").textContent = completed;
+    document.getElementById("processingScans").textContent = processing;
+    document.getElementById("successRate").textContent = successRate + "%";
+  }
+
+  function updateRecentXrays(xrays) {
+    const container = document.getElementById("recentXrays");
+
+    if (xrays.length === 0) {
+      container.innerHTML = `
+      <div class="text-center py-4">
+        <i class="fas fa-x-ray fa-3x text-muted mb-3"></i>
+        <h6 class="text-muted">No X-rays yet</h6>
+        <p class="text-muted mb-0">Upload your first X-ray to get started</p>
+      </div>
+    `;
+      return;
+    }
+
+    const html = xrays
+      .map(
+        (xray) => `
+    <div class="d-flex align-items-center py-2 border-bottom">
+      <img src="${
+        xray.image
+      }" alt="X-ray" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;">
+      <div class="flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h6 class="mb-1">${
+              xray.scanType.charAt(0).toUpperCase() + xray.scanType.slice(1)
+            } X-ray</h6>
+            <small class="text-muted">${new Date(
+              xray.createdAt
+            ).toLocaleDateString()}</small>
+          </div>
+          <span class="badge ${getStatusBadgeClass(xray.status)}">${
+          xray.status
+        }</span>
+        </div>
+        ${
+          xray.notes
+            ? `<small class="text-muted">${xray.notes.substring(0, 50)}${
+                xray.notes.length > 50 ? "..." : ""
+              }</small>`
+            : ""
+        }
+      </div>
+      <a href="/prediction/xray/${
+        xray._id
+      }" class="btn btn-outline-primary btn-sm ms-2">
+        <i class="fas fa-eye"></i>
+      </a>
+    </div>
+  `
+      )
+      .join("");
+
+    container.innerHTML = html;
+  }
+
+  function getStatusBadgeClass(status) {
+    switch (status) {
+      case "completed":
+        return "bg-success";
+      case "processing":
+        return "bg-warning text-dark";
+      case "failed":
+        return "bg-danger";
+      default:
+        return "bg-secondary";
+    }
+  }
+
+  function checkMLService() {
+    fetch("/prediction/health/ml")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          alert(
+            "ML Service is healthy! ✅\n\nModel Version: " +
+              data.ml_service.model_version +
+              "\nLabels: " +
+              data.ml_service.labels_count
+          );
+        } else {
+          alert("ML Service is unhealthy! ❌\n\nError: " + data.error);
+        }
+      })
+      .catch((error) => {
+        alert("Failed to check ML service: " + error.message);
+      });
+  }
+
+  function checkServiceStatus() {
+    fetch("/prediction/health")
+      .then((response) => response.json())
+      .then((data) => {
+        const mlStatus = document.getElementById("mlStatus");
+        const nodeStatus = document.getElementById("nodeStatus");
+
+        if (data.success && data.ml_service.status === "ok") {
+          mlStatus.className = "badge bg-success me-2";
+          mlStatus.textContent = "Healthy";
+        } else {
+          mlStatus.className = "badge bg-danger me-2";
+          mlStatus.textContent = "Unhealthy";
+        }
+
+        nodeStatus.className = "badge bg-success me-2";
+        nodeStatus.textContent = "Healthy";
+      })
+      .catch((error) => {
+        const mlStatus = document.getElementById("mlStatus");
+        mlStatus.className = "badge bg-danger me-2";
+        mlStatus.textContent = "Error";
+      });
+  }
+
+  function downloadReport() {
+    fetch("/prediction/api/xray")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success) {
+          const report = generateSummaryReport(data.data);
+          downloadTextFile(report, "xray-summary-report.txt");
+        }
+      })
+      .catch((error) => {
+        alert("Failed to generate report: " + error.message);
+      });
+  }
+
+  function generateSummaryReport(xrays) {
+    const total = xrays.length;
+    const completed = xrays.filter((x) => x.status === "completed").length;
+    const processing = xrays.filter((x) => x.status === "processing").length;
+    const failed = xrays.filter((x) => x.status === "failed").length;
+
+    let report = `X-ray Analysis Summary Report
+===============================
+Generated: ${new Date().toLocaleString()}
+Total Scans: ${total}
+Completed: ${completed}
+Processing: ${processing}
+Failed: ${failed}
+Success Rate: ${total > 0 ? Math.round((completed / total) * 100) : 0}%
+
+Recent Scans:
+`;
+
+    xrays.slice(0, 10).forEach((xray, index) => {
+      report += `${index + 1}. ${xray.scanType} X-ray - ${
+        xray.status
+      } (${new Date(xray.createdAt).toLocaleDateString()})\n`;
+    });
+
+    return report;
+  }
+
+  function downloadTextFile(content, filename) {
+    const blob = new Blob([content], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+</script>
+
+<%- include('../partials/footer') %>

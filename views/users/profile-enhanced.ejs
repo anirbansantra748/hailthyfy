@@ -1,0 +1,1172 @@
+<%- include('../partials/header') %>
+
+<% 
+// Calculate age from date of birth
+function calculateAge(dob) {
+  if (!dob) return null;
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+// Get emoji based on user info
+function getUserEmoji(user) {
+  if (user.isDoctor) return '👩‍⚕️';
+  if (user.gender === 'female') return '👩‍💼';
+  if (user.gender === 'male') return '👨‍💼';
+  return '👤';
+}
+
+// Get blood group color
+function getBloodGroupColor(bloodGroup) {
+  const colors = {
+    'O+': '#EF4444', 'O-': '#DC2626',
+    'A+': '#F59E0B', 'A-': '#D97706', 
+    'B+': '#3B82F6', 'B-': '#2563EB',
+    'AB+': '#8B5CF6', 'AB-': '#7C3AED'
+  };
+  return colors[bloodGroup] || '#6B7280';
+}
+
+const calculatedAge = calculateAge(user.dob);
+%>
+
+<style>
+  :root {
+    --healthcare-primary: #0EA5E9;
+    --healthcare-secondary: #0284C7;
+    --healthcare-light: #E0F2FE;
+    --healthcare-accent: #38BDF8;
+    --healthcare-success: #22C55E;
+    --healthcare-warning: #F59E0B;
+    --healthcare-danger: #EF4444;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --bg-primary: #F8FAFC;
+    --bg-secondary: #F1F5F9;
+    --white: #FFFFFF;
+    --border-light: #E2E8F0;
+    --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  body {
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .profile-header {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    color: white;
+    padding: 4rem 0 3rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 2rem 2rem;
+  }
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 2px, transparent 2px),
+      radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 1px, transparent 1px),
+      radial-gradient(circle at 40% 80%, rgba(255,255,255,0.1) 1px, transparent 1px),
+      radial-gradient(circle at 60% 30%, rgba(255,255,255,0.1) 2px, transparent 2px);
+    background-size: 50px 50px, 30px 30px, 40px 40px, 60px 60px;
+    opacity: 0.4;
+  }
+
+  .profile-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.1) 50%, transparent 51%);
+  }
+
+  .profile-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .profile-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--healthcare-primary);
+  }
+
+  .emoji-avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--healthcare-light) 0%, rgba(255,255,255,0.8) 100%);
+    border: 4px solid white;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    margin: 0 auto;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .emoji-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .emoji-avatar::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, var(--healthcare-primary), var(--healthcare-accent));
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .emoji-avatar:hover::before {
+    opacity: 0.3;
+  }
+
+  .completeness-ring {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
+  }
+
+  .completeness-ring svg {
+    transform: rotate(-90deg);
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+  }
+
+  .completeness-ring .progress-ring {
+    stroke: var(--healthcare-primary);
+    stroke-width: 10;
+    fill: transparent;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .completeness-ring .progress-ring-bg {
+    stroke: var(--border-light);
+    stroke-width: 10;
+    fill: transparent;
+  }
+
+  .completeness-percentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+
+  .completeness-percentage .number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--healthcare-primary);
+    line-height: 1;
+    display: block;
+  }
+
+  .completeness-percentage .label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 2rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--healthcare-primary), var(--healthcare-accent));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+    border-color: var(--healthcare-primary);
+  }
+
+  .stat-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--healthcare-primary), var(--healthcare-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .activity-item {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+    border-left: 4px solid var(--healthcare-primary);
+    transition: all 0.3s ease;
+  }
+
+  .activity-item:hover {
+    transform: translateX(5px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .quick-action-btn {
+    background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    padding: 14px 28px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quick-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .quick-action-btn:hover {
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px -8px rgba(14, 165, 233, 0.4);
+  }
+
+  .quick-action-btn:hover::before {
+    left: 100%;
+  }
+
+  .btn-secondary {
+    background: white;
+    color: var(--text-primary);
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-xs);
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg-primary);
+    color: var(--healthcare-primary);
+    border-color: var(--healthcare-primary);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .health-metric {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-xs);
+    border: 1px solid var(--border-light);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .health-metric::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--healthcare-primary), var(--healthcare-accent));
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+  }
+
+  .health-metric:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--healthcare-primary);
+  }
+
+  .health-metric:hover::before {
+    transform: scaleY(1);
+  }
+
+  .risk-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .risk-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .risk-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .risk-icon {
+    font-size: 1.5rem;
+  }
+
+  .risk-title {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+  }
+
+  .risk-score {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .risk-score.high {
+    color: var(--healthcare-danger);
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+  }
+
+  .risk-score.moderate {
+    color: var(--healthcare-warning);
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  }
+
+  .risk-score.low {
+    color: var(--healthcare-success);
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+  }
+
+  .risk-level {
+    margin-top: 1rem;
+  }
+
+  .alert-card {
+    border-left: 4px solid var(--healthcare-warning);
+  }
+
+  .alert-card .alert {
+    border-radius: 12px;
+    border: none;
+    box-shadow: var(--shadow-xs);
+  }
+
+  .badge-custom {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .badge-excellent { background: #D1FAE5; color: #059669; }
+  .badge-good { background: #DBEAFE; color: #2563EB; }
+  .badge-moderate { background: #FEF3C7; color: #D97706; }
+  .badge-incomplete { background: #FEE2E2; color: #DC2626; }
+
+  .prediction-loading {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+  }
+
+  .loading-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+  }
+
+  .loading-spinner {
+    border: 4px solid var(--border-light);
+    border-top: 4px solid var(--healthcare-primary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<!-- Profile Header -->
+<div class="profile-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-3 text-center">
+        <div class="emoji-avatar">
+          <%= getUserEmoji(user) %>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h1 class="mb-2" style="position: relative; z-index: 1; font-size: 2.5rem; font-weight: 700;">
+          <%= user.name %>
+        </h1>
+        <p class="mb-3" style="position: relative; z-index: 1; font-size: 1.1rem; opacity: 0.9;">
+          <i class="fas fa-envelope me-2"></i><%= user.email %>
+        </p>
+        <% if (user.phone) { %>
+        <p class="mb-3" style="position: relative; z-index: 1; opacity: 0.9;">
+          <i class="fas fa-phone me-2"></i><%= user.phone %>
+        </p>
+        <% } %>
+        <div style="position: relative; z-index: 1;">
+          <span class="badge badge-custom badge-<%= profileCompleteness.level.toLowerCase() %>">
+            <i class="fas fa-user-check me-1"></i><%= profileCompleteness.level %> Profile
+          </span>
+        </div>
+      </div>
+      <div class="col-md-3 text-center">
+        <div class="completeness-ring">
+          <svg width="140" height="140">
+            <circle cx="70" cy="70" r="62" class="progress-ring-bg"></circle>
+            <circle cx="70" cy="70" r="62" class="progress-ring" 
+                    stroke-dasharray="389.6" 
+                    stroke-dashoffset="<%= 389.6 - (389.6 * profileCompleteness.percentage) / 100 %>">
+            </circle>
+          </svg>
+          <div class="completeness-percentage">
+            <span class="number"><%= profileCompleteness.percentage %>%</span>
+            <span class="label">Complete</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Quick Stats -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-number text-primary"><%= profileStats.totalHealthLogs %></div>
+        <h6 class="text-muted mb-0">Health Logs</h6>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-number text-success"><%= profileStats.totalInteractionChecks %></div>
+        <h6 class="text-muted mb-0">Drug Interactions</h6>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-number text-info"><%= profileStats.totalPredictions %></div>
+        <h6 class="text-muted mb-0">AI Predictions</h6>
+      </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="stat-card">
+        <div class="stat-number text-warning"><%= profileStats.xrayCount %></div>
+        <h6 class="text-muted mb-0">X-ray Scans</h6>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Left Column -->
+    <div class="col-lg-8">
+      <!-- Profile Information -->
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-user-circle me-2 text-primary"></i>Personal Information
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Age</small>
+                  <p class="mb-0 fw-bold">
+                    <% if (calculatedAge) { %>
+                      <%= calculatedAge %> years
+                    <% } else if (user.age) { %>
+                      <%= user.age %> years
+                    <% } else { %>
+                      Not specified
+                    <% } %>
+                  </p>
+                </div>
+                <i class="fas fa-birthday-cake" style="color: var(--healthcare-primary);"></i>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Gender</small>
+                  <p class="mb-0 fw-bold"><%= user.gender || 'Not specified' %></p>
+                </div>
+                <i class="fas fa-venus-mars text-info"></i>
+              </div>
+            </div>
+            <% if (user.dob) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Date of Birth</small>
+                  <p class="mb-0 fw-bold"><%= new Date(user.dob).toLocaleDateString() %></p>
+                </div>
+                <i class="fas fa-calendar text-success"></i>
+              </div>
+            </div>
+            <% } %>
+            <% if (user.address) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Address</small>
+                  <p class="mb-0 fw-bold"><%= user.address %></p>
+                </div>
+                <i class="fas fa-map-marker-alt text-danger"></i>
+              </div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Health Metrics -->
+      <% if (user.height || user.weight || user.bloodGroup || user.bloodPressure) { %>
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-heartbeat me-2 text-danger"></i>Health Metrics
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <div class="row g-3">
+            <% if (user.height) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Height</small>
+                  <p class="mb-0 fw-bold"><%= user.height %> cm</p>
+                </div>
+                <i class="fas fa-ruler-vertical text-primary"></i>
+              </div>
+            </div>
+            <% } %>
+            <% if (user.weight) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Weight</small>
+                  <p class="mb-0 fw-bold"><%= user.weight %> kg</p>
+                </div>
+                <i class="fas fa-weight text-success"></i>
+              </div>
+            </div>
+            <% } %>
+            <% if (user.bloodGroup) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Blood Group</small>
+                  <p class="mb-0 fw-bold"><%= user.bloodGroup %></p>
+                </div>
+                <i class="fas fa-tint text-danger"></i>
+              </div>
+            </div>
+            <% } %>
+            <% if (user.bloodPressure) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Blood Pressure</small>
+                  <p class="mb-0 fw-bold"><%= user.bloodPressure %> mmHg</p>
+                </div>
+                <i class="fas fa-heart text-danger"></i>
+              </div>
+            </div>
+            <% } %>
+            <% if (user.heartRate) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Heart Rate</small>
+                  <p class="mb-0 fw-bold"><%= user.heartRate %> bpm</p>
+                </div>
+                <i class="fas fa-heartbeat text-primary"></i>
+              </div>
+            </div>
+            <% } %>
+            <% if (user.bloodSugar) { %>
+            <div class="col-md-6">
+              <div class="health-metric">
+                <div>
+                  <small class="text-muted">Blood Sugar</small>
+                  <p class="mb-0 fw-bold"><%= user.bloodSugar %> mg/dL</p>
+                </div>
+                <i class="fas fa-vial text-warning"></i>
+              </div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Recent Health Logs -->
+      <% if (recentHealthLogs && recentHealthLogs.length > 0) { %>
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-clipboard-list me-2 text-success"></i>Recent Health Logs
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <% recentHealthLogs.forEach(function(log) { %>
+          <div class="activity-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1"><%= log.title || 'Health Log Entry' %></h6>
+                <p class="mb-0 text-muted small"><%= log.description || 'Health monitoring entry' %></p>
+              </div>
+              <small class="text-muted"><%= new Date(log.createdAt).toLocaleDateString() %></small>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- AI Health Risk Analysis -->
+      <% if (user.riskScores && Object.keys(user.riskScores).length > 0) { %>
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-brain me-2 text-info"></i>AI Health Risk Analysis
+          </h5>
+          <p class="text-muted mb-0">Predictive analysis based on your health data</p>
+        </div>
+        <div class="card-body pt-0">
+          <div class="row g-3">
+            <% if (user.riskScores.diabetes !== undefined) { %>
+            <div class="col-md-6">
+              <div class="risk-card diabetes">
+                <div class="risk-header">
+                  <span class="risk-icon">🩺</span>
+                  <span class="risk-title">Diabetes Risk</span>
+                </div>
+                <div class="risk-score <%= user.riskScores.diabetes >= 60 ? 'high' : user.riskScores.diabetes >= 40 ? 'moderate' : 'low' %>">
+                  <%= user.riskScores.diabetes || 0 %>%
+                </div>
+                <div class="risk-level">
+                  <% if (user.riskScores.diabetes >= 60) { %>
+                    <span class="badge bg-danger">High Risk</span>
+                  <% } else if (user.riskScores.diabetes >= 40) { %>
+                    <span class="badge bg-warning">Moderate Risk</span>
+                  <% } else { %>
+                    <span class="badge bg-success">Low Risk</span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            
+            <% if (user.riskScores.heartDisease !== undefined) { %>
+            <div class="col-md-6">
+              <div class="risk-card heart-disease">
+                <div class="risk-header">
+                  <span class="risk-icon">❤️</span>
+                  <span class="risk-title">Heart Disease Risk</span>
+                </div>
+                <div class="risk-score <%= user.riskScores.heartDisease >= 60 ? 'high' : user.riskScores.heartDisease >= 40 ? 'moderate' : 'low' %>">
+                  <%= user.riskScores.heartDisease || 0 %>%
+                </div>
+                <div class="risk-level">
+                  <% if (user.riskScores.heartDisease >= 60) { %>
+                    <span class="badge bg-danger">High Risk</span>
+                  <% } else if (user.riskScores.heartDisease >= 40) { %>
+                    <span class="badge bg-warning">Moderate Risk</span>
+                  <% } else { %>
+                    <span class="badge bg-success">Low Risk</span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            
+            <% if (user.riskScores.hypertension !== undefined) { %>
+            <div class="col-md-6">
+              <div class="risk-card hypertension">
+                <div class="risk-header">
+                  <span class="risk-icon">🩸</span>
+                  <span class="risk-title">Hypertension Risk</span>
+                </div>
+                <div class="risk-score <%= user.riskScores.hypertension >= 60 ? 'high' : user.riskScores.hypertension >= 40 ? 'moderate' : 'low' %>">
+                  <%= user.riskScores.hypertension || 0 %>%
+                </div>
+                <div class="risk-level">
+                  <% if (user.riskScores.hypertension >= 60) { %>
+                    <span class="badge bg-danger">High Risk</span>
+                  <% } else if (user.riskScores.hypertension >= 40) { %>
+                    <span class="badge bg-warning">Moderate Risk</span>
+                  <% } else { %>
+                    <span class="badge bg-success">Low Risk</span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <% } %>
+            
+            <% if (user.riskScores.obesity !== undefined) { %>
+            <div class="col-md-6">
+              <div class="risk-card obesity">
+                <div class="risk-header">
+                  <span class="risk-icon">⚖️</span>
+                  <span class="risk-title">Obesity Risk</span>
+                </div>
+                <div class="risk-score <%= user.riskScores.obesity >= 60 ? 'high' : user.riskScores.obesity >= 40 ? 'moderate' : 'low' %>">
+                  <%= user.riskScores.obesity || 0 %>%
+                </div>
+                <div class="risk-level">
+                  <% if (user.riskScores.obesity >= 60) { %>
+                    <span class="badge bg-danger">High Risk</span>
+                  <% } else if (user.riskScores.obesity >= 40) { %>
+                    <span class="badge bg-warning">Moderate Risk</span>
+                  <% } else { %>
+                    <span class="badge bg-success">Low Risk</span>
+                  <% } %>
+                </div>
+              </div>
+            </div>
+            <% } %>
+          </div>
+          
+          <div class="text-center mt-4">
+            <a href="/health-predictions" class="quick-action-btn">
+              <i class="fas fa-chart-line"></i> Detailed Analysis
+            </a>
+            <button class="quick-action-btn btn-secondary" onclick="generateNewPrediction()">
+              <i class="fas fa-sync-alt"></i> Update Analysis
+            </button>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Health Alerts -->
+      <% 
+        const hasHighRisk = user.riskScores && Object.values(user.riskScores).some(score => score >= 60);
+        const hasCriticalVitals = (user.bloodPressure && (user.bloodPressure.systolic >= 140 || user.bloodPressure.diastolic >= 90)) ||
+                                 (user.bloodSugar && user.bloodSugar.fasting >= 126);
+      %>
+      <% if (hasHighRisk || hasCriticalVitals) { %>
+      <div class="profile-card mb-4 alert-card">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0 text-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>Health Alerts
+          </h5>
+          <p class="text-muted mb-0">Important health notifications</p>
+        </div>
+        <div class="card-body pt-0">
+          <% if (hasHighRisk) { %>
+            <% Object.entries(user.riskScores).forEach(function([disease, score]) { %>
+              <% if (score >= 60) { %>
+              <div class="alert alert-warning mb-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-warning me-3"></i>
+                  <div>
+                    <strong>High <%= disease.charAt(0).toUpperCase() + disease.slice(1) %> Risk Detected</strong>
+                    <p class="mb-0">Risk Score: <%= score %>% - Consider scheduling a medical consultation</p>
+                  </div>
+                </div>
+              </div>
+              <% } %>
+            <% }); %>
+          <% } %>
+          
+          <% if (user.bloodPressure && (user.bloodPressure.systolic >= 140 || user.bloodPressure.diastolic >= 90)) { %>
+          <div class="alert alert-danger mb-3">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-heart me-3"></i>
+              <div>
+                <strong>High Blood Pressure Alert</strong>
+                <p class="mb-0">Current: <%= user.bloodPressure.systolic %>/<%= user.bloodPressure.diastolic %> mmHg - Monitor closely</p>
+              </div>
+            </div>
+          </div>
+          <% } %>
+          
+          <% if (user.bloodSugar && user.bloodSugar.fasting >= 126) { %>
+          <div class="alert alert-danger mb-3">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-vial me-3"></i>
+              <div>
+                <strong>High Blood Sugar Alert</strong>
+                <p class="mb-0">Fasting glucose: <%= user.bloodSugar.fasting %> mg/dL - Consult healthcare provider</p>
+              </div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Recent AI Predictions -->
+      <% if (recentPredictions && recentPredictions.length > 0) { %>
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-history me-2 text-info"></i>Recent AI Predictions
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <% recentPredictions.forEach(function(prediction) { %>
+          <div class="activity-item">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="mb-1"><%= prediction.type || 'AI Health Analysis' %></h6>
+                <p class="mb-0 text-muted small">
+                  <% if (prediction.details && prediction.details.predictions) { %>
+                    Health Score: <%= prediction.score || 'N/A' %>%
+                  <% } else { %>
+                    Confidence: <%= prediction.confidence || 'N/A' %>%
+                  <% } %>
+                </p>
+              </div>
+              <small class="text-muted"><%= new Date(prediction.date || prediction.createdAt).toLocaleDateString() %></small>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-lg-4">
+      <!-- Profile Completeness -->
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-tasks me-2 text-warning"></i>Profile Completeness
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <div class="text-center mb-3">
+            <div class="h4 text-primary"><%= profileCompleteness.percentage %>%</div>
+            <p class="text-muted">Complete</p>
+          </div>
+          <% if (profileCompleteness.missing && profileCompleteness.missing.length > 0) { %>
+          <div class="mb-3">
+            <h6 class="text-muted mb-2">Missing Information:</h6>
+            <% profileCompleteness.missing.forEach(function(field) { %>
+            <span class="badge bg-light text-dark me-1 mb-1"><%= field.replace(/([A-Z])/g, ' $1').replace(/^./, function(str){ return str.toUpperCase(); }) %></span>
+            <% }); %>
+          </div>
+          <% } %>
+          <div class="d-grid">
+            <a href="/users/update-profile" class="quick-action-btn">
+              <i class="fas fa-edit"></i> Update Profile
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-bolt me-2 text-primary"></i>Quick Actions
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <div class="d-grid gap-2">
+            <a href="/prediction/xray" class="quick-action-btn">
+              <i class="fas fa-x-ray"></i> AI Health Scan
+            </a>
+            <a href="/medicine-search" class="quick-action-btn btn-secondary">
+              <i class="fas fa-pills"></i> Medicine Search
+            </a>
+            <a href="/doctors" class="quick-action-btn btn-secondary">
+              <i class="fas fa-user-md"></i> Find Doctors
+            </a>
+            <a href="/posts" class="quick-action-btn btn-secondary">
+              <i class="fas fa-comments"></i> Community
+            </a>
+            <a href="/drug-interaction-checker" class="quick-action-btn btn-secondary">
+              <i class="fas fa-exclamation-triangle"></i> Drug Interaction
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical History -->
+      <% if (user.allergies && user.allergies.length > 0) { %>
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-exclamation-triangle me-2 text-danger"></i>Allergies
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <% user.allergies.forEach(function(allergy) { %>
+          <span class="badge bg-danger text-white me-1 mb-1"><%= allergy %></span>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Current Medications -->
+      <% if (user.currentMedications && user.currentMedications.length > 0) { %>
+      <div class="profile-card mb-4">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-pills me-2 text-primary"></i>Current Medications
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <% user.currentMedications.forEach(function(medication) { %>
+          <div class="d-flex align-items-center mb-2">
+            <i class="fas fa-pill text-primary me-2"></i>
+            <span><%= medication %></span>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Recent Drug Interactions -->
+      <% if (recentInteractionChecks && recentInteractionChecks.length > 0) { %>
+      <div class="profile-card">
+        <div class="card-header bg-transparent border-0 p-4">
+          <h5 class="mb-0">
+            <i class="fas fa-shield-alt me-2 text-warning"></i>Recent Interactions
+          </h5>
+        </div>
+        <div class="card-body pt-0">
+          <% recentInteractionChecks.forEach(function(check) { %>
+          <div class="activity-item">
+            <div>
+              <h6 class="mb-1">Drug Interaction Check</h6>
+              <p class="mb-0 text-muted small">
+                <%= check.drugs ? check.drugs.join(', ') : 'Multiple drugs checked' %>
+              </p>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="prediction-loading" id="predictionLoading">
+  <div class="loading-content">
+    <div class="loading-spinner"></div>
+    <h5>Analyzing Your Health Data</h5>
+    <p class="text-muted">Our AI is processing your health information to generate personalized predictions...</p>
+  </div>
+</div>
+
+<script>
+// Generate new AI health prediction
+function generateNewPrediction() {
+  // Show loading overlay
+  document.getElementById('predictionLoading').style.display = 'block';
+  
+  fetch('/health-predictions/generate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+  .then(response => response.json())
+  .then(data => {
+    // Hide loading overlay
+    document.getElementById('predictionLoading').style.display = 'none';
+    
+    if (data.success) {
+      // Show success message
+      showAlert('success', 'Health analysis completed successfully! Refreshing page to show new predictions...');
+      
+      // Reload page after 2 seconds to show new data
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    } else {
+      if (data.requiresMoreData) {
+        showAlert('warning', data.message + ' Please update your profile with more health information.');
+        // Optionally redirect to update profile page
+        setTimeout(() => {
+          window.location.href = '/users/update-profile';
+        }, 3000);
+      } else {
+        showAlert('error', data.message || 'Failed to generate health predictions');
+      }
+    }
+  })
+  .catch(error => {
+    // Hide loading overlay
+    document.getElementById('predictionLoading').style.display = 'none';
+    console.error('Error:', error);
+    showAlert('error', 'Network error: Failed to generate predictions');
+  });
+}
+
+// Show alert messages
+function showAlert(type, message) {
+  // Remove existing alerts
+  const existingAlerts = document.querySelectorAll('.dynamic-alert');
+  existingAlerts.forEach(alert => alert.remove());
+  
+  // Create new alert
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show dynamic-alert`;
+  alertDiv.style.position = 'fixed';
+  alertDiv.style.top = '20px';
+  alertDiv.style.right = '20px';
+  alertDiv.style.zIndex = '10000';
+  alertDiv.style.minWidth = '300px';
+  
+  alertDiv.innerHTML = `
+    <div class="d-flex align-items-center">
+      <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'times-circle'} me-2"></i>
+      <div>${message}</div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  `;
+  
+  document.body.appendChild(alertDiv);
+  
+  // Auto-dismiss after 5 seconds
+  setTimeout(() => {
+    if (alertDiv.parentNode) {
+      alertDiv.remove();
+    }
+  }, 5000);
+}
+
+// Initialize tooltips for risk cards
+document.addEventListener('DOMContentLoaded', function() {
+  // Add click handlers for risk cards to show more details
+  const riskCards = document.querySelectorAll('.risk-card');
+  riskCards.forEach(card => {
+    card.addEventListener('click', function() {
+      // You can add functionality to show detailed risk analysis
+      const riskType = this.classList[1]; // Get the disease type class
+      window.location.href = `/health-predictions#${riskType}`;
+    });
+  });
+  
+  // Add hover effects for interactive elements
+  const interactiveElements = document.querySelectorAll('.risk-card, .quick-action-btn, .health-metric');
+  interactiveElements.forEach(element => {
+    element.addEventListener('mouseenter', function() {
+      this.style.transform = this.style.transform || 'translateY(-2px)';
+    });
+  });
+});
+
+// Check if user has enough data for predictions
+function checkPredictionEligibility() {
+  // This could be enhanced to check specific data requirements
+  const requiredFields = ['age', 'height', 'weight'];
+  // Implementation would check if user has filled required fields
+}
+
+// Export functions for potential use by other scripts
+window.healthPredictions = {
+  generate: generateNewPrediction,
+  showAlert: showAlert
+};
+</script>
+
+<%- include('../partials/footer') %>

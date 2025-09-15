@@ -1,0 +1,110 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-4">
+    <h1>Medicine Price Comparison</h1>
+    <p>Find the best prices for your medicines across multiple pharmacies</p>
+
+    <!-- Search Form -->
+    <form action="/medicine-search" method="POST" class="mb-4">
+        <div class="input-group">
+            <input 
+                type="text" 
+                class="form-control" 
+                name="medicineName" 
+                placeholder="Enter medicine name (e.g., Paracetamol, Dolo 650...)"
+                value="<%= searchQuery || '' %>"
+                required
+                minlength="2"
+            >
+            <button class="btn btn-primary" type="submit">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+    </form>
+
+    <!-- Search Results -->
+    <% if (typeof searchResults !== 'undefined' && searchResults) { %>
+        <div class="search-results">
+            <h2>Results for "<%= searchResults.medicineName %>"</h2>
+            <p>Search completed in <%= searchResults.searchDuration %>ms • <%= searchResults.platforms.length %> platforms checked</p>
+            
+            <div class="row">
+                <% searchResults.platforms.forEach(function(platform) { %>
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><%= platform.platform %></h5>
+                                <span class="badge <%= platform.available ? 'bg-success' : 'bg-danger' %>">
+                                    <%= platform.available ? 'Available' : 'Not Available' %>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <% if (platform.available && platform.prices && platform.prices.length > 0) { %>
+                                    <% platform.prices.forEach(function(product) { %>
+                                        <div class="mb-3 border-bottom pb-3">
+                                            <h6><%= product.name %></h6>
+                                            <p class="mb-1"><strong>Price: ₹<%= product.price %></strong></p>
+                                            <% if (product.discount > 0) { %>
+                                                <p class="mb-1 text-muted">Original: ₹<%= product.originalPrice %> (<%= product.discount %>% OFF)</p>
+                                            <% } %>
+                                            <p class="mb-1">Seller: <%= product.seller %></p>
+                                            <p class="mb-1">Delivery: <%= product.deliveryTime %></p>
+                                            <p class="mb-1">Rating: <%= product.rating %> ⭐ (<%= product.reviews %> reviews)</p>
+                                            <p class="mb-1">
+                                                <span class="badge <%= product.inStock ? 'bg-success' : 'bg-warning' %>">
+                                                    <%= product.inStock ? 'In Stock' : 'Out of Stock' %>
+                                                </span>
+                                            </p>
+                                            <a href="<%= product.productUrl %>" target="_blank" class="btn btn-sm btn-primary">
+                                                View Product
+                                            </a>
+                                        </div>
+                                    <% }) %>
+                                <% } else { %>
+                                    <p>Medicine not available on this platform</p>
+                                    <a href="<%= platform.searchUrl %>" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        Search on <%= platform.platform %>
+                                    </a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% } else if (typeof searchQuery !== 'undefined' && searchQuery && searchResults === null) { %>
+        <div class="alert alert-info">
+            <h4>No Results Found</h4>
+            <p>We couldn't find any results for "<%= searchQuery %>". Please try a different medicine name.</p>
+        </div>
+    <% } %>
+
+    <!-- Trending Medicines -->
+    <% if (typeof trending !== 'undefined' && trending && trending.length > 0) { %>
+        <div class="mt-5">
+            <h2>Trending Medicines</h2>
+            <div class="row">
+                <% trending.forEach(function(medicine) { %>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100" onclick="searchMedicine('<%= medicine.name %>')">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= medicine.name %></h5>
+                                <p class="card-text">
+                                    <small class="text-muted"><%= medicine.searches %> searches</small><br>
+                                    <span class="badge bg-secondary"><%= medicine.category %></span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+<script>
+function searchMedicine(name) {
+    document.querySelector('input[name="medicineName"]').value = name;
+    document.querySelector('form').submit();
+}
+</script>
