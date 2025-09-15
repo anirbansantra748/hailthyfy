@@ -1,0 +1,84 @@
+# 🏥 Healthfy - Render Multi-Service Deployment Configuration
+# This file defines both Node.js app and Python ML service for Render
+
+databases:
+  - name: healthfy-mongodb
+    databaseName: healthfy
+    user: healthfy-user
+
+services:
+  # Node.js Main Application
+  - type: web
+    name: healthfy-app
+    runtime: node
+    plan: starter # Change to standard or pro for production
+    region: oregon # Change to your preferred region
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: healthfy-mongodb
+          property: connectionString
+      - key: ML_API_URL
+        value: https://healthfy-ml-service.onrender.com
+      - key: ML_API_KEY
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: REDIS_URL
+        value: redis://localhost:6379
+      # Add your other environment variables here
+      - key: GOOGLE_AI_API_KEY
+        sync: false # Set this manually in Render dashboard
+      - key: EMAIL_HOST
+        value: smtp.gmail.com
+      - key: EMAIL_PORT
+        value: 587
+      - key: EMAIL_USER
+        sync: false # Set this manually
+      - key: EMAIL_PASS
+        sync: false # Set this manually
+    domains:
+      - healthfy.onrender.com # Your custom domain
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  # Python ML Service
+  - type: web
+    name: healthfy-ml-service
+    runtime: python
+    plan: starter # Upgrade for better ML performance
+    region: oregon # Same region as main app
+    rootDir: ./ml_service
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: ML_API_KEY
+        fromService:
+          type: web
+          name: healthfy-app
+          envVarKey: ML_API_KEY
+      - key: MODEL_VERSION
+        value: chexnet_v1.0.0
+      - key: CHEXNET_MODEL_PATH
+        value: ./model/chexnet_model.h5
+      - key: PYTHON_VERSION
+        value: 3.11.7
+    domains:
+      - healthfy-ml-service.onrender.com
+
+  # Optional: Redis Service (if needed)
+  - type: redis
+    name: healthfy-redis
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: [] # Empty means allow all

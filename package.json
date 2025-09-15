@@ -40,5 +40,14 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.0"
+  },
+  "pm2": {
+    "name": "healthfy",
+    "script": "app.js",
+    "instances": 1,
+    "env": {
+      "NODE_ENV": "production",
+      "PORT": 3000
+    }
   }
 }
