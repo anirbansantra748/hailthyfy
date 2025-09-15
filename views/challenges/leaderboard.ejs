@@ -1,0 +1,449 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+:root {
+  --healthcare-primary: #10b981;
+  --healthcare-secondary: #059669;
+  --healthcare-dark: #047857;
+  --healthcare-light: #d1fae5;
+  --healthcare-accent: #34d399;
+}
+
+.leaderboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.leaderboard-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, var(--healthcare-primary), var(--healthcare-secondary));
+  color: white;
+  padding: 3rem 2rem;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.leaderboard-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="trophy" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><text x="10" y="15" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="12">🏆</text></pattern></defs><rect width="100" height="100" fill="url(%23trophy)"/></svg>');
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  33% { transform: translateX(30px) translateY(-30px) rotate(120deg); }
+  66% { transform: translateX(-20px) translateY(20px) rotate(240deg); }
+}
+
+.leaderboard-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.leaderboard-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  position: relative;
+  z-index: 2;
+}
+
+.leaderboard-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.tab-btn {
+  background: white;
+  color: var(--healthcare-primary);
+  border: 2px solid var(--healthcare-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover, .tab-btn.active {
+  background: var(--healthcare-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.leaderboard-grid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .leaderboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1200px) {
+  .leaderboard-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+.leaderboard-card {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.leaderboard-card h3 {
+  background: linear-gradient(135deg, var(--healthcare-light), rgba(16, 185, 129, 0.1));
+  color: var(--healthcare-dark);
+  padding: 1.5rem;
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.leaderboard-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.leaderboard-item {
+  padding: 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.leaderboard-item:hover {
+  background: var(--healthcare-light);
+  transform: translateX(5px);
+}
+
+.leaderboard-item:last-child {
+  border-bottom: none;
+}
+
+.rank-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  font-size: 1.1rem;
+}
+
+.rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4a); color: #8b6914; }
+.rank-2 { background: linear-gradient(135deg, #c0c0c0, #e2e8f0); color: #4a5568; }
+.rank-3 { background: linear-gradient(135deg, #cd7f32, #d69e2e); color: white; }
+.rank-other { background: var(--healthcare-primary); }
+
+.user-info {
+  flex: 1;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.user-stats {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.points-badge {
+  background: var(--healthcare-primary);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.stats-card {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.stat-item:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: var(--healthcare-primary);
+  font-size: 1.1rem;
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.no-data i {
+  font-size: 4rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+</style>
+
+<div class="leaderboard-container">
+  <!-- Header -->
+  <div class="leaderboard-header">
+    <h1>
+      <i class="fas fa-crown me-3"></i>
+      Global Leaderboard
+    </h1>
+    <p>See who's leading the charge in health and wellness challenges</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="leaderboard-tabs">
+    <a href="/challenges/leaderboard" class="tab-btn active">
+      <i class="fas fa-globe me-2"></i>
+      Global
+    </a>
+    <a href="/challenges/leaderboard/weekly" class="tab-btn">
+      <i class="fas fa-calendar-week me-2"></i>
+      Weekly
+    </a>
+    <a href="/challenges/leaderboard/monthly" class="tab-btn">
+      <i class="fas fa-calendar-alt me-2"></i>
+      Monthly
+    </a>
+  </div>
+
+  <div class="leaderboard-grid">
+    <!-- Main Leaderboard -->
+    <div class="leaderboard-card">
+      <h3>
+        <i class="fas fa-trophy me-2"></i>
+        Top Performers
+      </h3>
+      
+      <ul class="leaderboard-list" id="leaderboard-list">
+        <!-- Sample data - replace with dynamic content -->
+        <li class="leaderboard-item">
+          <div class="rank-badge rank-1">1</div>
+          <div class="user-info">
+            <div class="user-name">Sarah Johnson</div>
+            <div class="user-stats">Completed 25 challenges • Level 12</div>
+          </div>
+          <div class="points-badge">2,450 pts</div>
+        </li>
+        
+        <li class="leaderboard-item">
+          <div class="rank-badge rank-2">2</div>
+          <div class="user-info">
+            <div class="user-name">Mike Chen</div>
+            <div class="user-stats">Completed 22 challenges • Level 11</div>
+          </div>
+          <div class="points-badge">2,180 pts</div>
+        </li>
+        
+        <li class="leaderboard-item">
+          <div class="rank-badge rank-3">3</div>
+          <div class="user-info">
+            <div class="user-name">Emma Wilson</div>
+            <div class="user-stats">Completed 20 challenges • Level 10</div>
+          </div>
+          <div class="points-badge">1,950 pts</div>
+        </li>
+        
+        <li class="leaderboard-item">
+          <div class="rank-badge rank-other">4</div>
+          <div class="user-info">
+            <div class="user-name">Alex Rodriguez</div>
+            <div class="user-stats">Completed 18 challenges • Level 9</div>
+          </div>
+          <div class="points-badge">1,720 pts</div>
+        </li>
+        
+        <li class="leaderboard-item">
+          <div class="rank-badge rank-other">5</div>
+          <div class="user-info">
+            <div class="user-name">Lisa Thompson</div>
+            <div class="user-stats">Completed 16 challenges • Level 8</div>
+          </div>
+          <div class="points-badge">1,580 pts</div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Stats Panel -->
+    <div class="stats-card">
+      <h3 style="margin-bottom: 1.5rem; color: var(--healthcare-dark);">
+        <i class="fas fa-chart-bar me-2"></i>
+        Community Stats
+      </h3>
+      
+      <div class="stat-item">
+        <div class="stat-label">
+          <i class="fas fa-users"></i>
+          Total Participants
+        </div>
+        <div class="stat-value">1,247</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">
+          <i class="fas fa-trophy"></i>
+          Challenges Completed
+        </div>
+        <div class="stat-value">4,823</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">
+          <i class="fas fa-fire"></i>
+          Total Points Earned
+        </div>
+        <div class="stat-value">156,340</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">
+          <i class="fas fa-calendar-day"></i>
+          Active This Week
+        </div>
+        <div class="stat-value">892</div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-label">
+          <i class="fas fa-medal"></i>
+          Badges Awarded
+        </div>
+        <div class="stat-value">2,341</div>
+      </div>
+      
+      <% if (typeof user !== 'undefined' && user) { %>
+      <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #f3f4f6;">
+        <h4 style="color: var(--healthcare-dark); margin-bottom: 1rem;">
+          <i class="fas fa-user me-2"></i>
+          Your Ranking
+        </h4>
+        <div class="stat-item">
+          <div class="stat-label">
+            <i class="fas fa-hashtag"></i>
+            Your Position
+          </div>
+          <div class="stat-value">#42</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">
+            <i class="fas fa-star"></i>
+            Your Points
+          </div>
+          <div class="stat-value">980 pts</div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+  
+  <% if (typeof user === 'undefined' || !user) { %>
+  <div class="no-data">
+    <i class="fas fa-user-plus"></i>
+    <h3>Join the Competition!</h3>
+    <p>Sign up to participate in challenges and see your ranking here.</p>
+    <a href="/users/signup" class="btn" style="background: var(--healthcare-primary); color: white; padding: 0.75rem 2rem; border-radius: 25px; text-decoration: none; font-weight: 600; margin-top: 1rem; display: inline-block;">
+      <i class="fas fa-rocket me-2"></i>
+      Get Started
+    </a>
+  </div>
+  <% } %>
+</div>
+
+<script>
+// Load leaderboard data dynamically
+document.addEventListener('DOMContentLoaded', function() {
+  loadLeaderboard();
+  
+  // Refresh leaderboard every 30 seconds
+  setInterval(loadLeaderboard, 30000);
+});
+
+async function loadLeaderboard() {
+  try {
+    const response = await fetch('/challenges/api/leaderboard');
+    if (response.ok) {
+      const data = await response.json();
+      updateLeaderboardUI(data);
+    }
+  } catch (error) {
+    console.error('Failed to load leaderboard:', error);
+  }
+}
+
+function updateLeaderboardUI(data) {
+  const list = document.getElementById('leaderboard-list');
+  if (!data || !data.leaderboard || data.leaderboard.length === 0) {
+    list.innerHTML = '<li class="no-data"><i class="fas fa-trophy"></i><p>No leaderboard data available yet. Be the first to complete a challenge!</p></li>';
+    return;
+  }
+  
+  list.innerHTML = data.leaderboard.map((user, index) => `
+    <li class="leaderboard-item">
+      <div class="rank-badge ${getRankClass(index + 1)}">${index + 1}</div>
+      <div class="user-info">
+        <div class="user-name">${user.name || 'Anonymous'}</div>
+        <div class="user-stats">Completed ${user.challengesCompleted || 0} challenges • Level ${user.level || 1}</div>
+      </div>
+      <div class="points-badge">${user.totalPoints || 0} pts</div>
+    </li>
+  `).join('');
+}
+
+function getRankClass(rank) {
+  switch(rank) {
+    case 1: return 'rank-1';
+    case 2: return 'rank-2';
+    case 3: return 'rank-3';
+    default: return 'rank-other';
+  }
+}
+</script>

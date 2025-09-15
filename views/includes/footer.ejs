@@ -1,63 +1,406 @@
-<footer class="w-full backdrop-blur-xl text-white py-14 px-6 md:px-20 mt-auto text-sm bg-white/5 border-t border-white/10 shadow-inner">
-  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+<style>
+:root {
+  --healthcare-primary: #10b981;
+  --healthcare-secondary: #059669;
+  --healthcare-dark: #047857;
+  --healthcare-light: #d1fae5;
+  --healthcare-accent: #34d399;
+}
 
-    <!-- 💬 Brand -->
-    <div>
-      <h2 class="text-2xl font-bold text-blue-300 mb-4">💬 InterViewX</h2>
-      <p class="text-gray-300 leading-relaxed">
-        Crafted by <span class="text-white font-medium">Anirban Santra</span>, LetsTalk makes learning and practicing coding feel intuitive, community-driven, and real-world focused.
-      </p>
-    </div>
+.healthfy-footer {
+  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+  color: #374151;
+  padding-top: 4rem;
+  border-top: 1px solid rgba(16, 185, 129, 0.1);
+  box-shadow: 0 -5px 20px rgba(16, 185, 129, 0.05);
+  margin-top: 5rem;
+}
 
-    <!-- 📍 Contact Info -->
-    <div>
-      <h3 class="text-sm font-semibold text-blue-300 mb-4 uppercase tracking-widest">Contact</h3>
-      <ul class="space-y-1 text-gray-400 text-[15px]">
-        <li>📍 Hooghly, West Bengal</li>
-        <li>PIN: 712124</li>
-        <li class="text-blue-200 mt-2">📧 anirbansantra748@gmail.com</li>
-        <li class="text-blue-400 font-medium">📞 +91 79800 15159</li>
-      </ul>
-    </div>
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
 
-    <!-- 🧭 Navigation -->
-    <div>
-      <h3 class="text-sm font-semibold text-blue-300 mb-4 uppercase tracking-widest">Quick Links</h3>
-      <ul class="space-y-2 text-gray-300 text-[15px]">
-        <li><a href="/" class="hover:text-white duration-200">🏠 Home</a></li>
-        <li><a href="/questions/" class="hover:text-white duration-200">💻 Problems</a></li>
-        <li><a href="/about" class="hover:text-white duration-200">👨‍💻 About</a></li>
-        <li><a href="/jobs/" class="hover:text-white duration-200">🛠 Projects</a></li>
-        <li><a href="/about" class="hover:text-white duration-200">📩 Contact</a></li>
-      </ul>
-    </div>
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 3rem;
+}
 
-    <!-- 📨 Newsletter & Socials -->
-    <div>
-      <h3 class="text-sm font-semibold text-blue-300 mb-4 uppercase tracking-widest">Stay Updated</h3>
-      <form class="flex bg-white/10 rounded-lg overflow-hidden ring-1 ring-white/20 mb-4 shadow-md">
-        <input
-          type="email"
-          placeholder="Your email"
-          required
-          class="flex-1 bg-transparent px-4 py-2 text-sm text-white placeholder:text-gray-400 outline-none"
-        />
-        <button type="submit" class="px-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition">
-          <i class="fa-solid fa-paper-plane text-white text-base"></i>
-        </button>
-      </form>
+@media (min-width: 640px) {
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
-      <div class="flex gap-4 text-xl mt-2">
-        <a href="https://www.linkedin.com/in/anirban-santra" target="_blank" class="hover:text-blue-400 transition"><i class="fa-brands fa-linkedin"></i></a>
-        <a href="https://github.com/anirbansantra" target="_blank" class="hover:text-gray-300 transition"><i class="fa-brands fa-github"></i></a>
-        <a href="https://www.instagram.com/anirban4555" target="_blank" class="hover:text-pink-400 transition"><i class="fa-brands fa-instagram"></i></a>
-        <a href="mailto:anirbansantra748@gmail.com" class="hover:text-green-400 transition"><i class="fa-solid fa-envelope"></i></a>
+@media (min-width: 1024px) {
+  .footer-grid {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+}
+
+.footer-brand {
+  margin-bottom: 1rem;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.footer-logo i {
+  font-size: 1.8rem;
+  color: var(--healthcare-primary);
+}
+
+.footer-logo h2 {
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: var(--healthcare-dark);
+  margin: 0;
+}
+
+.footer-tagline {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.footer-section h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--healthcare-dark);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--healthcare-light);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+  color: #6b7280;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.footer-links a:hover {
+  color: var(--healthcare-primary);
+  transform: translateX(3px);
+}
+
+.footer-links i {
+  color: var(--healthcare-primary);
+  font-size: 0.9rem;
+}
+
+.contact-info {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.contact-info li {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.contact-info i {
+  color: var(--healthcare-primary);
+  margin-top: 0.25rem;
+}
+
+.contact-info span {
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.social-media {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--healthcare-primary);
+  transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+  background: var(--healthcare-primary);
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+}
+
+.newsletter-form {
+  margin-top: 1.5rem;
+}
+
+.newsletter-input {
+  display: flex;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.newsletter-input input {
+  flex: 1;
+  border: none;
+  padding: 0.75rem 1rem;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.newsletter-input button {
+  background: var(--healthcare-primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.newsletter-input button:hover {
+  background: var(--healthcare-dark);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(16, 185, 129, 0.1);
+  padding: 1.5rem 0;
+  margin-top: 3rem;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.healthcare-features {
+  margin-top: 1.5rem;
+  background: var(--healthcare-light);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.healthcare-features h4 {
+  font-weight: 600;
+  color: var(--healthcare-dark);
+  margin-bottom: 1rem;
+}
+
+.healthcare-features ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+}
+
+.healthcare-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.healthcare-features i {
+  color: var(--healthcare-primary);
+}
+
+.footer-app-badges {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.app-badge {
+  background: white;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.app-badge:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+}
+
+.app-badge i {
+  font-size: 1.5rem;
+  color: var(--healthcare-primary);
+}
+
+.app-badge div {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-badge span:first-child {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.app-badge span:last-child {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.9rem;
+}
+</style>
+
+<footer class="healthfy-footer">
+  <div class="footer-container">
+    <div class="footer-grid">
+      <!-- Brand Information -->
+      <div class="footer-section">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <i class="fas fa-heartbeat"></i>
+            <h2>Healthfy</h2>
+          </div>
+          <p class="footer-tagline">
+            Your comprehensive healthcare platform designed to empower your wellness journey with personalized health tracking, AI-powered insights, and a supportive community.
+          </p>
+        </div>
+        
+        <div class="healthcare-features">
+          <h4>Why Choose Healthfy?</h4>
+          <ul>
+            <li><i class="fas fa-robot"></i>AI Health Assistant</li>
+            <li><i class="fas fa-chart-line"></i>Health Analytics</li>
+            <li><i class="fas fa-pills"></i>Medicine Finder</li>
+            <li><i class="fas fa-trophy"></i>Gamified Challenges</li>
+            <li><i class="fas fa-user-md"></i>Doctor Consultations</li>
+            <li><i class="fas fa-comments"></i>Community Support</li>
+          </ul>
+        </div>
+        
+        <div class="footer-app-badges">
+          <a href="#" class="app-badge">
+            <i class="fab fa-apple"></i>
+            <div>
+              <span>Download on the</span>
+              <span>App Store</span>
+            </div>
+          </a>
+          
+          <a href="#" class="app-badge">
+            <i class="fab fa-google-play"></i>
+            <div>
+              <span>Get it on</span>
+              <span>Google Play</span>
+            </div>
+          </a>
+        </div>
+      </div>
+      
+      <!-- Useful Links -->
+      <div class="footer-section">
+        <h3>Useful Links</h3>
+        <ul class="footer-links">
+          <li><a href="/home"><i class="fas fa-home"></i>Home</a></li>
+          <li><a href="/users/dashboard"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+          <li><a href="/medicine-search"><i class="fas fa-pills"></i>Medicine Search</a></li>
+          <li><a href="/health-analytics/health-predictions"><i class="fas fa-brain"></i>Health Predictions</a></li>
+          <li><a href="/challenges"><i class="fas fa-trophy"></i>Health Challenges</a></li>
+          <li><a href="/chat"><i class="fas fa-comments"></i>Community</a></li>
+          <li><a href="/doctors"><i class="fas fa-user-md"></i>Find Doctors</a></li>
+          <li><a href="/prediction/xray"><i class="fas fa-x-ray"></i>X-ray Analysis</a></li>
+        </ul>
+      </div>
+      
+      <!-- Resources -->
+      <div class="footer-section">
+        <h3>Resources</h3>
+        <ul class="footer-links">
+          <li><a href="/help"><i class="fas fa-question-circle"></i>Help Center</a></li>
+          <li><a href="/privacy"><i class="fas fa-shield-alt"></i>Privacy Policy</a></li>
+          <li><a href="/terms"><i class="fas fa-file-contract"></i>Terms of Service</a></li>
+          <li><a href="/faqs"><i class="fas fa-info-circle"></i>FAQs</a></li>
+          <li><a href="/blog"><i class="fas fa-newspaper"></i>Health Blog</a></li>
+          <li><a href="/careers"><i class="fas fa-briefcase"></i>Careers</a></li>
+          <li><a href="/about"><i class="fas fa-info"></i>About Us</a></li>
+          <li><a href="/contact"><i class="fas fa-envelope"></i>Contact Us</a></li>
+        </ul>
+      </div>
+      
+      <!-- Contact & Newsletter -->
+      <div class="footer-section">
+        <h3>Contact Us</h3>
+        <ul class="contact-info">
+          <li>
+            <i class="fas fa-map-marker-alt"></i>
+            <span>123 Health Street, Medical District<br>Kolkata, West Bengal 700001</span>
+          </li>
+          <li>
+            <i class="fas fa-envelope"></i>
+            <span>support@healthfy.com</span>
+          </li>
+          <li>
+            <i class="fas fa-phone"></i>
+            <span>+91 1234 567 890</span>
+          </li>
+        </ul>
+        
+        <h3>Stay Connected</h3>
+        <div class="social-media">
+          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+        </div>
+        
+        <h3>Newsletter</h3>
+        <p style="color: #6b7280; margin-bottom: 0.5rem; font-size: 0.9rem;">Subscribe for health tips and updates</p>
+        <form class="newsletter-form">
+          <div class="newsletter-input">
+            <input type="email" placeholder="Your email address" required>
+            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </form>
       </div>
     </div>
-  </div>
-
-  <!-- 🔻 Bottom Line -->
-  <div class="border-t border-white/20 mt-10 pt-6 text-center text-gray-500 text-xs tracking-wide">
-    © <%= new Date().getFullYear() %> <span class="text-blue-300 font-semibold"> InterViewX</span> — Built with ❤️ by Anirban Santra. All rights reserved.
+    
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+      <p>© <%= new Date().getFullYear() %> Healthfy. All rights reserved. | Developed by <a href="#" style="color: var(--healthcare-primary); text-decoration: none;">Anirban Santra</a></p>
+    </div>
   </div>
 </footer>

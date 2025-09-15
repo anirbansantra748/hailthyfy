@@ -99,6 +99,7 @@ app.use((req, res, next) => {
   next();
 });
 
+
 // Routes
 const indexRoutes = require("./routes/indexRoutes");
 const userRoutes = require("./routes/userRouetes.js");
@@ -110,6 +111,7 @@ const videoRoutes = require("./routes/videoRoutes");
 const medicineRoutes = require("./routes/medicineRoutes");
 const healthAnalyticsRoutes = require("./routes/healthAnalyticsRoutes");
 const challengeRoutes = require("./routes/challenges");
+const settingsRoutes = require("./routes/settingsRoutes");
 const RealTimeService = require('./services/realTimeService');
 const { isLoggedIn } = require("./middleware/isLoggedIn");
 const predictionController = require("./controllers/predictionController");
@@ -127,6 +129,7 @@ app.use("/medicine-search", medicineRoutes);
 app.use("/", healthAnalyticsRoutes);
 app.use("/challenges", challengeRoutes);
 app.use("/ai", aiRoutes);
+app.use("/", settingsRoutes);
 
 // Convenience aliases
 app.post("/upload", isLoggedIn, predictionController.uploadXray);

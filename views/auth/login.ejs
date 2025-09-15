@@ -1,0 +1,416 @@
+<% layout('layouts/boilerplate') %>
+
+<!-- Healthcare-themed Login Page -->
+<style>
+:root {
+  --healthcare-primary: #10b981;
+  --healthcare-secondary: #059669;
+  --healthcare-dark: #047857;
+  --healthcare-light: #d1fae5;
+  --healthcare-accent: #34d399;
+}
+
+.login-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #d1fae5 100%);
+  padding: 2rem 1rem;
+}
+
+.login-card {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 
+    0 10px 30px rgba(16, 185, 129, 0.1),
+    0 1px 8px rgba(16, 185, 129, 0.1),
+    0 0 0 1px rgba(16, 185, 129, 0.05);
+  max-width: 450px;
+  width: 100%;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h1 {
+  color: var(--healthcare-primary);
+  font-weight: 700;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.login-header p {
+  color: #6b7280;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-control {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fafafa;
+}
+
+.form-control:focus {
+  border-color: var(--healthcare-primary);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  background: white;
+  outline: none;
+}
+
+.form-control:hover {
+  border-color: #d1d5db;
+  background: white;
+}
+
+.btn-login {
+  background: linear-gradient(135deg, var(--healthcare-primary), var(--healthcare-secondary));
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 0.875rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, var(--healthcare-secondary), var(--healthcare-dark));
+}
+
+.btn-login:active {
+  transform: translateY(0);
+}
+
+.forgot-password {
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.forgot-password a {
+  color: var(--healthcare-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+  color: var(--healthcare-dark);
+  text-decoration: underline;
+}
+
+.signup-link {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 1.5rem;
+}
+
+.signup-link p {
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.btn-signup {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--healthcare-primary);
+  border: 2px solid var(--healthcare-primary);
+  border-radius: 12px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
+}
+
+.btn-signup:hover {
+  background: var(--healthcare-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.health-features {
+  background: var(--healthcare-light);
+  border-radius: 15px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.health-features h3 {
+  color: var(--healthcare-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feature-list li {
+  color: var(--healthcare-dark);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.feature-list i {
+  color: var(--healthcare-primary);
+  width: 16px;
+}
+
+.alert-custom {
+  border-radius: 12px;
+  border: none;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.alert-danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border-left: 4px solid #dc2626;
+}
+
+.alert-success {
+  background: var(--healthcare-light);
+  color: var(--healthcare-dark);
+  border-left: 4px solid var(--healthcare-primary);
+}
+
+@media (max-width: 576px) {
+  .login-card {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+  
+  .login-header h1 {
+    font-size: 1.8rem;
+  }
+}
+
+.loading-spinner {
+  display: none;
+}
+
+.btn-login.loading .loading-spinner {
+  display: inline-block;
+}
+
+.btn-login.loading .btn-text {
+  display: none;
+}
+</style>
+
+<div class="login-container">
+  <div class="login-card">
+    <!-- Login Header -->
+    <div class="login-header">
+      <h1>
+        <i class="fas fa-heartbeat"></i>
+        Welcome Back
+      </h1>
+      <p>Sign in to continue your health journey</p>
+    </div>
+
+    <!-- Flash Messages -->
+    <% if (typeof error !== 'undefined' && error.length > 0) { %>
+      <div class="alert alert-danger alert-custom">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        <%= error[0] %>
+      </div>
+    <% } %>
+    
+    <% if (typeof success !== 'undefined' && success.length > 0) { %>
+      <div class="alert alert-success alert-custom">
+        <i class="fas fa-check-circle me-2"></i>
+        <%= success[0] %>
+      </div>
+    <% } %>
+
+    <!-- Login Form -->
+    <form method="POST" action="/users/login" id="loginForm">
+      <div class="form-group">
+        <label for="email" class="form-label">
+          <i class="fas fa-envelope"></i>
+          Email Address
+        </label>
+        <input 
+          type="email" 
+          class="form-control" 
+          id="email" 
+          name="email" 
+          placeholder="Enter your email address"
+          required
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">
+          <i class="fas fa-lock"></i>
+          Password
+        </label>
+        <input 
+          type="password" 
+          class="form-control" 
+          id="password" 
+          name="password" 
+          placeholder="Enter your password"
+          required
+          autocomplete="current-password"
+        >
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+          <label class="form-check-label" for="rememberMe">
+            Remember me
+          </label>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-login" id="loginBtn">
+        <span class="btn-text">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          Sign In
+        </span>
+        <span class="loading-spinner">
+          <i class="fas fa-spinner fa-spin me-2"></i>
+          Signing you in...
+        </span>
+      </button>
+    </form>
+
+    <!-- Forgot Password -->
+    <div class="forgot-password">
+      <a href="/users/forgot-password">
+        <i class="fas fa-key me-1"></i>
+        Forgot your password?
+      </a>
+    </div>
+
+    <!-- Sign Up Link -->
+    <div class="signup-link">
+      <p>Don't have an account yet?</p>
+      <a href="/users/signup" class="btn-signup">
+        <i class="fas fa-user-plus me-2"></i>
+        Create Account
+      </a>
+    </div>
+
+    <!-- Health Features -->
+    <div class="health-features">
+      <h3>
+        <i class="fas fa-sparkles me-2"></i>
+        What's waiting for you
+      </h3>
+      <ul class="feature-list">
+        <li>
+          <i class="fas fa-robot"></i>
+          AI-powered health assistant
+        </li>
+        <li>
+          <i class="fas fa-chart-line"></i>
+          Personal health analytics
+        </li>
+        <li>
+          <i class="fas fa-trophy"></i>
+          Health challenges & rewards
+        </li>
+        <li>
+          <i class="fas fa-user-md"></i>
+          Connect with healthcare professionals
+        </li>
+        <li>
+          <i class="fas fa-pills"></i>
+          Medicine search & interactions
+        </li>
+        <li>
+          <i class="fas fa-users"></i>
+          Join a supportive community
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+// Form submission with loading state
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  const loginBtn = document.getElementById('loginBtn');
+  loginBtn.classList.add('loading');
+  loginBtn.disabled = true;
+});
+
+// Form validation
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+
+function validateEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function validateForm() {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const loginBtn = document.getElementById('loginBtn');
+  
+  if (validateEmail(email) && password.length >= 6) {
+    loginBtn.disabled = false;
+    loginBtn.style.opacity = '1';
+  } else {
+    loginBtn.disabled = true;
+    loginBtn.style.opacity = '0.6';
+  }
+}
+
+// Real-time validation
+emailInput.addEventListener('input', validateForm);
+passwordInput.addEventListener('input', validateForm);
+
+// Initial validation
+validateForm();
+
+// Auto-focus first input
+document.addEventListener('DOMContentLoaded', function() {
+  emailInput.focus();
+});
+</script>

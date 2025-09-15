@@ -1,325 +1,441 @@
-<!-- Healthcare-themed Navbar -->
-<style>
-:root {
-  --healthcare-primary: #10b981;
-  --healthcare-secondary: #059669;
-  --healthcare-dark: #047857;
-  --healthcare-light: #d1fae5;
-  --healthcare-accent: #34d399;
-}
+<!-- Professional Healthcare Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top professional-navbar">
+  <div class="container-fluid">
 
-.healthcare-navbar {
-  background: linear-gradient(135deg, var(--healthcare-primary) 0%, var(--healthcare-secondary) 100%);
-  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
-  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.healthcare-navbar .navbar-brand {
-  font-weight: 700;
-  font-size: 1.5rem;
-  color: white !important;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.healthcare-navbar .nav-link {
-  color: rgba(255, 255, 255, 0.9) !important;
-  font-weight: 500;
-  padding: 0.5rem 1rem !important;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.healthcare-navbar .nav-link:hover {
-  color: white !important;
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-1px);
-}
-
-.healthcare-navbar .dropdown-menu {
-  border: none;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  border-radius: 12px;
-  background: white;
-  padding: 0.75rem 0;
-}
-
-.healthcare-navbar .dropdown-item {
-  padding: 0.75rem 1.5rem;
-  color: #374151;
-  font-weight: 500;
-  border-radius: 0;
-  transition: all 0.2s ease;
-}
-
-.healthcare-navbar .dropdown-item:hover {
-  background: var(--healthcare-light);
-  color: var(--healthcare-dark);
-  transform: translateX(5px);
-}
-
-.btn-healthcare-primary {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  font-weight: 600;
-  border-radius: 25px;
-  padding: 0.5rem 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.btn-healthcare-primary:hover {
-  background: white;
-  color: var(--healthcare-primary);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.btn-healthcare-secondary {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid white;
-  color: var(--healthcare-primary);
-  font-weight: 600;
-  border-radius: 25px;
-  padding: 0.5rem 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.btn-healthcare-secondary:hover {
-  background: white;
-  color: var(--healthcare-dark);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 991.98px) {
-  .healthcare-navbar .navbar-collapse {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    padding: 1rem;
-    margin-top: 1rem;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  }
-  
-  .healthcare-navbar .navbar-collapse .nav-link {
-    color: var(--healthcare-primary) !important;
-    margin: 0.25rem 0;
-  }
-  
-  .healthcare-navbar .navbar-collapse .nav-link:hover {
-    background: var(--healthcare-light);
-    color: var(--healthcare-dark) !important;
-  }
-}
-</style>
-
-<nav class="navbar navbar-expand-lg healthcare-navbar sticky-top">
-  <div class="container-fluid px-3 px-md-5">
     <!-- Brand -->
-    <a class="navbar-brand" href="/home">
-      <i class="fas fa-heartbeat me-2"></i>Healthfy
+    <a class="navbar-brand d-flex align-items-center" href="/">
+      <i class="fas fa-hospital-symbol me-2 brand-icon"></i>
+      <span class="fw-bold">
     </a>
 
-    <!-- Mobile toggle button -->
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="color: white;">
-      <i class="fas fa-bars" style="color: white;"></i>
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
     </button>
 
-    <!-- Navigation Links -->
+    <!-- Navigation -->
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto">
+      <!-- Main Navigation -->
+      <ul class="navbar-nav mx-auto nav-pills-custom">
         <li class="nav-item">
-          <a class="nav-link" href="/home">
-            <i class="fas fa-home me-1"></i>Home
-          </a>
-        </li>
-        
-        <% if (typeof user !== 'undefined' && user) { %>
-        <!-- AI Tools Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="aiDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-robot me-1"></i>AI Tools
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="aiDropdown">
-            <li><a class="dropdown-item" href="/ai">
-              <i class="fas fa-robot me-2"></i>AI Health Assistant
-            </a></li>
-            <li><a class="dropdown-item" href="/prediction/xray">
-              <i class="fas fa-x-ray me-2"></i>X-ray Analysis
-            </a></li>
-            <li><a class="dropdown-item" href="/prediction">
-              <i class="fas fa-chart-line me-2"></i>Prediction Dashboard
-            </a></li>
-          </ul>
-        </li>
+          <a class="nav-link nav-icon-link" href="/" title="Home">
+            <i class="fas fa-home"></i>
 
-        <!-- Medical Services Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="medicalDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-pills me-1"></i>Medical
           </a>
-          <ul class="dropdown-menu" aria-labelledby="medicalDropdown">
-            <li><a class="dropdown-item" href="/medicine-search">
-              <i class="fas fa-pills me-2"></i>Medicine Search
-            </a></li>
-            <li><a class="dropdown-item" href="/doctors">
-              <i class="fas fa-user-md me-2"></i>Find Doctors
-            </a></li>
-          </ul>
         </li>
+        <li class="nav-item">
+          <a class="nav-link nav-icon-link" href="/analytics" title="Analytics">
+            <i class="fas fa-chart-line"></i>
 
-        <!-- Analytics Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-chart-line me-1"></i>Analytics
           </a>
-          <ul class="dropdown-menu" aria-labelledby="analyticsDropdown">
-            <li><a class="dropdown-item" href="/analytics">
-              <i class="fas fa-home me-2"></i>Analytics Home
-            </a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/analytics/overview">
-              <i class="fas fa-chart-pie me-2"></i>Overview Dashboard
-            </a></li>
-            <li><a class="dropdown-item" href="/analytics/patient-journey">
-              <i class="fas fa-route me-2"></i>Patient Journey
-            </a></li>
-            <li><a class="dropdown-item" href="/analytics/dashboard">
-              <i class="fas fa-tachometer-alt me-2"></i>Full Dashboard
-            </a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/health-analytics/health-predictions">
-              <i class="fas fa-brain me-2"></i>AI Predictions
-            </a></li>
-            <li><a class="dropdown-item" href="/health-analytics/drug-interaction-checker">
-              <i class="fas fa-pills me-2"></i>Drug Interactions
-            </a></li>
-          </ul>
         </li>
+        <li class="nav-item">
+          <a class="nav-link nav-icon-link" href="/doctors" title="Find Doctors">
+            <i class="fas fa-user-md"></i>
 
-        <!-- Health Challenges Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="challengesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-trophy me-1"></i>Challenges
           </a>
-          <ul class="dropdown-menu" aria-labelledby="challengesDropdown">
-            <li><a class="dropdown-item" href="/challenges">
-              <i class="fas fa-home me-2"></i>Challenge Hub
-            </a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/challenges/my-challenges">
-              <i class="fas fa-user me-2"></i>My Challenges
-            </a></li>
-            <li><a class="dropdown-item" href="/challenges/create">
-              <i class="fas fa-plus me-2"></i>Create Challenge
-            </a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="/challenges/leaderboard">
-              <i class="fas fa-crown me-2"></i>Global Leaderboard
-            </a></li>
-            <li><a class="dropdown-item" href="/challenges/badges">
-              <i class="fas fa-medal me-2"></i>Badges Gallery
-            </a></li>
-            <li><a class="dropdown-item" href="/challenges/achievements">
-              <i class="fas fa-trophy me-2"></i>Achievements
-            </a></li>
-            <li><a class="dropdown-item" href="/challenges/profile">
-              <i class="fas fa-chart-bar me-2"></i>My Progress
-            </a></li>
-          </ul>
         </li>
+        <li class="nav-item">
+          <a class="nav-link nav-icon-link" href="/medicine-search" title="Medicine Search">
+            <i class="fas fa-pills"></i>
 
-        <!-- Connect Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="connectDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-comments me-1"></i>Connect
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="connectDropdown">
-            <li><a class="dropdown-item" href="/chat">
-              <i class="fas fa-comments me-2"></i>My Chats
-            </a></li>
-            <li><a class="dropdown-item" href="/video-calls">
-              <i class="fas fa-video me-2"></i>Video Calls
-            </a></li>
-            <li><a class="dropdown-item" href="/posts">
-              <i class="fas fa-users me-2"></i>Community Posts
-            </a></li>
-          </ul>
-        </li>
-        
-        <li class="nav-item">
-          <a class="nav-link" href="/users/dashboard">
-            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-          </a>
-        </li>
-        <% } else { %>
-        <!-- Quick Access for Non-logged Users -->
-        <li class="nav-item">
-          <a class="nav-link" href="/ai">
-            <i class="fas fa-robot me-1"></i>AI Assistant
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/medicine-search">
-            <i class="fas fa-pills me-1"></i>Medicine Search
+          <a class="nav-link nav-icon-link" href="/posts" title="Community">
+            <i class="fas fa-users"></i>
+
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/challenges">
-            <i class="fas fa-trophy me-1"></i>Challenges
+          <a class="nav-link nav-icon-link" href="/challenges" title="Health Challenges">
+            <i class="fas fa-trophy"></i>
+
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/posts">
-            <i class="fas fa-users me-1"></i>Community
+          <a class="nav-link nav-icon-link" href="/prediction" title="AI Analysis">
+            <i class="fas fa-brain"></i>
+
           </a>
         </li>
-        <% } %>
+        <li class="nav-item">
+          <a class="nav-link nav-icon-link" href="/chat" title="Chat">
+            <i class="fas fa-comments"></i>
+
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-icon-link" href="/video-calls" title="Video Calls">
+            <i class="fas fa-video"></i>
+
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-icon-link" href="/ai" title="AI Assistant">
+            <i class="fas fa-robot"></i>
+
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-icon-link" href="/settings" title="Settings">
+            <i class="fas fa-cog"></i>
+          </a>
+        </li>
       </ul>
 
-      <!-- Right side buttons -->
-      <div class="navbar-nav ms-auto">
-        <% if (typeof user !== 'undefined' && user) { %>
-        <% if (user.isDoctor) { %>
-        <a href="/doctors/register" class="btn btn-healthcare-primary me-2">
-          <i class="fas fa-user-md me-1"></i>Doctor Panel
-        </a>
+      <!-- User Section -->
+      <ul class="navbar-nav user-nav">
+        <% if (user) { %>
+          <!-- Notifications -->
+          <li class="nav-item">
+            <a class="nav-link nav-icon-link position-relative" href="#" title="Notifications">
+              <i class="fas fa-bell"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge">3
+            </a>
+          </li>
+
+          <!-- User Dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle user-dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+              <% if (user.profilePicture) { %>
+                <img src="<%= user.profilePicture %>" alt="Profile" class="user-avatar-img">
+              <% } else { %>
+                <div class="user-avatar-placeholder">
+                  <%= user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email ? user.email.charAt(0).toUpperCase() : 'U' %>
+                </div>
+              <% } %>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end user-dropdown-menu">
+              <li class="dropdown-header">
+                <div class="user-info">
+                  <div class="user-name"><%= user.firstName || user.username || 'User' %></div>
+                  <div class="user-email"><%= user.email %></div>
+                </div>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="/users/profile"><i class="fas fa-user me-2"></i>My Profile</a></li>
+              <li><a class="dropdown-item" href="/settings"><i class="fas fa-cog me-2"></i>Settings</a></li>
+              <li><a class="dropdown-item" href="/users/dashboard"><i class="fas fa-tachometer-alt me-2"></i>Dashboard</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="/users/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+          </li>
         <% } else { %>
-        <a href="/doctors/register" class="nav-link">
-          <i class="fas fa-stethoscope me-1"></i>Become a Doctor
-        </a>
+          <!-- Login/Signup -->
+          <li class="nav-item">
+            <a class="nav-link nav-icon-link" href="/users/login">
+              <i class="fas fa-sign-in-alt me-1"></i>Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-light text-dark px-3 rounded-pill ms-2 signup-btn" href="/users/signup">
+              <i class="fas fa-user-plus me-1"></i>Sign Up
+            </a>
+          </li>
         <% } %>
-        <a href="/users/logout" class="nav-link text-warning">
-          <i class="fas fa-sign-out-alt me-1"></i>Logout
-        </a>
-        <% } else { %>
-        <a href="/users/login" class="btn btn-healthcare-primary me-2">
-          <i class="fas fa-sign-in-alt me-1"></i>Login
-        </a>
-        <a href="/users/signup" class="btn btn-healthcare-secondary">
-          <i class="fas fa-user-plus me-1"></i>Sign Up
-        </a>
-        <% } %>
-      </div>
+      </ul>
     </div>
   </div>
 </nav>
 
-<!-- Bootstrap dropdowns work automatically with Bootstrap JS -->
+<style>
+/* Professional Healthcare Navbar */
+.professional-navbar {
+  background: linear-gradient(135deg, #065f46 0%, #047857 100%);
+  box-shadow: 0 2px 20px rgba(6, 95, 70, 0.3);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.professional-navbar .container-fluid {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Brand Styling */
+.navbar-brand {
+  color: white !important;
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.navbar-brand:hover {
+  color: white !important;
+  transform: scale(1.02);
+}
+
+.brand-icon {
+  font-size: 1.75rem;
+  color: #10b981;
+}
+
+/* Navigation Links */
+.nav-pills-custom .nav-item {
+  margin: 0 0.25rem;
+}
+
+.nav-icon-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.6rem 0.75rem !important;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-icon-link i {
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.nav-icon-link:hover {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.nav-icon-link:hover i {
+  transform: scale(1.1);
+}
+
+.nav-icon-link.active {
+  color: white !important;
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.nav-text {
+  font-weight: 500;
+}
+
+/* User Navigation */
+.user-nav .nav-item {
+  margin: 0 0.25rem;
+}
+
+/* Notification Badge */
+.notification-badge {
+  font-size: 0.65rem !important;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* User Avatar */
+.user-dropdown-toggle {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem !important;
+}
+
+.user-avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.user-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981, #059669);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.user-dropdown-toggle:hover .user-avatar-img,
+.user-dropdown-toggle:hover .user-avatar-placeholder {
+  border-color: rgba(255, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+/* User Dropdown Menu */
+.user-dropdown-menu {
+  background: white;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  min-width: 280px;
+  margin-top: 0.5rem;
+}
+
+.user-dropdown-menu .dropdown-header {
+  background: linear-gradient(135deg, #f0fdfa, #ecfdf5);
+  padding: 1rem 1.25rem;
+  border-radius: 12px 12px 0 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.user-info .user-name {
+  font-weight: 600;
+  color: #065f46;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.user-info .user-email {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.user-dropdown-menu .dropdown-item {
+  padding: 0.75rem 1.25rem;
+  color: #374151;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+  background: #f0fdfa;
+  color: #065f46;
+  transform: translateX(3px);
+}
+
+.user-dropdown-menu .dropdown-item.text-danger:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.user-dropdown-menu .dropdown-item i {
+  width: 16px;
+  text-align: center;
+}
+
+/* Signup Button */
+.signup-btn {
+  background: white !important;
+  color: #065f46 !important;
+  border: 2px solid white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.signup-btn:hover {
+  background: #10b981 !important;
+  color: white !important;
+  border-color: #10b981;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Mobile Responsive */
+@media (max-width: 991.98px) {
+  .professional-navbar .container-fluid {
+    padding: 0 1rem;
+  }
+
+  .navbar-collapse {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(15px);
+    border-radius: 12px;
+    margin-top: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-pills-custom {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .nav-icon-link {
+    color: #065f46 !important;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .nav-icon-link:hover {
+    background: #f0fdfa;
+    color: #047857 !important;
+  }
+
+  .nav-text {
+    display: inline-block;
+  }
+
+  .user-nav {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+
+  .signup-btn {
+    margin-top: 0.5rem;
+    justify-self: start;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-pills-custom .nav-text {
+    display: inline-block;
+  }
+}
+
+/* Desktop: Hide text for some items to keep it minimal */
+@media (min-width: 992px) {
+  .nav-icon-link[href="/settings"] .nav-text {
+    display: none;
+  }
+
+  .nav-icon-link[title="Settings"] {
+    width: 40px;
+    justify-content: center;
+  }
+}
+
+/* Smooth transitions */
+.navbar-nav .nav-link {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus styles for accessibility */
+.nav-icon-link:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+</style>
+
 <script>
-// Additional navbar enhancements
+// Active link highlighting
 document.addEventListener('DOMContentLoaded', function() {
-  // Add smooth scroll behavior for better UX
-  document.documentElement.style.scrollBehavior = 'smooth';
-  
-  // Add active state to current page nav link
   const currentPath = window.location.pathname;
   const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-  
+
   navLinks.forEach(link => {
-    if (link.getAttribute('href') === currentPath) {
-      link.style.background = 'rgba(255, 255, 255, 0.2)';
-      link.style.borderRadius = '8px';
+    const href = link.getAttribute('href');
+    if ((currentPath === '/' && href === '/') ||
+        (currentPath !== '/' && href !== '/' && currentPath.startsWith(href))) {
+      link.classList.add('active');
     }
   });
 });

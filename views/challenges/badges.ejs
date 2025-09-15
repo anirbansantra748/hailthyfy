@@ -1,0 +1,577 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+:root {
+  --healthcare-primary: #10b981;
+  --healthcare-secondary: #059669;
+  --healthcare-dark: #047857;
+  --healthcare-light: #d1fae5;
+  --healthcare-accent: #34d399;
+}
+
+.badges-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.badges-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, var(--healthcare-primary), var(--healthcare-secondary));
+  color: white;
+  padding: 3rem 2rem;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.badges-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="medals" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse"><text x="12.5" y="18" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="15">🏅</text></pattern></defs><rect width="100" height="100" fill="url(%23medals)"/></svg>');
+  animation: float 25s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  25% { transform: translateX(25px) translateY(-20px) rotate(90deg); }
+  50% { transform: translateX(-15px) translateY(25px) rotate(180deg); }
+  75% { transform: translateX(-20px) translateY(-15px) rotate(270deg); }
+}
+
+.badges-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.badges-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  position: relative;
+  z-index: 2;
+}
+
+.badges-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15);
+}
+
+.stat-card i {
+  font-size: 2.5rem;
+  color: var(--healthcare-primary);
+  margin-bottom: 1rem;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--healthcare-dark);
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.badges-filters {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: white;
+  color: var(--healthcare-primary);
+  border: 2px solid var(--healthcare-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.filter-btn:hover, .filter-btn.active {
+  background: var(--healthcare-primary);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.badge-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15);
+}
+
+.badge-card.earned {
+  background: linear-gradient(135deg, var(--healthcare-light), rgba(16, 185, 129, 0.1));
+  border-color: var(--healthcare-primary);
+}
+
+.badge-card.earned::before {
+  content: '✓';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--healthcare-primary);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.badge-card.locked {
+  opacity: 0.6;
+  background: #f9fafb;
+}
+
+.badge-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.badge-card.earned .badge-icon {
+  filter: none;
+}
+
+.badge-card.locked .badge-icon {
+  filter: grayscale(100%) opacity(0.5);
+}
+
+.badge-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--healthcare-dark);
+  margin-bottom: 0.5rem;
+}
+
+.badge-description {
+  color: #6b7280;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.badge-requirements {
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--healthcare-primary);
+}
+
+.badge-requirements h4 {
+  color: var(--healthcare-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-requirements p {
+  color: #374151;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.badge-progress {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 0.5rem;
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  background: var(--healthcare-primary);
+  height: 8px;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-text {
+  font-size: 0.8rem;
+  color: #4b5563;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.badge-rarity {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.rarity-common { background: #e5e7eb; color: #4b5563; }
+.rarity-uncommon { background: #dbeafe; color: #1d4ed8; }
+.rarity-rare { background: #fef3c7; color: #d97706; }
+.rarity-epic { background: #e7e5ff; color: #7c3aed; }
+.rarity-legendary { background: #fce7f3; color: #be185d; }
+
+.no-badges {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+}
+
+.no-badges i {
+  font-size: 5rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.achievement-tip {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-top: 3rem;
+  border-left: 4px solid #f59e0b;
+}
+
+.achievement-tip h3 {
+  color: #92400e;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.achievement-tip p {
+  color: #78350f;
+  margin: 0;
+  line-height: 1.6;
+}
+</style>
+
+<div class="badges-container">
+  <!-- Header -->
+  <div class="badges-header">
+    <h1>
+      <i class="fas fa-medal me-3"></i>
+      Badges Gallery
+    </h1>
+    <p>Collect badges by completing challenges and reaching milestones</p>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="badges-stats">
+    <div class="stat-card">
+      <i class="fas fa-medal"></i>
+      <div class="stat-number" id="earned-count">12</div>
+      <div class="stat-label">Badges Earned</div>
+    </div>
+    
+    <div class="stat-card">
+      <i class="fas fa-lock"></i>
+      <div class="stat-number" id="available-count">24</div>
+      <div class="stat-label">Available</div>
+    </div>
+    
+    <div class="stat-card">
+      <i class="fas fa-percentage"></i>
+      <div class="stat-number" id="completion-rate">33%</div>
+      <div class="stat-label">Collection Rate</div>
+    </div>
+    
+    <div class="stat-card">
+      <i class="fas fa-crown"></i>
+      <div class="stat-number" id="rare-count">3</div>
+      <div class="stat-label">Rare Badges</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="badges-filters">
+    <button class="filter-btn active" data-filter="all">
+      <i class="fas fa-th me-2"></i>All Badges
+    </button>
+    <button class="filter-btn" data-filter="earned">
+      <i class="fas fa-check-circle me-2"></i>Earned
+    </button>
+    <button class="filter-btn" data-filter="locked">
+      <i class="fas fa-lock me-2"></i>Locked
+    </button>
+    <button class="filter-btn" data-filter="rare">
+      <i class="fas fa-gem me-2"></i>Rare
+    </button>
+  </div>
+
+  <!-- Badges Grid -->
+  <div class="badges-grid" id="badges-grid">
+    <!-- Sample badges - replace with dynamic content -->
+    
+    <!-- Earned Badge -->
+    <div class="badge-card earned" data-category="earned health">
+      <div class="badge-rarity rarity-common">Common</div>
+      <div class="badge-icon">🏃‍♀️</div>
+      <div class="badge-name">First Steps</div>
+      <div class="badge-description">Complete your first health challenge</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Complete any health challenge</p>
+      </div>
+    </div>
+
+    <!-- Earned Badge -->
+    <div class="badge-card earned" data-category="earned streak">
+      <div class="badge-rarity rarity-uncommon">Uncommon</div>
+      <div class="badge-icon">🔥</div>
+      <div class="badge-name">Week Warrior</div>
+      <div class="badge-description">Maintain a 7-day challenge streak</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Complete challenges for 7 consecutive days</p>
+      </div>
+    </div>
+
+    <!-- Earned Badge -->
+    <div class="badge-card earned" data-category="earned social">
+      <div class="badge-rarity rarity-common">Common</div>
+      <div class="badge-icon">🤝</div>
+      <div class="badge-name">Team Player</div>
+      <div class="badge-description">Join your first group challenge</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Participate in any group challenge</p>
+      </div>
+    </div>
+
+    <!-- Locked Badge -->
+    <div class="badge-card locked" data-category="locked streak">
+      <div class="badge-rarity rarity-rare">Rare</div>
+      <div class="badge-icon">⚡</div>
+      <div class="badge-name">Lightning Strike</div>
+      <div class="badge-description">Complete 30 challenges in 30 days</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Complete at least one challenge every day for 30 days</p>
+      </div>
+      <div class="badge-progress">
+        <div class="progress-bar" style="width: 60%;"></div>
+        <div class="progress-text">18 / 30 days completed</div>
+      </div>
+    </div>
+
+    <!-- Locked Badge -->
+    <div class="badge-card locked" data-category="locked health">
+      <div class="badge-rarity rarity-epic">Epic</div>
+      <div class="badge-icon">💪</div>
+      <div class="badge-name">Health Guardian</div>
+      <div class="badge-description">Complete 100 health challenges</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Complete a total of 100 health challenges</p>
+      </div>
+      <div class="badge-progress">
+        <div class="progress-bar" style="width: 45%;"></div>
+        <div class="progress-text">45 / 100 challenges completed</div>
+      </div>
+    </div>
+
+    <!-- Locked Badge -->
+    <div class="badge-card locked" data-category="locked rare">
+      <div class="badge-rarity rarity-legendary">Legendary</div>
+      <div class="badge-icon">🏆</div>
+      <div class="badge-name">Health Master</div>
+      <div class="badge-description">Reach the top of the global leaderboard</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Achieve #1 position on the global leaderboard</p>
+      </div>
+      <div class="badge-progress">
+        <div class="progress-bar" style="width: 15%;"></div>
+        <div class="progress-text">Currently ranked #42</div>
+      </div>
+    </div>
+
+    <!-- More sample badges -->
+    <div class="badge-card locked" data-category="locked social">
+      <div class="badge-rarity rarity-uncommon">Uncommon</div>
+      <div class="badge-icon">👥</div>
+      <div class="badge-name">Community Builder</div>
+      <div class="badge-description">Help 10 people in the community</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Comment helpfully on 10 community posts</p>
+      </div>
+      <div class="badge-progress">
+        <div class="progress-bar" style="width: 30%;"></div>
+        <div class="progress-text">3 / 10 helpful comments</div>
+      </div>
+    </div>
+
+    <div class="badge-card locked" data-category="locked health">
+      <div class="badge-rarity rarity-rare">Rare</div>
+      <div class="badge-icon">🧘‍♀️</div>
+      <div class="badge-name">Mindful Master</div>
+      <div class="badge-description">Complete 50 meditation challenges</div>
+      <div class="badge-requirements">
+        <h4>How to Earn</h4>
+        <p>Complete 50 meditation or mindfulness challenges</p>
+      </div>
+      <div class="badge-progress">
+        <div class="progress-bar" style="width: 24%;"></div>
+        <div class="progress-text">12 / 50 meditation sessions</div>
+      </div>
+    </div>
+  </div>
+
+  <% if (typeof user === 'undefined' || !user) { %>
+  <div class="no-badges">
+    <i class="fas fa-medal"></i>
+    <h3>Start Your Badge Collection!</h3>
+    <p>Sign up to start earning badges and tracking your health journey.</p>
+    <a href="/users/signup" class="btn" style="background: var(--healthcare-primary); color: white; padding: 0.75rem 2rem; border-radius: 25px; text-decoration: none; font-weight: 600; margin-top: 1rem; display: inline-block;">
+      <i class="fas fa-rocket me-2"></i>
+      Get Started
+    </a>
+  </div>
+  <% } %>
+
+  <!-- Achievement Tip -->
+  <div class="achievement-tip">
+    <h3>
+      <i class="fas fa-lightbulb"></i>
+      Pro Tip
+    </h3>
+    <p>
+      Focus on consistency rather than intensity! Many rare badges are earned through regular participation over time. 
+      Set small daily goals and watch your badge collection grow steadily. Remember, every expert was once a beginner! 🌟
+    </p>
+  </div>
+</div>
+
+<script>
+// Badge filtering functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const badgeCards = document.querySelectorAll('.badge-card');
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Update active filter button
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      const filter = btn.dataset.filter;
+      
+      // Filter badges
+      badgeCards.forEach(card => {
+        if (filter === 'all') {
+          card.style.display = 'block';
+        } else if (filter === 'earned' && card.classList.contains('earned')) {
+          card.style.display = 'block';
+        } else if (filter === 'locked' && card.classList.contains('locked')) {
+          card.style.display = 'block';
+        } else if (filter === 'rare' && (
+          card.querySelector('.rarity-rare') || 
+          card.querySelector('.rarity-epic') || 
+          card.querySelector('.rarity-legendary')
+        )) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+  
+  // Load user badges
+  loadUserBadges();
+});
+
+async function loadUserBadges() {
+  try {
+    const response = await fetch('/challenges/api/my-badges');
+    if (response.ok) {
+      const data = await response.json();
+      updateBadgesUI(data);
+    }
+  } catch (error) {
+    console.error('Failed to load user badges:', error);
+  }
+}
+
+function updateBadgesUI(data) {
+  if (data && data.badges) {
+    // Update stats
+    document.getElementById('earned-count').textContent = data.earnedCount || 0;
+    document.getElementById('available-count').textContent = data.totalCount || 0;
+    document.getElementById('completion-rate').textContent = 
+      Math.round((data.earnedCount / data.totalCount) * 100) + '%' || '0%';
+    document.getElementById('rare-count').textContent = data.rareCount || 0;
+  }
+}
+
+// Badge card hover effects
+document.querySelectorAll('.badge-card').forEach(card => {
+  card.addEventListener('mouseenter', function() {
+    this.style.transform = 'translateY(-8px) scale(1.02)';
+  });
+  
+  card.addEventListener('mouseleave', function() {
+    this.style.transform = 'translateY(-5px) scale(1)';
+  });
+});
+</script>

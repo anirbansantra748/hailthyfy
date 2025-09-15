@@ -1,0 +1,790 @@
+<% layout('layouts/boilerplate') %>
+
+<style>
+:root {
+  --healthcare-primary: #10b981;
+  --healthcare-secondary: #059669;
+  --healthcare-dark: #047857;
+  --healthcare-light: #d1fae5;
+  --healthcare-accent: #34d399;
+}
+
+.achievements-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.achievements-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: linear-gradient(135deg, var(--healthcare-primary), var(--healthcare-secondary));
+  color: white;
+  padding: 3rem 2rem;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.achievements-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="achievements" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse"><text x="15" y="20" text-anchor="middle" fill="rgba(255,255,255,0.1)" font-size="16">🎯</text></pattern></defs><rect width="100" height="100" fill="url(%23achievements)"/></svg>');
+  animation: float 30s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  20% { transform: translateX(20px) translateY(-25px) rotate(72deg); }
+  40% { transform: translateX(-10px) translateY(20px) rotate(144deg); }
+  60% { transform: translateX(25px) translateY(10px) rotate(216deg); }
+  80% { transform: translateX(-15px) translateY(-10px) rotate(288deg); }
+}
+
+.achievements-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.achievements-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  position: relative;
+  z-index: 2;
+}
+
+.achievements-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.overview-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.overview-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.15);
+}
+
+.overview-card .icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--healthcare-primary), var(--healthcare-accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.overview-card h3 {
+  color: var(--healthcare-dark);
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.overview-card p {
+  color: #6b7280;
+  margin: 0;
+  font-weight: 500;
+}
+
+.achievements-categories {
+  display: grid;
+  gap: 3rem;
+}
+
+.category-section {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.category-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--healthcare-light);
+}
+
+.category-header .icon {
+  font-size: 2.5rem;
+}
+
+.category-header h2 {
+  color: var(--healthcare-dark);
+  margin: 0;
+  flex: 1;
+  font-size: 1.8rem;
+}
+
+.category-progress {
+  font-size: 1.1rem;
+  color: var(--healthcare-primary);
+  font-weight: 600;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.achievement-card {
+  background: #f9fafb;
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.achievement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.achievement-card.completed {
+  background: linear-gradient(135deg, var(--healthcare-light), rgba(16, 185, 129, 0.1));
+  border-color: var(--healthcare-primary);
+}
+
+.achievement-card.completed::before {
+  content: '✓';
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--healthcare-primary);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.achievement-card.in-progress {
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  border-color: #f59e0b;
+}
+
+.achievement-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.achievement-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.achievement-card.completed .achievement-icon {
+  background: var(--healthcare-primary);
+  color: white;
+}
+
+.achievement-info {
+  flex: 1;
+}
+
+.achievement-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--healthcare-dark);
+  margin-bottom: 0.25rem;
+}
+
+.achievement-description {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.achievement-progress {
+  margin-top: 1rem;
+}
+
+.progress-bar-container {
+  background: #e5e7eb;
+  border-radius: 10px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar {
+  background: linear-gradient(135deg, var(--healthcare-primary), var(--healthcare-accent));
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+  position: relative;
+}
+
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.achievement-reward {
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 1rem;
+  border-left: 3px solid var(--healthcare-primary);
+}
+
+.achievement-reward h4 {
+  color: var(--healthcare-dark);
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.achievement-reward p {
+  color: #374151;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.milestone-timeline {
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  margin-top: 3rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.milestone-timeline h2 {
+  color: var(--healthcare-dark);
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 1.8rem;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 1rem;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--healthcare-primary), var(--healthcare-accent));
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-left: 2rem;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -0.5rem;
+  top: 0.5rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--healthcare-primary);
+  border: 3px solid white;
+  box-shadow: 0 0 0 3px var(--healthcare-primary);
+}
+
+.timeline-item.completed::before {
+  background: var(--healthcare-primary);
+}
+
+.timeline-item.upcoming::before {
+  background: #e5e7eb;
+  box-shadow: 0 0 0 3px #e5e7eb;
+}
+
+.timeline-content {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.timeline-item.completed .timeline-content {
+  background: linear-gradient(135deg, var(--healthcare-light), rgba(16, 185, 129, 0.1));
+}
+
+.timeline-date {
+  color: var(--healthcare-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-title {
+  color: var(--healthcare-dark);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-description {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.no-achievements {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #6b7280;
+}
+
+.no-achievements i {
+  font-size: 5rem;
+  color: #d1d5db;
+  margin-bottom: 1rem;
+}
+
+.motivation-quote {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-radius: 15px;
+  padding: 2rem;
+  margin-top: 3rem;
+  text-align: center;
+  border-left: 4px solid #0ea5e9;
+}
+
+.motivation-quote blockquote {
+  font-size: 1.2rem;
+  font-style: italic;
+  color: #0c4a6e;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.motivation-quote cite {
+  color: #075985;
+  font-weight: 600;
+}
+</style>
+
+<div class="achievements-container">
+  <!-- Header -->
+  <div class="achievements-header">
+    <h1>
+      <i class="fas fa-trophy me-3"></i>
+      Your Achievements
+    </h1>
+    <p>Track your progress and celebrate your health journey milestones</p>
+  </div>
+
+  <!-- Overview Cards -->
+  <div class="achievements-overview">
+    <div class="overview-card">
+      <div class="icon">🏆</div>
+      <h3 id="total-achievements">24</h3>
+      <p>Total Achievements</p>
+    </div>
+    
+    <div class="overview-card">
+      <div class="icon">✅</div>
+      <h3 id="completed-achievements">12</h3>
+      <p>Completed</p>
+    </div>
+    
+    <div class="overview-card">
+      <div class="icon">⏳</div>
+      <h3 id="in-progress-achievements">6</h3>
+      <p>In Progress</p>
+    </div>
+    
+    <div class="overview-card">
+      <div class="icon">🎯</div>
+      <h3 id="completion-percentage">50%</h3>
+      <p>Completion Rate</p>
+    </div>
+  </div>
+
+  <!-- Achievement Categories -->
+  <div class="achievements-categories">
+    
+    <!-- Health Challenges Category -->
+    <div class="category-section">
+      <div class="category-header">
+        <div class="icon">🏃‍♀️</div>
+        <h2>Health & Fitness</h2>
+        <div class="category-progress">4 / 8 completed</div>
+      </div>
+      
+      <div class="achievements-grid">
+        <div class="achievement-card completed">
+          <div class="achievement-header">
+            <div class="achievement-icon">🎯</div>
+            <div class="achievement-info">
+              <div class="achievement-name">First Challenge</div>
+              <div class="achievement-description">Complete your first health challenge</div>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>50 points + "Health Starter" badge</p>
+          </div>
+        </div>
+
+        <div class="achievement-card completed">
+          <div class="achievement-header">
+            <div class="achievement-icon">🔥</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Week Warrior</div>
+              <div class="achievement-description">Complete challenges for 7 consecutive days</div>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>200 points + "Consistency" badge</p>
+          </div>
+        </div>
+
+        <div class="achievement-card in-progress">
+          <div class="achievement-header">
+            <div class="achievement-icon">💪</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Fitness Fanatic</div>
+              <div class="achievement-description">Complete 50 fitness challenges</div>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: 68%;"></div>
+            </div>
+            <div class="progress-text">
+              <span>34 / 50 completed</span>
+              <span>68%</span>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>500 points + "Fitness Expert" badge</p>
+          </div>
+        </div>
+
+        <div class="achievement-card">
+          <div class="achievement-header">
+            <div class="achievement-icon">🏆</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Health Master</div>
+              <div class="achievement-description">Complete 100 health challenges</div>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: 34%;"></div>
+            </div>
+            <div class="progress-text">
+              <span>34 / 100 completed</span>
+              <span>34%</span>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>1000 points + "Health Master" badge</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Category -->
+    <div class="category-section">
+      <div class="category-header">
+        <div class="icon">👥</div>
+        <h2>Community & Social</h2>
+        <div class="category-progress">2 / 6 completed</div>
+      </div>
+      
+      <div class="achievements-grid">
+        <div class="achievement-card completed">
+          <div class="achievement-header">
+            <div class="achievement-icon">🤝</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Team Player</div>
+              <div class="achievement-description">Join your first group challenge</div>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>75 points + "Team Spirit" badge</p>
+          </div>
+        </div>
+
+        <div class="achievement-card in-progress">
+          <div class="achievement-header">
+            <div class="achievement-icon">💬</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Community Helper</div>
+              <div class="achievement-description">Help 10 community members</div>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: 40%;"></div>
+            </div>
+            <div class="progress-text">
+              <span>4 / 10 helped</span>
+              <span>40%</span>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>300 points + "Helper" badge</p>
+          </div>
+        </div>
+
+        <div class="achievement-card">
+          <div class="achievement-header">
+            <div class="achievement-icon">🌟</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Community Leader</div>
+              <div class="achievement-description">Create 5 successful group challenges</div>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: 20%;"></div>
+            </div>
+            <div class="progress-text">
+              <span>1 / 5 created</span>
+              <span>20%</span>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>750 points + "Leader" badge</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Streak & Consistency Category -->
+    <div class="category-section">
+      <div class="category-header">
+        <div class="icon">📅</div>
+        <h2>Streaks & Consistency</h2>
+        <div class="category-progress">3 / 5 completed</div>
+      </div>
+      
+      <div class="achievements-grid">
+        <div class="achievement-card completed">
+          <div class="achievement-header">
+            <div class="achievement-icon">🔥</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Hot Streak</div>
+              <div class="achievement-description">Maintain a 3-day challenge streak</div>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>100 points + "Streak Starter" badge</p>
+          </div>
+        </div>
+
+        <div class="achievement-card in-progress">
+          <div class="achievement-header">
+            <div class="achievement-icon">⚡</div>
+            <div class="achievement-info">
+              <div class="achievement-name">Lightning Strike</div>
+              <div class="achievement-description">Complete 30 challenges in 30 days</div>
+            </div>
+          </div>
+          <div class="achievement-progress">
+            <div class="progress-bar-container">
+              <div class="progress-bar" style="width: 60%;"></div>
+            </div>
+            <div class="progress-text">
+              <span>18 / 30 days</span>
+              <span>60%</span>
+            </div>
+          </div>
+          <div class="achievement-reward">
+            <h4>Reward</h4>
+            <p>600 points + "Lightning" badge</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Milestones Timeline -->
+  <div class="milestone-timeline">
+    <h2>
+      <i class="fas fa-history me-2"></i>
+      Recent Milestones
+    </h2>
+    
+    <div class="timeline">
+      <div class="timeline-item completed">
+        <div class="timeline-content">
+          <div class="timeline-date">2 days ago</div>
+          <div class="timeline-title">Week Warrior Achievement Unlocked! 🏆</div>
+          <div class="timeline-description">
+            Congratulations! You completed challenges for 7 consecutive days and earned 200 points plus the "Consistency" badge.
+          </div>
+        </div>
+      </div>
+      
+      <div class="timeline-item completed">
+        <div class="timeline-content">
+          <div class="timeline-date">1 week ago</div>
+          <div class="timeline-title">Team Player Achievement Unlocked! 🤝</div>
+          <div class="timeline-description">
+            Great job joining your first group challenge! You've earned 75 points and the "Team Spirit" badge.
+          </div>
+        </div>
+      </div>
+      
+      <div class="timeline-item completed">
+        <div class="timeline-content">
+          <div class="timeline-date">2 weeks ago</div>
+          <div class="timeline-title">First Challenge Achievement Unlocked! 🎯</div>
+          <div class="timeline-description">
+            Welcome to the Healthfy community! You've completed your first health challenge and started your journey.
+          </div>
+        </div>
+      </div>
+      
+      <div class="timeline-item upcoming">
+        <div class="timeline-content">
+          <div class="timeline-date">Coming soon</div>
+          <div class="timeline-title">Keep up the great work!</div>
+          <div class="timeline-description">
+            Continue your health journey to unlock more achievements and reach new milestones.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if (typeof user === 'undefined' || !user) { %>
+  <div class="no-achievements">
+    <i class="fas fa-trophy"></i>
+    <h3>Start Your Achievement Journey!</h3>
+    <p>Sign up to start tracking your progress and unlocking achievements.</p>
+    <a href="/users/signup" class="btn" style="background: var(--healthcare-primary); color: white; padding: 0.75rem 2rem; border-radius: 25px; text-decoration: none; font-weight: 600; margin-top: 1rem; display: inline-block;">
+      <i class="fas fa-rocket me-2"></i>
+      Get Started
+    </a>
+  </div>
+  <% } %>
+
+  <!-- Motivational Quote -->
+  <div class="motivation-quote">
+    <blockquote>
+      "Success is the sum of small efforts, repeated day in and day out."
+    </blockquote>
+    <cite>— Robert Collier</cite>
+  </div>
+</div>
+
+<script>
+// Load user achievements
+document.addEventListener('DOMContentLoaded', function() {
+  loadUserAchievements();
+});
+
+async function loadUserAchievements() {
+  try {
+    const response = await fetch('/challenges/api/my-achievements');
+    if (response.ok) {
+      const data = await response.json();
+      updateAchievementsUI(data);
+    }
+  } catch (error) {
+    console.error('Failed to load user achievements:', error);
+  }
+}
+
+function updateAchievementsUI(data) {
+  if (data && data.achievements) {
+    // Update overview stats
+    document.getElementById('total-achievements').textContent = data.totalCount || 0;
+    document.getElementById('completed-achievements').textContent = data.completedCount || 0;
+    document.getElementById('in-progress-achievements').textContent = data.inProgressCount || 0;
+    document.getElementById('completion-percentage').textContent = 
+      Math.round((data.completedCount / data.totalCount) * 100) + '%' || '0%';
+  }
+}
+
+// Achievement card hover effects
+document.querySelectorAll('.achievement-card').forEach(card => {
+  card.addEventListener('mouseenter', function() {
+    this.style.transform = 'translateY(-5px) scale(1.02)';
+  });
+  
+  card.addEventListener('mouseleave', function() {
+    this.style.transform = 'translateY(-2px) scale(1)';
+  });
+});
+
+// Animate progress bars on scroll
+const observerOptions = {
+  threshold: 0.1,
+  rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const progressBar = entry.target.querySelector('.progress-bar');
+      if (progressBar) {
+        const width = progressBar.style.width;
+        progressBar.style.width = '0%';
+        setTimeout(() => {
+          progressBar.style.width = width;
+        }, 200);
+      }
+    }
+  });
+}, observerOptions);
+
+document.querySelectorAll('.achievement-progress').forEach(progress => {
+  observer.observe(progress);
+});
+</script>

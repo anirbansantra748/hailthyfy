@@ -1,3 +1,4 @@
+<% layout('layouts/boilerplate') %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -880,26 +881,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <a href="/" class="logo">
-                <i class="fas fa-heartbeat"></i>
-                Healthfy
-            </a>
-
-            <div class="user-info">
-                <% if (user) { %>
-                    <div class="user-avatar">
-                        <%= user.name ? user.name.charAt(0).toUpperCase() : 'U' %>
-                    </div>
-                    <span>Hello, <%= user.name || 'User' %>!</span>
-                <% } else { %>
-                    <a href="/login" style="color: #667eea; text-decoration: none;">Login</a>
-                <% } %>
-            </div>
-        </div>
-    </header>
 
     <!-- Chat Container -->
     <div class="chat-container">
@@ -929,28 +910,28 @@
                             <!-- Show uploaded image(s) if exists -->
                             <% if (msg.image) { %>
                                 <div class="message-image-container">
-                                    <img src="<%= msg.image %>" alt="Shared photo" class="message-image" 
+                                    <img src="<%= msg.image %>" alt="Shared photo" class="message-image"
                                          onclick="window.open(this.src, '_blank')">
                                 </div>
                             <% } %>
-                            
+
                             <!-- Show uploaded images grid if multiple -->
                             <% if (msg.images && msg.images.length > 1) { %>
                                 <div class="message-images-grid">
                                     <% msg.images.forEach(function(imagePath) { %>
-                                        <img src="<%= imagePath %>" alt="Shared photo" class="message-image" 
+                                        <img src="<%= imagePath %>" alt="Shared photo" class="message-image"
                                              onclick="window.open(this.src, '_blank')">
                                     <% }); %>
                                 </div>
                             <% } %>
-                            
+
                             <!-- Show message text if exists -->
                             <% if (msg.content && msg.content.trim() !== 'Uploaded medical image for analysis') { %>
                                 <div class="message-text">
                                     <%- msg.content.replace(/\n/g, '<br>') %>
                                 </div>
                             <% } %>
-                            
+
                             <!-- Show image analysis if it's an AI response to image -->
                             <% if (msg.sender === 'ai' && msg.imageAnalysis) { %>
                                 <div class="image-analysis">
@@ -963,7 +944,7 @@
                                     </div>
                                 </div>
                             <% } %>
-                            
+
                             <div class="message-time">
                                 <%= new Date(msg.timestamp || Date.now()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) %>
                             </div>
@@ -1040,24 +1021,24 @@
                             placeholder="Type a message..."
                             rows="1"></textarea>
                     </div>
-                    
+
                     <div class="input-actions">
                         <!-- SIMPLE WORKING FILE INPUT -->
-                        <input 
-                            type="file" 
+                        <input
+                            type="file"
                             name="image"
-                            id="fileInput" 
+                            id="fileInput"
                             accept="image/*"
                             multiple
                             onchange="showSelectedFiles(this)"
                             style="position: absolute; left: -9999px; opacity: 0;">
-                        
+
                         <!-- SIMPLE WORKING BUTTON -->
                         <label for="fileInput" class="attach-btn" title="Attach images" style="cursor: pointer; user-select: none;">
                             <i class="fas fa-paperclip"></i>
                             <span id="fileCount" style="display: none; position: absolute; top: -6px; right: -6px; background: red; color: white; border-radius: 50%; min-width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center;">0</span>
                         </label>
-                        
+
                         <button type="submit" class="send-btn" title="Send message">
                             <i class="fas fa-paper-plane"></i>
                         </button>
@@ -1079,26 +1060,26 @@
     <!-- SIMPLE WORKING FILE UPLOAD SCRIPT -->
     <script>
         console.log('🚀 Simple file upload script loaded');
-        
+
         // Simple function to show selected files
         function showSelectedFiles(input) {
             console.log('📁 Files selected:', input.files.length);
-            
+
             const fileCount = document.getElementById('fileCount');
             const previewContainer = document.getElementById('imagePreviewContainer');
-            
+
             if (input.files.length > 0) {
                 // Show file count
                 fileCount.textContent = input.files.length;
                 fileCount.style.display = 'flex';
-                
+
                 // Show preview if container exists
                 if (previewContainer) {
                     previewContainer.style.display = 'block';
                     const thumbnails = document.getElementById('imageThumbnails');
                     if (thumbnails) {
                         thumbnails.innerHTML = '';
-                        
+
                         // Create simple previews
                         Array.from(input.files).forEach((file, index) => {
                             if (file.type.startsWith('image/')) {
@@ -1120,7 +1101,7 @@
                         });
                     }
                 }
-                
+
                 console.log('✅ Files processed successfully');
                 alert(`Selected ${input.files.length} file(s)`);
             } else {
@@ -1130,7 +1111,7 @@
                 }
             }
         }
-        
+
         // Auto-scroll chat messages
         function scrollToBottom() {
             const chatMessages = document.getElementById('chatMessages');
@@ -1138,7 +1119,7 @@
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
-        
+
         // Initialize when page loads
         window.addEventListener('load', function() {
             scrollToBottom();
