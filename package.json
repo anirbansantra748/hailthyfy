@@ -1,4 +1,9 @@
 {
+  "name": "healthfy",
+  "version": "1.0.0",
+  "description": "Advanced Healthcare Analytics Platform",
+  "main": "app.js",
+  "author": "Anirban Santra <anirbansantra748@gmail.com>",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "axios": "^1.12.1",
