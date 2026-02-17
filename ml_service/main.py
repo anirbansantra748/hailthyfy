@@ -1,287 +1,285 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, Header
-from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-import tensorflow as tf
-import numpy as np
-from PIL import Image
-import io
+
 import os
+import io
+import logging
 import uuid
 import time
-import json
-import logging
-from typing import Optional, Dict, List
-import pydicom
-from pydicom.pixel_data_handlers import apply_voi_lut
+import numpy as np
+import cv2
+from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from PIL import Image
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Import Custom Modules
+# Note: Ensure these files exist in the same directory
+from features_v2 import RadiologyFeatureExtractor
+from fusion import FusionEngine
+from vectordb import VectorDBManager
 
-app = FastAPI(
-    title="CheXNet ML Service",
-    description="X-ray prediction service using CheXNet DenseNet model",
-    version="1.0.0"
-)
+# Try to import TensorFlow/Keras
+try:
+    import tensorflow as tf
+    from tensorflow.keras.applications import DenseNet121
+    from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+    from tensorflow.keras.models import Model
+    from tensorflow.keras.applications.densenet import preprocess_input
+    TF_AVAILABLE = True
+except ImportError:
+    TF_AVAILABLE = False
+    print("Warning: TensorFlow not found. Using Mock DL Model.")
 
-# CORS middleware
+# ==============================================================================
+# LOGGING SETUP (The Magic Part)
+# ==============================================================================
+class ListHandler(logging.Handler):
+    """
+    Custom logging handler that captures log records into a list.
+    We attach this to the root logger during a request to capture everything.
+    """
+    def __init__(self):
+        super().__init__()
+        self.logs = []
+        self.formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+    def emit(self, record):
+        try:
+            msg = self.formatter.format(record)
+            self.logs.append(msg)
+        except Exception:
+            self.handleError(record)
+
+# Configure Root Logger to output to Console by default
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("__main__")
+
+# ==============================================================================
+# APP & GLOBAL VARS
+# ==============================================================================
+app = FastAPI(title="X-Ray Analysis Service", version="2.0")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Global variables
-model = None
-LABELS = []
-MODEL_VERSION = os.getenv("MODEL_VERSION", "unknown")
-ML_API_KEY = os.getenv("ML_API_KEY", "dev_key_for_development_only")
-MODEL_PATH = os.getenv("MODEL_PATH", "./model/chexnet_model.h5")
+# Global Components
+feature_extractor = None
+fusion_engine = None
+vector_db = None
+dl_model = None
 
-# CheXNet labels (14 common chest X-ray findings)
-DEFAULT_LABELS = [
-    "Atelectasis", "Cardiomegaly", "Consolidation", "Edema", 
-    "Effusion", "Emphysema", "Fibrosis", "Hernia", 
-    "Infiltration", "Mass", "Nodule", "Pleural_Thickening",
-    "Pneumonia", "Pneumothorax"
+DISEASE_LABELS = [
+    "Atelectasis", "Cardiomegaly", "Consolidation", "Edema", "Effusion", 
+    "Emphysema", "Fibrosis", "Hernia", "Infiltration", "Mass", "Nodule", 
+    "Pleural_Thickening", "Pneumonia", "Pneumothorax"
 ]
 
-async def verify_api_key(x_ml_api_key: str = Header(None)):
-    """Verify the ML API key from header"""
-    if not x_ml_api_key:
-        raise HTTPException(status_code=401, detail="Missing API key")
-    if x_ml_api_key != ML_API_KEY:
-        raise HTTPException(status_code=401, detail="Invalid API key")
-    return x_ml_api_key
-
+# ==============================================================================
+# MODEL LOADING
+# ==============================================================================
 def load_model():
-    """Load the CheXNet model and validate it"""
-    global model, LABELS
+    global dl_model
+    if not TF_AVAILABLE:
+        logger.warning("TensorFlow not available. Skipping model load.")
+        return
+
+    model_path = "./model/chexnet_model.h5"
     
     try:
-        # Load model
-        if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 1000:
-            logger.warning(f"Model file not found or too small: {MODEL_PATH}")
-            logger.info("Creating a simple test model for development...")
+        if os.path.exists(model_path):
+            logger.info(f"Loading weights from {model_path}...")
             
-            # Create a simple test model for development
-            from tensorflow.keras.models import Sequential
-            from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
-            from tensorflow.keras.applications import DenseNet121
+            # Build Architecture
+            base_model = DenseNet121(include_top=False, weights=None, input_shape=(224, 224, 3))
+            x = base_model.output
+            x = GlobalAveragePooling2D()(x)
+            predictions = Dense(14, activation='sigmoid')(x)
+            dl_model = Model(inputs=base_model.input, outputs=predictions)
             
-            # Create base DenseNet121
-            base_model = DenseNet121(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
-            base_model.trainable = False
-            
-            # Create model
-            model = Sequential([
-                base_model,
-                GlobalAveragePooling2D(),
-                Dense(len(DEFAULT_LABELS), activation='sigmoid')
-            ])
-            
-            logger.info("Test model created successfully")
+            # Load Weights
+            dl_model.load_weights(model_path)
+            logger.info("DenseNet121 weights loaded successfully.")
         else:
-            model = tf.keras.models.load_model(MODEL_PATH, compile=False)
-            logger.info(f"Model loaded successfully from {MODEL_PATH}")
-        
-        # Try to load labels from file, fallback to defaults
-        labels_path = os.path.join(os.path.dirname(MODEL_PATH), "labels.json")
-        if os.path.exists(labels_path):
-            with open(labels_path, 'r') as f:
-                LABELS = json.load(f)
-            logger.info(f"Labels loaded from {labels_path}")
-        else:
-            LABELS = DEFAULT_LABELS
-            logger.info("Using default CheXNet labels")
-        
-        # Validate model output dimension matches labels
-        test_input = np.random.random((1, 224, 224, 3))
-        test_output = model.predict(test_input, verbose=0)
-        
-        if test_output.shape[1] != len(LABELS):
-            error_msg = f"Model output dimension ({test_output.shape[1]}) doesn't match labels count ({len(LABELS)})"
-            logger.error(error_msg)
-            return False
+            logger.warning(f"Weights file not found at {model_path}. Using Untrained/Random DenseNet.")
+            # Load ImageNet weights as placeholder if possible, or just random
+            base_model = DenseNet121(include_top=False, weights='imagenet', input_shape=(224, 224, 3))
+            x = base_model.output
+            x = GlobalAveragePooling2D()(x)
+            predictions = Dense(14, activation='sigmoid')(x)
+            dl_model = Model(inputs=base_model.input, outputs=predictions)
+            logger.info("Initialized DenseNet121 with ImageNet weights (Pre-training only).")
             
-        logger.info(f"Model validated: {test_output.shape[1]} outputs, {len(LABELS)} labels")
-        return True
-        
     except Exception as e:
-        logger.error(f"Error loading model: {str(e)}")
-        return False
+        logger.error(f"Failed to load model: {e}")
+        dl_model = None
 
-def preprocess_image(image_bytes: bytes, content_type: str) -> np.ndarray:
-    """Preprocess image for DenseNet model"""
-    try:
-        # Handle DICOM files
-        if content_type == "application/dicom" or content_type.endswith("dcm"):
-            return preprocess_dicom(image_bytes)
-        
-        # Handle regular images
-        image = Image.open(io.BytesIO(image_bytes))
-        
-        # Convert to RGB if grayscale
-        if image.mode != 'RGB':
-            image = image.convert('RGB')
-        
-        # Resize to 224x224
-        image = image.resize((224, 224), Image.Resampling.LANCZOS)
-        
-        # Convert to numpy array and preprocess
-        image_array = np.array(image)
-        image_array = np.expand_dims(image_array, axis=0)
-        
-        # Apply DenseNet preprocessing
-        from tensorflow.keras.applications.densenet import preprocess_input
-        processed_image = preprocess_input(image_array)
-        
-        return processed_image
-        
-    except Exception as e:
-        logger.error(f"Error preprocessing image: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"Image preprocessing failed: {str(e)}")
-
-def preprocess_dicom(dicom_bytes: bytes) -> np.ndarray:
-    """Preprocess DICOM files"""
-    try:
-        # Read DICOM file
-        dicom = pydicom.dcmread(io.BytesIO(dicom_bytes))
-        
-        # Get pixel array
-        pixel_array = dicom.pixel_array
-        
-        # Apply VOI LUT transformation if available
-        if hasattr(dicom, 'VOILUTSequence'):
-            pixel_array = apply_voi_lut(pixel_array, dicom)
-        
-        # Convert to PIL Image
-        image = Image.fromarray(pixel_array)
-        
-        # Convert to RGB (repeat grayscale channel 3 times)
-        if len(image.getbands()) == 1:
-            image = image.convert('RGB')
-        
-        # Resize to 224x224
-        image = image.resize((224, 224), Image.Resampling.LANCZOS)
-        
-        # Convert to numpy array and preprocess
-        image_array = np.array(image)
-        image_array = np.expand_dims(image_array, axis=0)
-        
-        # Apply DenseNet preprocessing
-        from tensorflow.keras.applications.densenet import preprocess_input
-        processed_image = preprocess_input(image_array)
-        
-        return processed_image
-        
-    except Exception as e:
-        logger.error(f"Error preprocessing DICOM: {str(e)}")
-        raise HTTPException(status_code=400, detail=f"DICOM preprocessing failed: {str(e)}")
-
+# ==============================================================================
+# LIFECYCLE
+# ==============================================================================
 @app.on_event("startup")
 async def startup_event():
-    """Initialize the model on startup"""
-    logger.info("Starting CheXNet ML Service...")
+    global feature_extractor, fusion_engine, vector_db
+    logger.info("--- Service Startup ---")
     
-    if not load_model():
-        logger.error("Failed to load model. Service cannot start.")
-        os._exit(1)
+    load_model()
     
-    logger.info(f"Service started successfully with model version: {MODEL_VERSION}")
+    logger.info("Initializing Feature Extractor...")
+    feature_extractor = RadiologyFeatureExtractor()
+    
+    logger.info("Initializing Fusion Engine...")
+    fusion_engine = FusionEngine()
+    
+    logger.info("Initializing Vector DB...")
+    vector_db = VectorDBManager()
+    
+    logger.info("Service Ready.")
 
+# ==============================================================================
+# ENDPOINTS
+# ==============================================================================
 @app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "ok",
-        "model_version": MODEL_VERSION,
-        "model_loaded": model is not None,
-        "labels_count": len(LABELS),
-        "labels": LABELS
-    }
+def health():
+    return {"status": "ok", "model_loaded": dl_model is not None}
 
 @app.post("/api/v1/predict")
-async def predict(
-    file: UploadFile = File(...),
-    scan_type: Optional[str] = None,
-    api_key: str = Depends(verify_api_key)
-):
-    """Predict X-ray findings using CheXNet model"""
+async def predict(file: UploadFile = File(...), scan_type: str = "chest"):
+    # 1. Start Log Capture
+    log_capture = ListHandler()
+    logging.getLogger().addHandler(log_capture) # Attach to root logger
     
-    # Validate file
-    if not file:
-        raise HTTPException(status_code=400, detail="No file provided")
+    inference_id = str(uuid.uuid4())
+    start_time = time.time()
     
-    # Check file size (10MB limit)
-    if file.size and file.size > 10 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB")
-    
-    # Check file type
-    allowed_types = ["image/jpeg", "image/jpg", "image/png", "image/gif", "application/dicom"]
-    if file.content_type not in allowed_types and not file.filename.endswith('.dcm'):
-        raise HTTPException(
-            status_code=400, 
-            detail=f"Unsupported file type. Allowed: {', '.join(allowed_types)}"
-        )
+    response_data = {
+        "inference_id": inference_id,
+        "status": "failed",
+        "predictions": {},
+        "execution_logs": []
+    }
     
     try:
-        # Read file content
-        file_content = await file.read()
+        logger.info(f"Request received: {inference_id}")
+        logger.info(f"File: {file.filename}, Scan Type: {scan_type}")
         
-        # Preprocess image
-        start_time = time.time()
-        processed_image = preprocess_image(file_content, file.content_type or "")
+        # Read Image
+        contents = await file.read()
+        logger.info(f"Image read: {len(contents)} bytes")
         
-        # Run inference
-        predictions = await run_in_threadpool(model.predict, processed_image, verbose=0)
-        inference_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+        # ---------------------------------------------------------
+        # STEP 1: PREPROCESSING & HANDCRAFTED FEATURES
+        # ---------------------------------------------------------
+        logger.info("\n" + "="*60)
+        logger.info(f"STEP 1/5: HANDCRAFTED FEATURE EXTRACTION")
+        logger.info("="*60)
         
-        # Format results
-        prediction_dict = {}
-        for i, label in enumerate(LABELS):
-            prediction_dict[label] = float(predictions[0][i])
+        handcrafted_feats = feature_extractor.extract(contents)
+        logger.info(f"Extracted {len(handcrafted_feats)} handcrafted features.")
         
-        # Generate response
-        response = {
-            "model_version": MODEL_VERSION,
-            "inference_id": str(uuid.uuid4()),
-            "inference_time_ms": round(inference_time, 2),
-            "predictions": prediction_dict,
-            "labels": LABELS,
-            "warnings": [],
-            "scan_type": scan_type,
-            "file_name": file.filename,
-            "file_size": len(file_content)
-        }
+        # ---------------------------------------------------------
+        # STEP 2: DEEP LEARNING INFERENCE
+        # ---------------------------------------------------------
+        logger.info("\n" + "="*60)
+        logger.info(f"STEP 2/5: DENSENET INFERENCE")
+        logger.info("="*60)
         
-        # Log successful prediction
-        logger.info(f"Prediction completed: {response['inference_id']}, time: {inference_time:.2f}ms")
+        dl_preds = {}
+        embedding = None
         
-        return response
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Prediction error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Internal prediction error: {str(e)}")
+        if dl_model and TF_AVAILABLE:
+            try:
+                # Preprocess for Keras
+                img = Image.open(io.BytesIO(contents)).convert('RGB')
+                img = img.resize((224, 224))
+                x = np.array(img)
+                x = np.expand_dims(x, axis=0)
+                # x = preprocess_input(x) # DenseNet preprocess
+                x = x / 255.0 # Simple normalization if model trained that way, or use preprocess_input
+                
+                logger.info("Running inference...")
+                preds = dl_model.predict(x)
+                
+                # Map to labels
+                logger.info("Raw Predictions:")
+                for i, label in enumerate(DISEASE_LABELS):
+                    score = float(preds[0][i])
+                    dl_preds[label] = score
+                    logger.info(f"  {label}: {score:.4f}")
+                
+                # Extract Embedding (Mock for now or hook into layer)
+                # For MVP, we'll generate a consistent random embedding or use last layer weights
+                # Proper way: intermediate_layer_model = Model(inputs=dl_model.input, outputs=dl_model.get_layer('global_average_pooling2d').output)
+                try:
+                    # Quick embedding extraction
+                    intermediate_model = Model(inputs=dl_model.input, outputs=dl_model.get_layer('global_average_pooling2d').output)
+                    embedding = intermediate_model.predict(x)[0].tolist()
+                    logger.info(f"Generated visual embedding (Size: {len(embedding)})")
+                except Exception as e:
+                    logger.warning(f"Could not extract real embedding: {e}. Using random.")
+                    embedding = np.random.rand(1024).tolist()
 
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "message": "CheXNet ML Service",
-        "version": "1.0.0",
-        "endpoints": {
-            "health": "/health",
-            "predict": "/api/v1/predict"
-        }
-    }
+            except Exception as e:
+                logger.error(f"DL Inference failed: {e}")
+                dl_preds = {label: 0.0 for label in DISEASE_LABELS}
+                embedding = np.random.rand(1024).tolist()
+        else:
+             logger.warning("DL Model invalid. Returning 0.0 scores.")
+             dl_preds = {label: 0.0 for label in DISEASE_LABELS}
+             embedding = np.random.rand(1024).tolist()
+
+        # ---------------------------------------------------------
+        # STEP 3: VECTIOR DB SEARCH
+        # ---------------------------------------------------------
+        logger.info("\n" + "="*60)
+        logger.info(f"STEP 3/5: FINDING SIMILAR CASES")
+        logger.info("="*60)
+        
+        similar_cases = []
+        if vector_db:
+             similar_cases = vector_db.search_similar(embedding, k=5)
+        
+        # ---------------------------------------------------------
+        # STEP 4: FUSION ENGINE
+        # ---------------------------------------------------------
+        logger.info("\n" + "="*60)
+        logger.info(f"STEP 4/5: FUSION ENGINE LOGIC")
+        logger.info("="*60)
+        
+        fusion_result = fusion_engine.fuse(dl_preds, handcrafted_feats, similar_cases)
+        
+        # ---------------------------------------------------------
+        # FINALIZE
+        # ---------------------------------------------------------
+        total_time = (time.time() - start_time) * 1000
+        logger.info(f"\nAnalysis Complete in {total_time:.2f}ms")
+        
+        response_data["status"] = "success"
+        response_data["predictions"] = dl_preds # Original DL preds
+        response_data["final_diagnosis"] = fusion_result["final_diagnosis"]
+        response_data["confidence_score"] = fusion_result["confidence_score"]
+        response_data["handcrafted_features"] = handcrafted_feats
+        response_data["similar_cases"] = similar_cases
+        response_data["fusion_adjustments"] = fusion_result["adjustments"]
+        response_data["safety_flags"] = fusion_result["flags"]
+        response_data["inference_time_ms"] = total_time
+        response_data["model_version"] = "2.1-Fusion"
+        
+        # Flatten fusion result into top level response for ease
+        response_data.update(fusion_result)
+
+    except Exception as e:
+        logger.error(f"Pipeline failed: {str(e)}", exc_info=True)
+        response_data["error"] = str(e)
+        
+    finally:
+        # Stop capturing
+        logging.getLogger().removeHandler(log_capture)
+        # Add logs to response
+        response_data["execution_logs"] = log_capture.logs
+        return response_data
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

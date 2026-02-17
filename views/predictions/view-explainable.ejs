@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analysis: <%= xray.raw_response?.final_diagnosis || 'Processing' %> | Hailthyfy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --glass: rgba(30, 41, 59, 0.7);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .pipeline-flow {
+            position: relative;
+            padding: 2rem 0;
+        }
+        
+        .pipeline-connector {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--success) 100%);
+            z-index: 0;
+            opacity: 0.3;
+        }
+
+        .step-node {
+            background: var(--bg-card);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 10;
+            position: relative;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .step-done {
+            background: var(--accent);
+            color: white;
+        }
+
+        .terminal-view {
+            background: #000;
+            border-radius: 8px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #33ff33;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .confidence-ring {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--accent) var(--percent), #334155 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+        }
+
+        .confidence-ring::before {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: var(--bg-dark);
+            border-radius: 50%;
+        }
+
+        .confidence-text {
+            position: relative;
+            z-index: 1;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .badge-soft {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--accent);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .badge-warning-soft {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .breadcrumb-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+        .breadcrumb-item.active {
+            color: var(--text-primary);
+        }
+
+        /* Animation */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px var(--accent-glow); }
+            50% { box-shadow: 0 0 20px var(--accent-glow); }
+            100% { box-shadow: 0 0 5px var(--accent-glow); }
+        }
+
+        .animate-glow {
+            animation: pulse-glow 2s infinite;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/prediction/xray">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Analysis #<%= (xray._id || 'unknown').toString().substring(0,8) %></li>
+        </ol>
+    </nav>
+
+    <% if (xray.status === 'completed') { %>
+        <% const fusion = xray.raw_response %>
+        <% const conf = fusion?.confidence_score || (Object.values(xray.predictions || {}).length > 0 ? Object.values(xray.predictions)[0] : 0) %>
+        <!-- Summary Header -->
+        <div class="row align-items-center mb-5">
+            <div class="col-md-8">
+                <h6 class="text-secondary text-uppercase mb-1">Final Diagnosis</h6>
+                <h1 class="display-4 text-white">
+                    <%= fusion?.final_diagnosis || Object.keys(xray.predictions || {})[0] || 'Unknown' %>
+                    <span class="badge bg-success rounded-pill fs-6 align-middle ms-2">Completed</span>
+                </h1>
+                <p class="text-secondary mb-0">
+                    <i class="far fa-clock me-1"></i> Inference Time: <%= xray.inference_time_ms || 0 %>ms 
+                    <span class="mx-2">•</span> 
+                    <i class="fas fa-code-branch me-1"></i> Model: <%= xray.model_version || 'v2.1-Ensemble' %>
+                </p>
+            </div>
+            <div class="col-md-4 text-center">
+                <div class="confidence-ring animate-glow" style="--percent: <%= (conf * 100).toFixed(0) || 0 %>%;">
+                    <div class="confidence-text">
+                        <%= (conf * 100).toFixed(0) %>%
+                    </div>
+                </div>
+                <div class="mt-2 text-secondary small">Confidence Score</div>
+            </div>
+        </div>
+
+        <!-- THE PIPELINE VISUALIZATION -->
+        <h4 class="mb-4"><i class="fas fa-project-diagram me-2 text-primary"></i>Analysis Pipeline</h4>
+        <div class="row g-4 mb-5">
+            <!-- 1. Handcrafted Features -->
+            <div class="col-md-4">
+                <div class="glass-card h-100">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-node step-done me-3">1</div>
+                        <h5 class="mb-0">Physiology Analysis</h5>
+                    </div>
+                    <div class="text-secondary small mb-3">Extraction of handcrafted features from X-ray zones.</div>
+                    
+                    <% if (fusion?.handcrafted_features) { %>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Asymmetry Score</span>
+                            <span class="<%= (fusion.handcrafted_features.asym_max || 0) > 0.15 ? 'text-danger' : 'text-success' %> fw-bold">
+                                <%= (fusion.handcrafted_features.asym_max || 0).toFixed(3) %>
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Opacity Count</span>
+                            <span class="<%= (fusion.handcrafted_features.opacity_count || 0) > 25 ? 'text-danger' : 'text-info' %> fw-bold">
+                                <%= fusion.handcrafted_features.opacity_count || 0 %>
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Lung Ratio</span>
+                            <span><%= (fusion.handcrafted_features.lung_ratio || 0).toFixed(3) %></span>
+                        </div>
+                    <% } else { %>
+                        <span class="text-muted">Physiological data unavailable for this scan.</span>
+                    <% } %>
+                </div>
+            </div>
+
+            <!-- 2. DenseNet Model (The Broken One) -->
+            <div class="col-md-4">
+                <div class="glass-card h-100" style="border-color: rgba(245, 158, 11, 0.3);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-node bg-warning text-dark me-3">2</div>
+                        <h5 class="mb-0">Deep Learning (DenseNet)</h5>
+                    </div>
+                    
+                    <% const preds = xray.predictions || {}; %>
+                    <% const safeValues = Object.values(preds); %>
+                    <% const topDL = safeValues.length > 0 ? Math.max(...safeValues) : 0 %>
+                    
+                    <% if (topDL < 0.10) { %>
+                        <div class="alert alert-warning py-2 mb-3 small d-flex align-items-center">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <span>Low Confidence Detected (< 10%)</span>
+                        </div>
+                        <div class="text-secondary small mb-2">
+                            Model predictions are unreliable. Triggering fallback mechanisms.
+                        </div>
+                    <% } else { %>
+                        <div class="text-success small mb-2">
+                            <i class="fas fa-check-circle me-1"></i> Model operating normally.
+                        </div>
+                    <% } %>
+
+                    <!-- Mini Bar Chart -->
+                    <div class="mb-1 d-flex justify-content-between small">
+                        <span>Pneumonia</span>
+                        <span><%= ((preds.Pneumonia || 0) * 100).toFixed(1) %>%</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 4px;">
+                        <div class="progress-bar bg-warning" style="width: <%= ((preds.Pneumonia || 0) * 100) %>%"></div>
+                    </div>
+
+                    <div class="mb-1 d-flex justify-content-between small">
+                        <span>Infiltration</span>
+                        <span><%= ((preds.Infiltration || 0) * 100).toFixed(1) %>%</span>
+                    </div>
+                    <div class="progress" style="height: 4px;">
+                        <div class="progress-bar bg-warning" style="width: <%= ((preds.Infiltration || 0) * 100) %>%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Fusion Engine (The Logic) -->
+            <div class="col-md-4">
+                <div class="glass-card h-100" style="border-color: rgba(16, 185, 129, 0.5);">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="step-node bg-success me-3">3</div>
+                        <h5 class="mb-0">Fusion Engine</h5>
+                    </div>
+                    <div class="text-secondary small mb-3">Logic Gating & Consensus Mechanism</div>
+
+                    <% if (fusion?.safety_flags && fusion.safety_flags.length > 0) { %>
+                        <div class="badge-warning-soft mb-2">
+                            <i class="fas fa-shield-alt me-1"></i> Safety Protocols Active
+                        </div>
+                    <% } %>
+
+                    <% if (fusion?.similar_cases && Array.isArray(fusion.similar_cases)) { %>
+                        <div class="mb-2 small">
+                            <strong>Vector DB Retrieval:</strong><br>
+                            Found <%= fusion.similar_cases.length %> similar cases via ChromaDB.
+                        </div>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <% fusion.similar_cases.slice(0,3).forEach((c) => { %>
+                                <% if (c && c.label) { %>
+                                <span class="badge bg-secondary"><%= c.label.substring(0,3) %> <%= ((c.similarity || 0)*100).toFixed(0) %>%</span>
+                                <% } %>
+                            <% }) %>
+                        </div>
+                    <% } %>
+
+                    <div class="mt-3 pt-3 border-top border-secondary border-opacity-25">
+                        <div class="small text-success fw-bold">
+                            <i class="fas fa-arrow-right me-1"></i> Final Output: <%= fusion?.final_diagnosis || 'Processed' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DETAILED BREAKDOWN -->
+        <div class="row g-4">
+            <!-- Left Column: Visual -->
+            <div class="col-lg-5">
+                <div class="glass-card">
+                    <h5 class="mb-3">Input X-ray</h5>
+                    <img src="/<%= xray.image %>" class="img-fluid rounded mb-3" alt="X-ray Analysis">
+                    <div class="d-flex justify-content-between small text-secondary">
+                        <span><%= xray.file_name || 'Scan Image' %></span>
+                        <span><%= ((xray.file_size || 0) / 1024).toFixed(1) %> KB</span>
+                    </div>
+                </div>
+
+                <div class="glass-card mt-4">
+                    <h5 class="mb-3">Prediction Distribution</h5>
+                    <% const allPreds = xray.predictions || {} %>
+                    <% Object.keys(allPreds).sort((a,b) => allPreds[b] - allPreds[a]).slice(0, 5).forEach(label => { %>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span><%= label %></span>
+                                <span><%= (allPreds[label] * 100).toFixed(2) %>%</span>
+                            </div>
+                            <div class="progress" style="height: 6px; background: rgba(255,255,255,0.1);">
+                                <div class="progress-bar" 
+                                     style="width: <%= allPreds[label] * 100 %>%; background: <%= label === (fusion?.final_diagnosis) ? 'var(--success)' : 'var(--accent)' %>;">
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            </div>
+
+            <!-- Right Column: Technical Logs -->
+            <div class="col-lg-7">
+                <div class="glass-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0"><i class="fas fa-terminal me-2"></i>System Execution Log</h5>
+                        <span class="badge bg-dark border border-secondary">Live Trace</span>
+                    </div>
+                    
+                    <div class="terminal-view">
+
+
+                    <div class="terminal-timeline">
+                        <% 
+                        if (fusion && fusion.execution_logs && fusion.execution_logs.length > 0) { 
+                            let groups = [];
+                            let currentGroup = { title: "Initialization", logs: [], status: "normal" };
+                            
+                            fusion.execution_logs.forEach(logLine => {
+                                // 1. Clean Log Line (Remove Timestamp & Logger)
+                                // Example: "2026-02-15 12:45:05,153 - __main__ - INFO - Msg" -> "Msg"
+                                let cleanLine = logLine.replace(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3} - \S+ - \S+ - /, "").trim();
+                                if (!cleanLine) return; // Skip empty lines after cleaning
+
+                                // 2. Detect Step Transition
+                                if (cleanLine.includes("STEP 1")) {
+                                    groups.push(currentGroup);
+                                    currentGroup = { title: "Step 1: Feature Extraction", logs: [], status: "normal", icon: "fa-microscope" };
+                                } else if (cleanLine.includes("STEP 2")) {
+                                    groups.push(currentGroup);
+                                    currentGroup = { title: "Step 2: AI Model Analysis", logs: [], status: "normal", icon: "fa-brain" };
+                                } else if (cleanLine.includes("STEP 3")) {
+                                    groups.push(currentGroup);
+                                    currentGroup = { title: "Step 3: Historical Comparison", logs: [], status: "normal", icon: "fa-history" };
+                                } else if (cleanLine.includes("STEP 4")) {
+                                    groups.push(currentGroup);
+                                    currentGroup = { title: "Step 4: Fusion Logic", logs: [], status: "normal", icon: "fa-project-diagram" };
+                                } else if (cleanLine.includes("Final Diagnosis") || cleanLine.includes("Analysis Complete")) {
+                                    if (currentGroup.title !== "Final Result") {
+                                        groups.push(currentGroup);
+                                        currentGroup = { title: "Final Result", logs: [], status: "success", icon: "fa-clipboard-check" };
+                                    }
+                                }
+                                
+                                // 3. Skip Separator Lines
+                                if (cleanLine.startsWith("===") || cleanLine.startsWith("---")) return;
+
+                                // 4. Rich Formatting Logic
+                                let type = "text";
+                                let content = cleanLine;
+                                let extraClass = "";
+
+
+
+                                // A. Highlight Output Lists like ['A', 'B']
+                                // Use distinct color
+                                content = content.replace(/(\['[^\]]+'\])/g, '<span class="badge bg-secondary text-white font-monospace" style="font-size: 0.75em; white-space: normal;">$1</span>');
+
+                                // B. Highlight Key-Value Pairs
+                                // Matches: "Shape=(1, 2)", "Range=[0, 255]", "Mean=123.4", "Size: 1024"
+                                // Changed style to bg-dark text-white or outline for visibility
+                                content = content.replace(/\b(Shape|Range|Dtype|Mean|Std|Norm|Entropy|Area|Compactness|Size)\s*[=:]\s*([\[\(][0-9, ]+[\]\)]|[0-9.]+|uint8|float32|int)/g, 
+                                    '<span class="badge border border-dark text-dark fw-normal me-1" style="background-color: #f0f0f0;">$1: $2</span>');
+                                
+                                // C. Highlight Vector DB Results
+                                // [1] ID: xxx | Sim: 0.9 | Label: Pneumonia
+                                if (content.includes("| Sim:")) {
+                                    content = content.replace(/ID:\s*(\S+)/, '<span class="badge bg-primary bg-opacity-10 text-primary border border-primary">ID: $1</span>');
+                                    content = content.replace(/Sim:\s*([0-9.]+)/, '<span class="badge bg-success bg-opacity-10 text-success border border-success">Sim: $1</span>');
+                                    content = content.replace(/Label:\s*(\S+)/, '<span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Label: $1</span>');
+                                }
+
+                                // D. Highlight Probabilities/Scores
+                                content = content.replace(/(Score|Confidence|Similarity|Probability)[:\s]+([0-9.]+%?)/gi, '<span class="badge bg-info text-dark">$1: $2</span>');
+                                
+                                // E. Highlight specific keywords in sentences
+                                if (cleanLine.includes("Generated visual embedding")) {
+                                    content = content.replace("Generated visual embedding", '<span class="fw-bold text-primary"><i class="fas fa-vector-square me-1"></i>Generated visual embedding</span>');
+                                }
+
+                                // Highlight Warnings/Errors/Success
+                                if (cleanLine.includes("WARNING") || cleanLine.includes("WARN") || cleanLine.includes("⚠")) {
+                                    type = "warning";
+                                    currentGroup.status = "warning";
+                                    content = `<i class="fas fa-exclamation-triangle me-2"></i>${content}`;
+                                }
+                                if (cleanLine.includes("ABNORMAL") || cleanLine.includes("MULTIPLE")) {
+                                     content = content.replace(/(ABNORMAL|MULTIPLE)/g, '<span class="badge bg-warning text-dark border border-warning">$1</span>');
+                                }
+                                if (cleanLine.includes("SYMMETRIC") || cleanLine.includes("✓")) {
+                                     content = content.replace(/(SYMMETRIC|✓)/g, '<span class="badge bg-success text-white">$1</span>');
+                                }
+                                if (cleanLine.includes("ERROR") || cleanLine.includes("ERR")) {
+                                    type = "danger";
+                                    currentGroup.status = "danger";
+                                }
+
+                                // Specific Formatting for Arrays/Lists label
+                                if (cleanLine.includes("Zonal masks created")) {
+                                    content = content.replace(/:\s*<span/, ':<br><span'); // Break line before the list badge
+                                }
+
+                                currentGroup.logs.push({ html: content, type: type });
+                            });
+                            groups.push(currentGroup); // Push last group
+                            
+                            // Render Timeline
+                            groups.forEach((group, index) => {
+                                if (group.logs.length === 0) return;
+                        %>
+                                <div class="timeline-item mb-4">
+                                    <div class="timeline-marker bg-<%= group.status === 'normal' ? 'primary' : group.status %> d-flex align-items-center justify-content-center text-white shadow-sm" style="width: 32px; height: 32px; top: 10px; left: -10px;">
+                                        <i class="fas <%= group.icon || 'fa-info' %> fa-xs"></i>
+                                    </div>
+                                    <div class="timeline-content card border-0 shadow-sm ms-3">
+                                        <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center clickable" 
+                                             data-bs-toggle="collapse" data-bs-target="#collapseLog<%= index %>" style="cursor: pointer;">
+                                            <h6 class="mb-0 fw-bold text-<%= group.status === 'normal' ? 'dark' : group.status %>">
+                                                <%= group.title %>
+                                            </h6>
+                                            <i class="fas fa-chevron-down text-muted small transition-icon"></i>
+                                        </div>
+                                        <div class="collapse show" id="collapseLog<%= index %>">
+                                            <div class="card-body py-2 bg-light rounded-bottom terminal-font border-top" style="font-size: 0.85rem;">
+                                                <% group.logs.forEach(log => { %>
+                                                    <div class="py-1 <%= log.type === 'change' ? 'text-muted' : '' %>" style="line-height: 1.6;">
+                                                        <%- log.html %>
+                                                    </div>
+                                                <% }) %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        <% 
+                            });
+                        } else { 
+                        %>
+                            <!-- Fallback for no logs (same as before) -->
+                             <div class="alert alert-light border text-center py-4">
+                                <div class="spinner-border text-primary mb-2" role="status"></div>
+                                <div class="text-muted">Waiting for Live Neural Trace...</div>
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <style>
+                        .terminal-timeline { position: relative; padding-left: 10px; }
+                        .timeline-item { position: relative; }
+                        .timeline-item::before {
+                            content: ''; position: absolute; left: 5px; top: 40px; bottom: -20px; width: 2px; background-color: #e9ecef;
+                        }
+                        .timeline-item:last-child::before { display: none; }
+                        /* Custom badge style for logs */
+                        .terminal-font .badge { font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.75rem; vertical-align: middle; }
+                        .clickable:hover { background-color: #f8f9fa !important; }
+                    </style>
+
+                    <!-- JSON Data Toggle -->
+                    <div class="mt-3">
+                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#rawJson">
+                            <i class="fas fa-code me-1"></i> View Raw JSON Payload
+                        </button>
+                        <div class="collapse mt-2" id="rawJson">
+                            <pre class="bg-dark p-3 rounded text-secondary small" style="max-height: 200px; overflow: auto;"><%= JSON.stringify(fusion || xray, null, 2) %></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <!-- Processing State -->
+        <div class="text-center py-5">
+            <div class="spinner-border text-accent" role="status" style="width: 3rem; height: 3rem;"></div>
+            <h3 class="mt-4">Analyzing X-ray...</h3>
+            <p class="text-secondary">Running DenseNet inference and Fusion Logic...</p>
+        </div>
+    <% } %>
+
+        <!-- DETAILED REPORT SECTION (New) -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <h4 class="mb-4"><i class="fas fa-file-medical-alt me-2 text-primary"></i>Comprehensive Analysis Report</h4>
+            </div>
+            
+            <!-- Full Pathology Table -->
+            <div class="col-md-6">
+                <div class="glass-card h-100">
+                     <h5 class="mb-3">Full Pathology Screening (14 Conditions)</h5>
+                     <div class="table-responsive">
+                         <table class="table table-dark table-hover table-sm small" style="background: transparent;">
+                             <thead>
+                                 <tr>
+                                     <th class="text-secondary">Condition</th>
+                                     <th class="text-end text-secondary">Raw Probability</th>
+                                     <th class="text-end text-secondary">Status</th>
+                                 </tr>
+                             </thead>
+                             <tbody>
+                                 <% Object.keys(xray.predictions || {}).sort((a,b) => xray.predictions[b] - xray.predictions[a]).forEach(label => { %>
+                                     <tr>
+                                         <td><%= label %></td>
+                                         <td class="text-end font-monospace"><%= (xray.predictions[label] * 100).toFixed(4) %>%</td>
+                                         <td class="text-end">
+                                             <% if (xray.predictions[label] > 0.5) { %>
+                                                 <span class="badge-soft text-danger fw-bold">Positive</span>
+                                             <% } else { %>
+                                                 <span class="text-secondary">Negative</span>
+                                             <% } %>
+                                         </td>
+                                     </tr>
+                                 <% }) %>
+                             </tbody>
+                         </table>
+                     </div>
+                </div>
+            </div>
+
+            <!-- Vector DB & Logic -->
+            <div class="col-md-6">
+                <div class="glass-card mb-4">
+                    <h5 class="mb-3">Historical Consensus (Vector DB)</h5>
+                    <% if (fusion?.similar_cases && fusion.similar_cases.length > 0) { %>
+                        <div class="table-responsive">
+                            <table class="table table-dark table-sm small" style="background: transparent;">
+                                <thead>
+                                    <tr>
+                                        <th class="text-secondary">Case ID</th>
+                                        <th class="text-secondary">Similarity</th>
+                                        <th class="text-secondary">Diagnosis</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% fusion.similar_cases.forEach(c => { %>
+                                        <tr>
+                                            <td class="font-monospace text-muted"><%= c.id ? c.id.substring(0,8) : 'N/A' %>...</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="progress flex-grow-1 me-2" style="height: 4px; width: 50px; background: rgba(255,255,255,0.1);">
+                                             <div class="progress-bar" style="width: <%= (c.similarity||0)*100 %>%; background-color: var(--accent);"></div>
+                                                    </div>
+                                                    <%= ((c.similarity||0)*100).toFixed(1) %>%
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-secondary"><%= c.label %></span></td>
+                                        </tr>
+                                    <% }) %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <p class="text-secondary small">No similar cases found in knowledge base.</p>
+                    <% } %>
+                </div>
+
+                <div class="glass-card">
+                    <h5 class="mb-3">Fusion Logic Trace</h5>
+                     <% if (fusion?.clinical_notes && fusion.clinical_notes.length > 0) { %>
+                        <ul class="list-unstyled small text-secondary mb-0">
+                            <% fusion.clinical_notes.forEach(note => { %>
+                                <li class="mb-2 d-flex">
+                                    <i class="fas fa-angle-right me-2 text-accent mt-1"></i>
+                                    <span><%= note %></span>
+                                </li>
+                            <% }) %>
+                        </ul>
+                    <% } else { %>
+                        <p class="text-secondary small">Standard processing path used.</p>
+                    <% } %>
+                </div>
+                
+                <div class="glass-card mt-4">
+                     <h5 class="mb-3">Normalization Stats (Preprocessing)</h5>
+                     <div class="row small text-secondary">
+                         <div class="col-6">Input Size: 224x224</div>
+                         <div class="col-6">Channels: 3 (RGB)</div>
+                         <div class="col-6">Range: [0, 1]</div>
+                         <div class="col-6">Mean: ~0.485 (Standard)</div>
+                     </div>
+                </div>
+            </div>
+        </div>
+
+    <div class="mt-5 text-center">
+        <a href="/prediction/xray/upload" class="btn btn-primary px-4 py-2 rounded-pill">
+            <i class="fas fa-upload me-2"></i>Analyze Another Scan
+        </a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

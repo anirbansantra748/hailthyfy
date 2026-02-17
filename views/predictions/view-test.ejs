@@ -1,0 +1,925 @@
+<% layout('/layouts/boilerplate') %>
+
+<style>
+  body {
+    background: linear-gradient(135deg, #f0fff4 0%, #e8f5e8 100%);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+  }
+
+  .hero-header {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: 0 0 30px 30px;
+  }
+
+  .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transition: all 0.3s ease;
+  }
+
+  .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .xray-container {
+    border-radius: 15px;
+    padding: 3rem;
+    position: relative;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed rgba(34, 197, 94, 0.3);
+  }
+
+  .xray-image {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    cursor: pointer;
+    filter: contrast(1.1) brightness(1.05);
+    border-radius: 8px;
+  }
+
+  .xray-image:hover {
+    filter: contrast(1.2) brightness(1.1);
+  }
+
+
+  .action-button {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    border: none;
+    border-radius: 25px;
+    color: white;
+    padding: 12px 24px;
+    margin: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    color: white;
+    text-decoration: none;
+  }
+
+  .action-button.success { background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%); }
+  .action-button.warning { background: linear-gradient(135deg, #eab308 0%, #facc15 100%); }
+  .action-button.info { background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); }
+  .action-button.secondary { background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); }
+
+  .prediction-item {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    margin: 0.5rem 0;
+    border-left: 4px solid;
+    transition: all 0.3s ease;
+  }
+
+  .prediction-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  .prediction-item.high-risk { border-left-color: #e74c3c; }
+  .prediction-item.medium-risk { border-left-color: #f39c12; }
+  .prediction-item.low-risk { border-left-color: #27ae60; }
+
+  .chart-wrapper {
+    height: 300px;
+    position: relative;
+  }
+
+
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+  }
+
+  .notification.show {
+    transform: translateX(0);
+  }
+
+  .notification.success { background: #27ae60; }
+  .notification.error { background: #e74c3c; }
+  .notification.info { background: #3498db; }
+
+  @media (max-width: 768px) {
+    .hero-header { padding: 1rem 0; }
+    .xray-container { min-height: 300px; }
+    .action-button { padding: 10px 20px; margin: 3px; }
+  }
+
+  /* Print Styles */
+  @media print {
+    .action-button, .controls-overlay, .hero-header, .notification {
+      display: none !important;
+    }
+    
+    body {
+      background: white !important;
+      color: black !important;
+    }
+    
+    .card {
+      box-shadow: none !important;
+      border: 1px solid #ccc !important;
+      page-break-inside: avoid;
+    }
+    
+    .xray-container {
+      background: white !important;
+      border: 1px solid #ccc;
+    }
+    
+    .xray-image {
+      max-height: 400px;
+      max-width: 100%;
+    }
+    
+    .chart-wrapper {
+      height: 300px;
+    }
+    
+    h1, h2, h3, h4, h5 {
+      color: black !important;
+    }
+    
+    .prediction-item {
+      border: 1px solid #ddd !important;
+      margin-bottom: 10px;
+    }
+  }
+</style>
+
+<!-- Hero Header -->
+<div class="hero-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <h1 class="mb-2">
+          <i class="fas fa-x-ray me-2"></i>
+          X-ray Analysis Results
+        </h1>
+        <p class="mb-0 opacity-75">AI-powered medical imaging analysis</p>
+      </div>
+      <div class="col-md-4 text-end">
+        <% if (xray.status === 'completed') { %>
+        <span class="status-badge bg-success">
+          <i class="fas fa-check-circle me-1"></i>Analysis Complete
+        </span>
+        <% } else if (xray.status === 'processing') { %>
+        <span class="status-badge bg-warning text-dark">
+          <i class="fas fa-clock me-1"></i>Processing
+        </span>
+        <% } else if (xray.status === 'failed') { %>
+        <span class="status-badge bg-danger">
+          <i class="fas fa-exclamation-triangle me-1"></i>Failed
+        </span>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Quick Stats -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-stethoscope fa-2x text-primary mb-2"></i>
+          <h6 class="text-muted mb-1">Scan Type</h6>
+          <h5 class="mb-0"><%= xray.scanType || 'Unknown' %></h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-calendar fa-2x text-success mb-2"></i>
+          <h6 class="text-muted mb-1">Upload Date</h6>
+          <h5 class="mb-0"><%= new Date(xray.createdAt).toLocaleDateString() %></h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-file fa-2x text-info mb-2"></i>
+          <h6 class="text-muted mb-1">File Size</h6>
+          <h5 class="mb-0">
+            <% if (xray.file_size) { %>
+              <%= (xray.file_size / 1024 / 1024).toFixed(2) %> MB
+            <% } else { %>
+              Unknown
+            <% } %>
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+          <h6 class="text-muted mb-1">Process Time</h6>
+          <h5 class="mb-0">
+            <%= xray.inference_time_ms ? `${xray.inference_time_ms}ms` : 'N/A' %>
+          </h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row">
+    <!-- X-ray Image -->
+    <div class="col-lg-7 mb-4">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-image me-2"></i>X-ray Overview
+            <small class="opacity-75 ms-2">(<%= xray.scanType || 'Unknown' %> Scan)</small>
+          </h5>
+        </div>
+        <div class="card-body p-3">
+          <div class="xray-container" style="background: linear-gradient(135deg, #f0fff4, #dcfce7);">
+            <div class="text-center">
+              <div style="font-size: 5rem; line-height: 1; filter: drop-shadow(0 8px 20px rgba(34,197,94,0.25));">🩻</div>
+              <h4 class="mt-3 mb-1 text-success">X-ray Analysis Ready</h4>
+              <p class="text-muted mb-0">Your scan has been processed. View AI insights on the right.</p>
+            </div>
+          </div>
+          
+          <!-- Scan Info -->
+          <% if (xray.file_name) { %>
+          <div class="row mt-3 text-center">
+            <div class="col-md-6">
+              <small class="text-muted">File Name</small>
+              <div class="fw-bold"><%= xray.file_name %></div>
+            </div>
+            <div class="col-md-6">
+              <small class="text-muted">File Type</small>
+              <div class="fw-bold"><%= xray.file_mimetype || 'Unknown' %></div>
+            </div>
+          </div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis Results -->
+    <div class="col-lg-5 mb-4">
+      <% if (xray.status === 'completed') { %>
+      
+      <!-- AI Doctor Note -->
+      <div class="card mb-3 border-primary">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-user-md me-2"></i>AI Analysis Summary
+          </h5>
+          <% if (typeof fusion !== 'undefined' && fusion.confidence) { %>
+            <span class="badge bg-white text-primary">
+              Confidence: <%= (fusion.confidence * 100).toFixed(1) %>%
+            </span>
+          <% } %>
+        </div>
+        <div class="card-body bg-light">
+          <!-- Safety Flags -->
+          <% if (typeof fusion !== 'undefined' && fusion.flags && fusion.flags.length > 0) { %>
+            <div class="alert alert-warning border-warning shadow-sm mb-3">
+              <h6 class="alert-heading text-dark mb-1">
+                <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Safety Alerts
+              </h6>
+              <ul class="mb-0 ps-3 small text-dark">
+                <% fusion.flags.forEach(flag => { %>
+                  <li><%= flag %></li>
+                <% }); %>
+              </ul>
+            </div>
+          <% } %>
+
+          <p class="mb-0 lead" style="font-size: 1.1rem;">
+            <%= typeof aiExplanation !== 'undefined' ? aiExplanation : "Analysis complete." %>
+          </p>
+          
+          <!-- Clinical Reasoning -->
+          <% if (typeof fusion !== 'undefined' && fusion.notes && fusion.notes.length > 0) { %>
+            <hr class="my-3">
+            <h6 class="fw-bold text-muted small mb-2">
+              <i class="fas fa-clipboard-check me-1"></i>Clinical Logic:
+            </h6>
+            <ul class="list-unstyled small text-muted mb-0">
+              <% fusion.notes.forEach(note => { %>
+                <li class="mb-1"><i class="fas fa-angle-right me-2 opacity-50"></i><%= note %></li>
+              <% }); %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+
+      <% if (xray.predictions) { %>
+      <!-- Completed Analysis -->
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-check-circle me-2"></i>Analysis Results
+          </h5>
+        </div>
+        <div class="card-body">
+          <h6 class="fw-bold mb-3">Top Findings:</h6>
+          <% 
+          const predictions = xray.predictions || {};
+          const sortedPredictions = Object.entries(predictions).sort(([,a], [,b]) => b - a).slice(0, 5);
+          %>
+          <% sortedPredictions.forEach(([label, confidence], index) => { %>
+          <%
+          const riskClass = confidence >= 0.7 ? 'high-risk' : confidence >= 0.4 ? 'medium-risk' : 'low-risk';
+          const icon = 'fas fa-notes-medical text-primary';
+          const riskLabel = confidence >= 0.7 ? 'High Confidence' : confidence >= 0.4 ? 'Moderate Confidence' : 'Low Confidence';
+          const riskColor = confidence >= 0.7 ? 'text-danger' : confidence >= 0.4 ? 'text-warning' : 'text-success';
+          %>
+          <div class="prediction-item <%= riskClass %>">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <i class="<%= icon %> me-2"></i>
+                <div>
+                  <span class="fw-bold"><%= label.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) %></span>
+                  <div style="font-size: 0.75rem" class="<%= riskColor %>"><%= riskLabel %></div>
+                </div>
+              </div>
+              <span class="badge bg-primary">
+                <%= (confidence * 100).toFixed(1) %>%
+              </span>
+            </div>
+          </div>
+          <% }); %>
+
+          <!-- Model Info -->
+          <div class="mt-4">
+            <h6 class="fw-bold">Model Information:</h6>
+            <div class="row">
+              <div class="col-6">
+                <small class="text-muted">Version</small>
+                <div class="fw-bold"><%= xray.model_version || 'Unknown' %></div>
+              </div>
+              <div class="col-6">
+                <small class="text-muted">Analysis ID</small>
+                <div class="fw-bold"><%= xray.inference_id || 'N/A' %></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- Advanced Analysis Details -->
+      <% if (xray.handcrafted_features || (xray.similar_cases && xray.similar_cases.length > 0)) { %>
+      <div class="card mt-3">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-microscope me-2"></i>AI Transparency & Verification
+          </h5>
+        </div>
+        <div class="card-body">
+          
+          <!-- Biological Markers -->
+          <% if (xray.handcrafted_features) { %>
+          <h6 class="fw-bold text-primary mb-2">
+            <i class="fas fa-fingerprint me-2"></i>Biological Markers
+          </h6>
+          <p class="small text-muted mb-2">The AI analyzed these specific visual characteristics:</p>
+          <div class="row g-2 mb-3">
+            <% const features = xray.handcrafted_features; %>
+            
+            <!-- Texture -->
+            <div class="col-6">
+              <div class="p-2 border rounded bg-light">
+                <small class="d-block text-muted">Texture (GLCM)</small>
+                <strong><%= (features.glcm_contrast || 0).toFixed(1) %></strong>
+                <span class="badge bg-secondary ms-1" style="font-size:0.6em">Contrast</span>
+              </div>
+            </div>
+            
+            <!-- Edges -->
+            <div class="col-6">
+              <div class="p-2 border rounded bg-light">
+                <small class="d-block text-muted">Structure (Canny)</small>
+                <strong><%= (features.edge_density || 0).toFixed(3) %></strong>
+                <span class="badge bg-secondary ms-1" style="font-size:0.6em">Density</span>
+              </div>
+            </div>
+
+            <!-- Intensity -->
+            <div class="col-6">
+              <div class="p-2 border rounded bg-light">
+                <small class="d-block text-muted">Brightness</small>
+                <strong><%= (features.hist_mean || 0).toFixed(0) %></strong>
+                <span class="badge bg-secondary ms-1" style="font-size:0.6em">Mean</span>
+              </div>
+            </div>
+
+            <!-- CTR -->
+            <div class="col-6">
+              <div class="p-2 border rounded bg-light">
+                <small class="d-block text-muted">Heart Size (CTR)</small>
+                <strong><%= (features.estimated_ctr || 0).toFixed(2) %></strong>
+                <span class="badge bg-secondary ms-1" style="font-size:0.6em">Ratio</span>
+              </div>
+            </div>
+          </div>
+          <% } %>
+
+          <!-- Similar Cases -->
+          <% if (xray.similar_cases && xray.similar_cases.length > 0) { %>
+          <h6 class="fw-bold text-primary mb-2 mt-3">
+            <i class="fas fa-history me-2"></i>Reference Cases
+          </h6>
+          <p class="small text-muted mb-2">The AI compared this scan with <%= xray.similar_cases.length %> similar confirmed cases:</p>
+          <div class="list-group list-group-flush small">
+            <% xray.similar_cases.forEach((similar, idx) => { %>
+            <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+              <div>
+                <i class="fas fa-file-medical-alt text-muted me-2"></i>
+                Case #<%= similar.id.substring(0, 8) %>...
+              </div>
+              <span class="badge bg-light text-dark border">
+                <%= (similar.score * 100).toFixed(0) %> % Match
+              </span>
+            </div>
+            <% }); %>
+          </div>
+          <% } else { %>
+            <div class="alert alert-light border mt-3 mb-0">
+              <small><i class="fas fa-info-circle me-1"></i> No similar cases found in the database yet. As more data is collected, this feature will improve.</small>
+            </div>
+          <% } %>
+
+        </div>
+      </div>
+      <% } %>
+      
+      <% } else if (xray.status === 'processing') { %>
+      <!-- Processing Status -->
+      <div class="card">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="mb-0">
+            <i class="fas fa-spinner fa-spin me-2"></i>Processing
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <i class="fas fa-cog fa-3x text-warning mb-3"></i>
+          <h5>Analysis in Progress</h5>
+          <p class="text-muted">Your X-ray is being analyzed by our AI system.</p>
+          <div class="progress mb-3">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                 style="width: 75%"></div>
+          </div>
+          <button class="btn btn-primary" onclick="location.reload()">
+            <i class="fas fa-sync me-1"></i>Refresh Status
+          </button>
+        </div>
+      </div>
+
+      <% } else if (xray.status === 'failed') { %>
+      <!-- Failed Status -->
+      <div class="card">
+        <div class="card-header bg-danger text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>Analysis Failed
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <i class="fas fa-times-circle fa-3x text-danger mb-3"></i>
+          <h5>Processing Failed</h5>
+          <p class="text-danger">
+            <%= xray.error_message || 'An error occurred during processing' %>
+          </p>
+          <div class="d-grid gap-2">
+            <button class="action-button warning" onclick="retryAnalysis()">
+              <i class="fas fa-redo me-1"></i>Retry Analysis
+            </button>
+            <a href="/prediction/xray/upload" class="action-button">
+              <i class="fas fa-upload me-1"></i>Upload New X-ray
+            </a>
+          </div>
+        </div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+
+  <!-- Chart Section -->
+  <% if (xray.status === 'completed' && xray.predictions && Object.keys(xray.predictions).length > 0) { %>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-success text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-bar me-2"></i>Prediction Distribution
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrapper">
+            <canvas id="predictionChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } else { %>
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-bar me-2"></i>Prediction Distribution
+          </h5>
+        </div>
+        <div class="card-body text-center text-muted">
+          <i class="fas fa-info-circle fa-3x mb-3"></i>
+          <h5>No Prediction Data Available</h5>
+          <p>Charts will appear when analysis is completed and predictions are available.</p>
+          <small>Current status: <%= xray.status %></small>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Action Buttons -->
+  <div class="text-center mb-4">
+    <a href="/prediction/xray" class="action-button secondary">
+      <i class="fas fa-list me-1"></i>Back to List
+    </a>
+    <a href="/prediction/xray/upload" class="action-button">
+      <i class="fas fa-plus me-1"></i>Upload Another
+    </a>
+    <% if (xray.status === 'completed') { %>
+    <a href="/prediction/xray/<%= xray._id %>/download" class="action-button success">
+      <i class="fas fa-download me-1"></i>Download Report
+    </a>
+    <a href="/prediction/xray/<%= xray._id %>/export" class="action-button info">
+      <i class="fas fa-file-export me-1"></i>Export Data
+    </a>
+    <button class="action-button warning" onclick="printPage()">
+      <i class="fas fa-print me-1"></i>Print
+    </button>
+    <button class="action-button secondary" onclick="shareResults()">
+      <i class="fas fa-share me-1"></i>Share
+    </button>
+    <% } %>
+  </div>
+
+  <!-- Medical Disclaimer -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card border-0" style="background: linear-gradient(135deg, #dcfce7, #bbf7d0);">
+        <div class="card-body text-center py-4">
+          <div class="mb-3">
+            <i class="fas fa-shield-alt text-success" style="font-size: 2.5rem;"></i>
+          </div>
+          <h5 class="text-success fw-bold mb-2">⚕️ Medical Disclaimer</h5>
+          <p class="text-muted mb-0">
+            This AI analysis is for informational purposes only and should not be used as a substitute 
+            for professional medical diagnosis, advice, or treatment. Always consult with a qualified 
+            healthcare provider for medical concerns and before making any healthcare decisions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Chart Data -->
+<% 
+const chartData = {};
+if (xray.status === 'completed' && xray.predictions) {
+  // Handle MongoDB Map or regular object
+  let predictionsObj = {};
+  if (xray.predictions instanceof Map) {
+    // Convert Map to object
+    for (let [key, value] of xray.predictions.entries()) {
+      predictionsObj[key] = value;
+    }
+  } else if (typeof xray.predictions === 'object' && xray.predictions !== null) {
+    // Handle Mongoose Map-like object
+    if (xray.predictions.toObject) {
+      predictionsObj = xray.predictions.toObject();
+    } else {
+      predictionsObj = xray.predictions;
+    }
+  }
+  
+  // Convert to chart format
+  Object.entries(predictionsObj).forEach(([label, confidence]) => {
+    if (typeof confidence === 'number' && !isNaN(confidence)) {
+      chartData[label.replace(/_/g, ' ')] = (confidence * 100).toFixed(1);
+    }
+  });
+}
+%>
+
+<script>
+// Chart initialization
+document.addEventListener('DOMContentLoaded', function() {
+  const chartData = <%- JSON.stringify(chartData) %>;
+  
+  if (Object.keys(chartData).length > 0) {
+    const ctx = document.getElementById('predictionChart');
+    
+    if (ctx) {
+      try {
+        new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: Object.keys(chartData),
+            datasets: [{
+              data: Object.values(chartData).map(v => parseFloat(v)),
+              backgroundColor: [
+                'rgba(231, 76, 60, 0.8)',   // Red
+                'rgba(243, 156, 18, 0.8)',  // Orange  
+                'rgba(39, 174, 96, 0.8)',   // Green
+                'rgba(52, 152, 219, 0.8)',  // Blue
+                'rgba(155, 89, 182, 0.8)',  // Purple
+                'rgba(26, 188, 156, 0.8)',  // Teal
+                'rgba(230, 126, 34, 0.8)',  // Dark Orange
+                'rgba(52, 73, 94, 0.8)',    // Dark Blue
+                'rgba(241, 196, 15, 0.8)',  // Yellow
+                'rgba(233, 30, 99, 0.8)'    // Pink
+              ],
+              borderWidth: 2,
+              borderColor: '#fff'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: {
+                  padding: 15,
+                  usePointStyle: true,
+                  font: {
+                    size: 12
+                  }
+                }
+              },
+              tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                titleColor: 'white',
+                bodyColor: 'white',
+                borderColor: 'rgba(255,255,255,0.2)',
+                borderWidth: 1,
+                cornerRadius: 8,
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ': ' + context.raw + '%';
+                  }
+                }
+              }
+            },
+            animation: {
+              duration: 1500,
+              easing: 'easeInOutQuart'
+            }
+          }
+        });
+      } catch (error) {
+        // Show a fallback message
+        ctx.parentElement.innerHTML = `
+          <div class="text-center text-muted p-4">
+            <i class="fas fa-chart-pie fa-3x mb-3"></i>
+            <h5>Chart Data Available</h5>
+            <p>Chart visualization temporarily unavailable</p>
+            <small>Data: ${Object.keys(chartData).length} predictions found</small>
+          </div>
+        `;
+      }
+    }
+  } else {
+    const chartContainer = document.querySelector('.chart-wrapper');
+    if (chartContainer) {
+      chartContainer.innerHTML = `
+        <div class="text-center text-muted p-4">
+          <i class="fas fa-info-circle fa-3x mb-3"></i>
+          <h5>No Prediction Data</h5>
+          <p>Chart will appear when analysis is complete</p>
+        </div>
+      `;
+    }
+  }
+});
+
+// Show notification
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  notification.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'info'}-circle me-2"></i>
+    ${message}
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => notification.classList.add('show'), 100);
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => document.body.removeChild(notification), 300);
+  }, 3000);
+}
+
+// Download report function
+function downloadReport() {
+  showNotification('Generating report...', 'info');
+  
+  const reportData = {
+    id: '<%= xray._id %>',
+    scanType: '<%= xray.scanType %>',
+    uploadDate: '<%= xray.createdAt %>',
+    status: '<%= xray.status %>',
+    predictions: JSON.parse('<%- JSON.stringify(xray.predictions || {}) %>'),
+    modelVersion: '<%= xray.model_version || "Unknown" %>',
+    processingTime: '<%= xray.inference_time_ms || "N/A" %>ms'
+  };
+
+  const reportContent = `
+HEALTHFY X-RAY ANALYSIS REPORT
+==============================
+
+Report ID: ${reportData.id}
+Scan Type: ${reportData.scanType}
+Upload Date: ${new Date(reportData.uploadDate).toLocaleString()}
+Status: ${reportData.status.toUpperCase()}
+Model Version: ${reportData.modelVersion}
+Processing Time: ${reportData.processingTime}
+
+FINDINGS:
+${Object.entries(reportData.predictions)
+  .sort(([,a], [,b]) => b - a)
+  .map(([condition, confidence]) => 
+    `- ${condition.replace(/_/g, ' ')}: ${(confidence * 100).toFixed(1)}%`
+  ).join('\\n')}
+
+Generated: ${new Date().toLocaleString()}
+
+DISCLAIMER: This analysis is generated by AI and should not be used as a substitute for professional medical diagnosis. Please consult with a qualified healthcare provider.
+  `;
+
+  const blob = new Blob([reportContent], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `xray-report-${reportData.id}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showNotification('Report downloaded successfully!', 'success');
+}
+
+// Export data function
+function exportData() {
+  showNotification('Exporting data...', 'info');
+  
+  const exportData = {
+    report: {
+      id: '<%= xray._id %>',
+      timestamp: new Date().toISOString(),
+      xray: {
+        status: '<%= xray.status %>',
+        scanType: '<%= xray.scanType %>',
+        uploadDate: '<%= xray.createdAt %>',
+        fileName: '<%= xray.file_name || "Unknown" %>',
+        fileSize: '<%= xray.file_size || 0 %>'
+      },
+      analysis: {
+        predictions: JSON.parse('<%- JSON.stringify(xray.predictions || {}) %>'),
+        modelVersion: '<%= xray.model_version || "Unknown" %>',
+        processingTime: '<%= xray.inference_time_ms || 0 %>',
+        inferenceId: '<%= xray.inference_id || "N/A" %>'
+      }
+    }
+  };
+
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `xray-data-<%= xray._id %>.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showNotification('Data exported successfully!', 'success');
+}
+
+// Print function
+function printPage() {
+  showNotification('Preparing for print...', 'info');
+  
+  // Add a small delay to show the notification
+  setTimeout(() => {
+    try {
+      window.print();
+    } catch (error) {
+      console.error('Print error:', error);
+      showNotification('Print failed. Please try again.', 'error');
+    }
+  }, 500);
+}
+
+// Share function
+function shareResults() {
+  if (navigator.share) {
+    navigator.share({
+      title: 'X-ray Analysis Results - HealthFy',
+      text: 'Check out my X-ray analysis results from HealthFy AI!',
+      url: window.location.href
+    }).then(() => {
+      showNotification('Results shared successfully!', 'success');
+    }).catch(() => {
+      // Fallback to clipboard
+      copyToClipboard();
+    });
+  } else {
+    copyToClipboard();
+  }
+}
+
+function copyToClipboard() {
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      showNotification('Results URL copied to clipboard!', 'success');
+    }).catch(() => {
+      // Manual fallback
+      showNotification('Please copy the URL manually from your browser', 'info');
+    });
+  } else {
+    // Very old browser fallback
+    showNotification('Please copy the URL manually from your browser', 'info');
+  }
+}
+
+// Retry analysis function
+function retryAnalysis() {
+  if (confirm('Are you sure you want to retry the analysis?')) {
+    showNotification('Retrying analysis...', 'info');
+    
+    fetch(`/prediction/xray/<%= xray._id %>/retry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showNotification('Analysis restarted successfully!', 'success');
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        showNotification('Retry failed: ' + (data.message || 'Unknown error'), 'error');
+      }
+    })
+    .catch(error => {
+      showNotification('Error: ' + error.message, 'error');
+    });
+  }
+}
+</script>

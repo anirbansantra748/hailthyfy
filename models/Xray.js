@@ -86,6 +86,22 @@ const xraySchema = new mongoose.Schema(
       default: null,
     },
 
+    // Detailed Analysis Data
+    handcrafted_features: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
+
+    similar_cases: {
+      type: [mongoose.Schema.Types.Mixed],
+      default: [],
+    },
+
+    embedding_generated: {
+      type: Boolean,
+      default: false,
+    },
+
     // Legacy fields (maintained for backward compatibility)
     predictionResults: {
       type: Object,

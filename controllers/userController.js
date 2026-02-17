@@ -18,14 +18,14 @@ exports.registerUser = async (req, res) => {
     console.log('📥 Signup request received');
     console.log('📋 Request body:', req.body);
     console.log('📊 Content-Type:', req.headers['content-type']);
-    
+
     // Check if req.body exists and has data
     if (!req.body || Object.keys(req.body).length === 0) {
       console.log('❌ req.body is empty or undefined');
       req.flash('error', 'Form data was not received properly. Please try again.');
       return res.redirect('/users/signup');
     }
-    
+
     const {
       // Personal info
       name,
@@ -35,7 +35,7 @@ exports.registerUser = async (req, res) => {
       phone,
       dob,
       gender,
-      
+
       // Address
       street,
       city,
@@ -47,7 +47,7 @@ exports.registerUser = async (req, res) => {
       height,
       weight,
       bloodGroup,
-      
+
       // Vitals
       systolic,
       diastolic,
@@ -75,7 +75,7 @@ exports.registerUser = async (req, res) => {
       privacyPolicy,
       termsConditions,
     } = req.body;
-    
+
     console.log('✅ Form data extracted successfully');
     console.log('👤 Name:', name);
     console.log('📧 Email:', email);
@@ -85,9 +85,9 @@ exports.registerUser = async (req, res) => {
     const parseCSV = (str) =>
       str
         ? str
-            .split(",")
-            .map((s) => s.trim())
-            .filter(Boolean)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
         : [];
 
     // Basic validation
@@ -101,16 +101,16 @@ exports.registerUser = async (req, res) => {
       req.flash('error', 'Passwords do not match.');
       return res.redirect('/users/signup');
     }
-    
+
     console.log('📝 Creating user object...');
-    
+
     const newUser = new User({
       name,
       email,
       phone,
       dob: dob ? new Date(dob) : undefined,
       gender,
-      
+
       // Address
       address: {
         street: street || undefined,
@@ -119,7 +119,7 @@ exports.registerUser = async (req, res) => {
         country: country || undefined,
         pincode: pincode || undefined,
       },
-      
+
       // Physical measurements
       height: height ? Number(height) : undefined,
       weight: weight ? Number(weight) : undefined,
@@ -132,7 +132,7 @@ exports.registerUser = async (req, res) => {
       },
       heartRate: heartRate ? Number(heartRate) : undefined,
       temperature: temperature ? Number(temperature) : undefined,
-      
+
       bloodSugar: {
         fasting: sugarFasting ? Number(sugarFasting) : undefined,
         postMeal: sugarPostMeal ? Number(sugarPostMeal) : undefined,
@@ -161,7 +161,7 @@ exports.registerUser = async (req, res) => {
         acceptedAt: new Date(),
       },
     });
-    
+
     console.log('👤 User object created:', {
       name: newUser.name,
       email: newUser.email,
@@ -174,7 +174,18 @@ exports.registerUser = async (req, res) => {
     User.register(newUser, password, (err, user) => {
       if (err) {
         console.error("❌ Error registering user:", err.message);
-        req.flash("error", err.message);
+        // Handle duplicate key error (E11000)
+        if (err.name === 'MongoServerError' && err.code === 11000) {
+          if (err.keyPattern && err.keyPattern.phone) {
+            req.flash("error", "This phone number is already registered. Please login or use a different number.");
+          } else if (err.keyPattern && err.keyPattern.email) {
+            req.flash("error", "This email is already registered. Please login.");
+          } else {
+            req.flash("error", "A user with the given details already exists.");
+          }
+        } else {
+          req.flash("error", err.message);
+        }
         return res.redirect("/users/signup");
       }
       req.flash("success", "Registration successful. Please log in.");
@@ -207,7 +218,7 @@ module.exports.renderLogin = (req, res) => {
 module.exports.renderProfile = async (req, res) => {
   try {
     const user = req.user;
-    
+
     if (!user) {
       req.flash('error', 'Please log in to view your profile.');
       return res.redirect('/users/login');
@@ -215,22 +226,22 @@ module.exports.renderProfile = async (req, res) => {
 
     // Calculate profile completeness
     const profileCompleteness = calculateProfileCompleteness(user);
-    
+
     // Get recent health logs (last 5)
-    const recentHealthLogs = user.healthLogs 
-      ? user.healthLogs.slice(-5).reverse() 
+    const recentHealthLogs = user.healthLogs
+      ? user.healthLogs.slice(-5).reverse()
       : [];
-    
+
     // Get recent interaction checks (last 3)
-    const recentInteractionChecks = user.interactionChecks 
-      ? user.interactionChecks.slice(-3).reverse() 
+    const recentInteractionChecks = user.interactionChecks
+      ? user.interactionChecks.slice(-3).reverse()
       : [];
-    
+
     // Get recent AI predictions (last 3)
-    const recentPredictions = user.aiPredictions 
-      ? user.aiPredictions.slice(-3).reverse() 
+    const recentPredictions = user.aiPredictions
+      ? user.aiPredictions.slice(-3).reverse()
       : [];
-    
+
     // Prepare stats
     const profileStats = {
       totalHealthLogs: user.healthLogs ? user.healthLogs.length : 0,
@@ -239,8 +250,8 @@ module.exports.renderProfile = async (req, res) => {
       lastHealthAssessment: user.lastHealthAssessment,
       xrayCount: user.xrayCount || 0
     };
-    
-    res.render("users/profile.ejs", { 
+
+    res.render("users/profile.ejs", {
       user: user,
       profileCompleteness,
       recentHealthLogs,
@@ -249,7 +260,7 @@ module.exports.renderProfile = async (req, res) => {
       profileStats,
       title: 'My Health Profile | Healthfy'
     });
-    
+
   } catch (error) {
     console.error('❌ [PROFILE] Error rendering profile:', error);
     req.flash('error', 'Failed to load profile page.');
@@ -293,7 +304,7 @@ function calculateProfileCompleteness(user) {
 
   Object.entries(fields).forEach(([field, points]) => {
     total += points;
-    
+
     const value = user[field];
     if (value !== null && value !== undefined) {
       if (Array.isArray(value)) {
@@ -317,15 +328,15 @@ function calculateProfileCompleteness(user) {
   });
 
   const percentage = Math.round((completed / total) * 100);
-  
+
   return {
     percentage,
     completed,
     total,
     missing: missing.slice(0, 5), // Show top 5 missing fields
-    level: percentage >= 90 ? 'Excellent' : 
-           percentage >= 70 ? 'Good' : 
-           percentage >= 50 ? 'Moderate' : 'Incomplete'
+    level: percentage >= 90 ? 'Excellent' :
+      percentage >= 70 ? 'Good' :
+        percentage >= 50 ? 'Moderate' : 'Incomplete'
   };
 };
 
@@ -379,8 +390,8 @@ module.exports.renderUpdateProfile = (req, res) => {
       req.flash('error', 'Please log in to update your profile.');
       return res.redirect('/users/login');
     }
-    
-    res.render("users/update-profile.ejs", { 
+
+    res.render("users/update-profile.ejs", {
       user: req.user,
       title: 'Update Profile | Healthfy'
     });
@@ -397,7 +408,7 @@ module.exports.updateProfile = async (req, res) => {
     const userId = req.user._id;
     const {
       name, phone, gender, dob,
-      height, weight, bloodGroup, 
+      height, weight, bloodGroup,
       bloodPressureSystolic, bloodPressureDiastolic,
       heartRate, bloodSugarFasting, bloodSugarPostMeal, bloodSugarHba1c,
       cholesterolTotal, cholesterolHdl, cholesterolLdl, cholesterolTriglycerides,
@@ -406,10 +417,10 @@ module.exports.updateProfile = async (req, res) => {
       emergencyContactName, emergencyContactRelation, emergencyContactPhone,
       addressStreet, addressCity, addressState, addressCountry, addressPincode
     } = req.body;
-    
+
     // Parse arrays from comma-separated strings
     const parseArray = (str) => str ? str.split(',').map(item => item.trim()).filter(Boolean) : [];
-    
+
     // Build update object
     const updateData = {
       name: name || req.user.name,
@@ -426,7 +437,7 @@ module.exports.updateProfile = async (req, res) => {
       surgeries: parseArray(surgeries),
       familyHistory: parseArray(familyHistory)
     };
-    
+
     // Handle nested objects
     if (bloodPressureSystolic || bloodPressureDiastolic) {
       updateData.bloodPressure = {
@@ -434,7 +445,7 @@ module.exports.updateProfile = async (req, res) => {
         diastolic: bloodPressureDiastolic ? Number(bloodPressureDiastolic) : req.user.bloodPressure?.diastolic
       };
     }
-    
+
     if (bloodSugarFasting || bloodSugarPostMeal || bloodSugarHba1c) {
       updateData.bloodSugar = {
         fasting: bloodSugarFasting ? Number(bloodSugarFasting) : req.user.bloodSugar?.fasting,
@@ -442,7 +453,7 @@ module.exports.updateProfile = async (req, res) => {
         hba1c: bloodSugarHba1c ? Number(bloodSugarHba1c) : req.user.bloodSugar?.hba1c
       };
     }
-    
+
     if (cholesterolTotal || cholesterolHdl || cholesterolLdl || cholesterolTriglycerides) {
       updateData.cholesterol = {
         total: cholesterolTotal ? Number(cholesterolTotal) : req.user.cholesterol?.total,
@@ -451,7 +462,7 @@ module.exports.updateProfile = async (req, res) => {
         triglycerides: cholesterolTriglycerides ? Number(cholesterolTriglycerides) : req.user.cholesterol?.triglycerides
       };
     }
-    
+
     if (smokingStatus || alcoholStatus || diet || exerciseFrequency || sleepHours || stressLevel) {
       updateData.lifestyle = {
         smoking: smokingStatus === 'true' || smokingStatus === 'on',
@@ -462,7 +473,7 @@ module.exports.updateProfile = async (req, res) => {
         stressLevel: stressLevel ? Number(stressLevel) : req.user.lifestyle?.stressLevel
       };
     }
-    
+
     if (emergencyContactName || emergencyContactRelation || emergencyContactPhone) {
       updateData.emergencyContact = {
         name: emergencyContactName || req.user.emergencyContact?.name,
@@ -470,7 +481,7 @@ module.exports.updateProfile = async (req, res) => {
         phone: emergencyContactPhone || req.user.emergencyContact?.phone
       };
     }
-    
+
     if (addressStreet || addressCity || addressState || addressCountry || addressPincode) {
       updateData.address = {
         street: addressStreet || req.user.address?.street,
@@ -480,20 +491,20 @@ module.exports.updateProfile = async (req, res) => {
         pincode: addressPincode || req.user.address?.pincode
       };
     }
-    
+
     // Calculate BMI if height and weight are provided
     if (updateData.height && updateData.weight) {
       const heightInMeters = updateData.height / 100;
       updateData.bmi = Math.round((updateData.weight / (heightInMeters * heightInMeters)) * 10) / 10;
     }
-    
+
     // Update the user
     await User.findByIdAndUpdate(userId, updateData, { new: true });
-    
+
     console.log('✅ [UPDATE-PROFILE] Profile updated successfully for user:', userId);
     req.flash("success", "Profile updated successfully!");
     res.redirect("/users/profile");
-    
+
   } catch (err) {
     console.error('❌ [UPDATE-PROFILE] Error updating profile:', err);
     req.flash("error", "Failed to update profile. Please try again.");

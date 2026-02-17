@@ -1,0 +1,50 @@
+2026-02-09 23:27:23,040 - RadiologyFeatures - INFO - Initializing RadiologyFeatureExtractor...
+2026-02-09 23:27:23,044 - LungSegmenter - INFO - LungSegmenter initialized with target size (512, 512)
+2026-02-09 23:27:31,773 - RadiologyFeatures - INFO - DEBUG_INTERNAL: L_Half Mean: 209.6700
+2026-02-09 23:27:31,774 - RadiologyFeatures - INFO - DEBUG_INTERNAL: R_Half Mean: 210.4851
+F
+======================================================================
+FAIL: test_feature_extraction (__main__.TestRadiologyFeatures.test_feature_extraction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\anirb\Downloads\hailthyfy\ml_service\tests\test_radiology_features.py", line 69, in test_feature_extraction
+    self.assertGreater(r_lower_mean, l_lower_mean)
+AssertionError: 11.407198933491335 not greater than 11.407198933491335
+
+----------------------------------------------------------------------
+Ran 1 test in 11.381s
+
+FAILED (failures=1)
+
+Extracted Radiology Features:
+global_lung_mean: 5.9958
+R_Upper_mean: 2.8837
+R_Upper_norm_mean: 0.4810
+R_Middle_mean: 4.3225
+R_Middle_norm_mean: 0.7209
+R_Lower_mean: 11.4072
+R_Lower_norm_mean: 1.9025
+L_Upper_mean: 2.8837
+L_Upper_norm_mean: 0.4810
+L_Middle_mean: 4.3225
+L_Middle_norm_mean: 0.7209
+L_Lower_mean: 11.4072
+L_Lower_norm_mean: 1.9025
+asym_Upper_opacity: 0.0000
+asym_Upper_texture: 0.0000
+asym_Middle_opacity: 0.0000
+asym_Middle_texture: 0.0000
+asym_Lower_opacity: 0.0000
+asym_Lower_texture: 0.0000
+max_opacity_compactness: 0.0118
+gabor_mean_energy: 36.1697
+DEBUG: Input L_Half Mean: 173.3353
+DEBUG: Input R_Half Mean: 173.8148
+DEBUG: Lung Mask Area: 45762
+DEBUG: Zone R_Upper Area: 6632
+DEBUG: Zone R_Middle Area: 9498
+DEBUG: Zone R_Lower Area: 6751
+DEBUG: Zone L_Upper Area: 6632
+DEBUG: Zone L_Middle Area: 9498
+DEBUG: Zone L_Lower Area: 6751
+L_Lower Mean: 11.407198933491335, R_Lower Mean: 11.407198933491335

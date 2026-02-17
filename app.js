@@ -34,7 +34,30 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "cdn.jsdelivr.net",
+        "cdnjs.cloudflare.com",
+        "code.jquery.com"
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'",
+        "cdn.jsdelivr.net",
+        "cdnjs.cloudflare.com",
+        "fonts.googleapis.com"
+      ],
+      fontSrc: ["'self'", "fonts.gstatic.com", "cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'", "ws:", "wss:"],
+    },
+  })
+);
 app.use(flash());
 
 // EJS Setup
@@ -102,7 +125,7 @@ app.use((req, res, next) => {
 
 // Routes
 const indexRoutes = require("./routes/indexRoutes");
-const userRoutes = require("./routes/userRouetes.js");
+const userRoutes = require("./routes/userRoutes.js");
 const doctorRoutes = require("./routes/doctorRoutes");
 const postRoutes = require("./routes/postRoutes");
 const predictionRoutes = require("./routes/predictionRoutes");

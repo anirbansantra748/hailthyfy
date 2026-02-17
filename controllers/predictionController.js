@@ -60,9 +60,9 @@ const upload = multer({
 
 // ML Service configuration
 const ML_CONFIG = {
-  url: process.env.ML_API_URL || "http://localhost:8000",
+  url: process.env.ML_API_URL || "http://127.0.0.1:8000",
   apiKey: process.env.ML_API_KEY || "dev_key_for_development_only",
-  timeout: parseInt(process.env.ML_API_TIMEOUT_MS) || 30000,
+  timeout: parseInt(process.env.ML_API_TIMEOUT_MS) || 60000, // Increased to 60s
   retries: 3,
   retryDelay: 1000, // Start with 1 second
 };
@@ -71,13 +71,13 @@ const ML_CONFIG = {
 const EMAIL_TRANSPORT = nodemailer.createTransport(
   process.env.NODE_ENV === "production"
     ? {
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || "587"),
-        secure: false,
-        auth: process.env.SMTP_USER
-          ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-          : undefined,
-      }
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587"),
+      secure: false,
+      auth: process.env.SMTP_USER
+        ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+        : undefined,
+    }
     : { jsonTransport: true }
 );
 
@@ -233,10 +233,9 @@ async function callMLService(filePath, scanType, retryCount = 0) {
         );
       } else {
         throw new Error(
-          `ML service error: ${
-            error.response.data?.detail ||
-            error.response.statusText ||
-            "Unknown error"
+          `ML service error: ${error.response.data?.detail ||
+          error.response.statusText ||
+          "Unknown error"
           }`
         );
       }
@@ -492,10 +491,34 @@ exports.uploadXray = (req, res) => {
           );
         }
 
+        // CRITICAL FIX: Use fusion engine results instead of raw DenseNet predictions
+        // The frontend expects a { label: confidence } format
+        // But we want to show the FUSION result, not raw DL predictions
+        let displayPredictions;
+
+        if (mlResult.final_diagnosis && mlResult.confidence_score) {
+          // Fusion engine provided a diagnosis - use it!
+          displayPredictions = {};
+          displayPredictions[mlResult.final_diagnosis] = mlResult.confidence_score;
+
+          // Add other predictions with much lower scores for context
+          for (const [label, score] of Object.entries(mlResult.predictions || {})) {
+            if (label !== mlResult.final_diagnosis) {
+              displayPredictions[label] = score; // Keep original raw scores for reference
+            }
+          }
+
+          console.log(`Using FUSION result for display: ${mlResult.final_diagnosis} at ${(mlResult.confidence_score * 100).toFixed(1)}%`);
+        } else {
+          // Fallback to raw predictions if fusion didn't provide results
+          displayPredictions = mlResult.predictions;
+          console.log('Using raw DL predictions (fusion engine did not provide final_diagnosis)');
+        }
+
         // Update X-ray record with results and metadata
         const updateData = {
           status: "completed",
-          predictions: mlResult.predictions,
+          predictions: displayPredictions, // Use fusion result!
           model_version: mlResult.model_version || "unknown",
           inference_id: mlResult.inference_id || `inf_${Date.now()}`,
           inference_time_ms: mlResult.inference_time_ms || 0,
@@ -504,7 +527,7 @@ exports.uploadXray = (req, res) => {
           isProcessed: true,
           // Additional metadata from ML response
           labels: mlResult.labels || [],
-          warnings: mlResult.warnings || [],
+          warnings: mlResult.safety_flags || mlResult.warnings || [],
           scan_type_ml: mlResult.scan_type || req.body.scanType || "chest",
         };
 
@@ -672,6 +695,10 @@ exports.getXrayPrediction = async (req, res) => {
               label,
               confidence: (confidence * 100).toFixed(2) + "%",
             })),
+          // Add detailed analysis data
+          handcrafted_features: xray.raw_response?.handcrafted_features || {},
+          similar_cases: xray.raw_response?.similar_cases || [],
+          embedding_generated: xray.raw_response?.embedding_generated || false,
         },
       });
     } else if (xray.status === "processing") {
@@ -853,6 +880,45 @@ exports.renderXrayList = async (req, res) => {
   }
 };
 
+// Helper to generate simple explanations
+const EXPLANATIONS = {
+  'Atelectasis': "The lung isn't inflating properly, like a deflated balloon. This can happen after surgery or from a blockage.",
+  'Cardiomegaly': "The heart looks larger than normal on the X-ray. It might be working harder than usual.",
+  'Effusion': "There is some fluid build-up around the lungs. This can make it harder to breathe deeply.",
+  'Infiltration': "There is a substance (like fluid or pus) in the lungs that shouldn't be there, often a sign of infection.",
+  'Mass': "There is a large abnormal spot (>3cm). This needs close follow-up with your doctor.",
+  'Nodule': "There is a small spot (<3cm) on the lung. These are common and often benign, but worth checking.",
+  'Pneumonia': "The lungs show signs of infection, likely caused by bacteria or a virus.",
+  'Pneumothorax': "There is air leaking into the space around the lung, which can cause it to collapse.",
+  'Consolidation': "A part of the lung is filled with fluid instead of air, usually due to pneumonia.",
+  'Edema': "There is fluid in the lungs, often related to heart function.",
+  'Emphysema': "The air sacs in the lungs are damaged, which can make it hard to breathe out fully.",
+  'Fibrosis': "There is some scarring in the lung tissue.",
+  'Pleural_Thickening': "The lining of the lungs is thicker than normal, possibly from a past infection.",
+  'Hernia': "Expected organs are not in their usual position.",
+  'No_Finding': "The X-ray appears normal with no obvious abnormalities detected."
+};
+
+function generateAIExplanation(predictions) {
+  if (!predictions) return "Analysis incomplete.";
+
+  // Sort predictions
+  const sorted = Object.entries(predictions).sort(([, a], [, b]) => b - a);
+  const topCondition = sorted[0];
+
+  if (!topCondition) return "No significant findings.";
+
+  const [condition, confidence] = topCondition;
+  const percentage = (confidence * 100).toFixed(1);
+  const explanation = EXPLANATIONS[condition] || "An abnormality was detected.";
+
+  if (confidence < 0.5) {
+    return `The findings are not definitive. There is a low chance (${percentage}%) of ${condition.replace(/_/g, ' ')}. ${explanation}`;
+  }
+
+  return `The AI detected signs of **${condition.replace(/_/g, ' ')}** with ${percentage}% confidence. ${explanation} Please consult a doctor for a proper diagnosis.`;
+}
+
 // Render X-ray view
 exports.renderXrayView = async (req, res) => {
   try {
@@ -914,16 +980,28 @@ exports.renderXrayView = async (req, res) => {
       predictions: safePredictions,
     };
 
+    // Extract Fusion Logic Data if available
+    const fusionData = {
+      diagnosis: xray.raw_response?.final_diagnosis || null,
+      confidence: xray.raw_response?.confidence_score || null,
+      notes: xray.raw_response?.clinical_notes || [],
+      flags: xray.raw_response?.safety_flags || [],
+      summary: xray.raw_response?.summary || null
+    };
+
     try {
       // Prepare predictionsKeys array for template
       const predictionsKeys = Object.keys(safePredictions);
 
-      res.render("predictions/view-fixed", {
+      res.render("predictions/view-explainable", {
         user: req.user,
-        title: "X-ray Results",
+        title: fusionData.diagnosis ? `Analysis: ${fusionData.diagnosis}` : "X-ray Results",
         xray: safeXray,
         predictions: safePredictions,
         predictionsKeys: predictionsKeys,
+        aiExplanation: fusionData.summary || generateAIExplanation(safePredictions),
+        fusion: fusionData, // Pass fusion data to view
+        scanType: xray.scanType || "chest"
       });
     } catch (renderError) {
       // Try to provide a fallback error page
@@ -974,7 +1052,7 @@ exports.renderDemo = async (req, res) => {
 exports.downloadXrayReport = async (req, res) => {
   try {
     const xray = await Xray.findById(req.params.id);
-    
+
     if (!xray) {
       return res.status(404).json({ success: false, message: "X-ray not found" });
     }
@@ -997,10 +1075,10 @@ Processing Time: ${xray.inference_time_ms || 'N/A'}ms
 
 FINDINGS:
 ${xray.predictions ? Object.entries(xray.predictions)
-  .sort(([,a], [,b]) => b - a)
-  .map(([condition, confidence]) => 
-    `- ${condition.replace(/_/g, ' ')}: ${(confidence * 100).toFixed(1)}%`
-  ).join('\n') : 'No predictions available'}
+        .sort(([, a], [, b]) => b - a)
+        .map(([condition, confidence]) =>
+          `- ${condition.replace(/_/g, ' ')}: ${(confidence * 100).toFixed(1)}%`
+        ).join('\n') : 'No predictions available'}
 
 Generated: ${new Date().toLocaleString()}
 
@@ -1010,7 +1088,7 @@ DISCLAIMER: This analysis is generated by AI and should not be used as a substit
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Content-Disposition', `attachment; filename="xray-report-${xray._id}.txt"`);
     res.send(reportContent);
-    
+
   } catch (error) {
     console.error("Download report error:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -1021,7 +1099,7 @@ DISCLAIMER: This analysis is generated by AI and should not be used as a substit
 exports.exportXrayData = async (req, res) => {
   try {
     const xray = await Xray.findById(req.params.id);
-    
+
     if (!xray) {
       return res.status(404).json({ success: false, message: "X-ray not found" });
     }
@@ -1054,7 +1132,7 @@ exports.exportXrayData = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Content-Disposition', `attachment; filename="xray-data-${xray._id}.json"`);
     res.json(exportData);
-    
+
   } catch (error) {
     console.error("Export data error:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -1065,7 +1143,7 @@ exports.exportXrayData = async (req, res) => {
 exports.shareXrayResults = async (req, res) => {
   try {
     const xray = await Xray.findById(req.params.id);
-    
+
     if (!xray) {
       return res.status(404).json({ success: false, message: "X-ray not found" });
     }
@@ -1077,13 +1155,13 @@ exports.shareXrayResults = async (req, res) => {
 
     // Generate shareable URL
     const shareUrl = `${req.protocol}://${req.get('host')}/prediction/xray/${xray._id}`;
-    
+
     res.json({
       success: true,
       shareUrl: shareUrl,
       message: "Share URL generated successfully"
     });
-    
+
   } catch (error) {
     console.error("Share results error:", error);
     res.status(500).json({ success: false, message: "Server error" });
