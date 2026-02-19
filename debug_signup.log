@@ -1,0 +1,30 @@
+[2026-02-18T18:08:29.978Z] 🚀 Signup route hit: GET
+[2026-02-18T18:08:29.978Z] 📊 Content-Type: undefined
+[2026-02-18T18:08:29.978Z] 📋 Body keys: 
+[2026-02-18T18:08:39.818Z] 🚀 Signup route hit: GET
+[2026-02-18T18:08:39.818Z] 📊 Content-Type: undefined
+[2026-02-18T18:08:39.818Z] 📋 Body keys: 
+[2026-02-18T18:08:41.373Z] 🚀 Signup route hit: GET
+[2026-02-18T18:08:41.373Z] 📊 Content-Type: undefined
+[2026-02-18T18:08:41.373Z] 📋 Body keys: 
+[2026-02-18T18:12:15.856Z] 🚀 Signup route hit: GET
+[2026-02-18T18:12:15.856Z] 📊 Content-Type: undefined
+[2026-02-18T18:12:15.856Z] 📋 Body keys: 
+[2026-02-18T18:20:45.499Z] 🚀 Signup route hit: GET
+[2026-02-18T18:20:45.499Z] 📊 Content-Type: undefined
+[2026-02-18T18:20:45.499Z] 📋 Body keys: 
+[2026-02-18T18:21:58.296Z] 🚀 Signup route hit: POST
+[2026-02-18T18:21:58.296Z] 📊 Content-Type: application/x-www-form-urlencoded
+[2026-02-18T18:21:58.296Z] 📋 Body keys: name, email, phone, password, confirmPassword, dob, street, gender, city, state, pincode, country, height, weight, bloodGroup, medicalHistory, allergies, currentMedications, systolic, diastolic, heartRate, sugarFasting, temperature, diet, exerciseFrequency, smoking, alcohol, sleepHours, stressLevel, termsConditions, privacyPolicy
+[2026-02-18T18:21:58.322Z] 📥 Signup request received in controller
+[2026-02-18T18:21:58.439Z] 👤 User object prepared for registration: dd@mai.com
+[2026-02-18T18:21:59.262Z] ❌ Error registering user: E11000 duplicate key error collection: helethify.users index: phone_1 dup key: { phone: "+917980015159" }
+[2026-02-18T18:22:00.040Z] 🚀 Signup route hit: GET
+[2026-02-18T18:22:00.040Z] 📊 Content-Type: undefined
+[2026-02-18T18:22:00.040Z] 📋 Body keys: 
+[2026-02-18T18:23:23.255Z] 🚀 Signup route hit: POST
+[2026-02-18T18:23:23.255Z] 📊 Content-Type: application/x-www-form-urlencoded
+[2026-02-18T18:23:23.255Z] 📋 Body keys: name, email, phone, password, confirmPassword, dob, street, gender, city, state, pincode, country, height, weight, bloodGroup, medicalHistory, allergies, currentMedications, systolic, diastolic, heartRate, sugarFasting, temperature, diet, exerciseFrequency, smoking, alcohol, sleepHours, stressLevel, termsConditions, privacyPolicy
+[2026-02-18T18:23:23.264Z] 📥 Signup request received in controller
+[2026-02-18T18:23:23.319Z] 👤 User object prepared for registration: d@mai.com
+[2026-02-18T18:23:23.898Z] ✅ Registration successful

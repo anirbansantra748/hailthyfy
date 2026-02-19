@@ -17,10 +17,10 @@ const User = require("./models/User");
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Env & App Setup
-const mongoUrl = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/healthfy";
+const mongoUrl = process.env.MONGODB_URI || process.env.MONGO_URL || "mongodb://127.0.0.1:27017/healthfy";
 
 // Connect to MongoDB
 // Connect to MongoDB

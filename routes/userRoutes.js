@@ -4,8 +4,19 @@ const userController = require("../controllers/userController");
 const doctorController = require("../controllers/doctorController");
 const { isLoggedIn } = require("../middleware/authMiddleware");
 
+const fs = require('fs');
+const path = require('path');
+
 // Add debugging middleware
 router.use('/signup', (req, res, next) => {
+  const logFile = path.join(__dirname, '../debug_signup.log');
+  const timestamp = new Date().toISOString();
+  const logEntry = `[${timestamp}] 🚀 Signup route hit: ${req.method}\n` +
+    `[${timestamp}] 📊 Content-Type: ${req.headers['content-type']}\n` +
+    `[${timestamp}] 📋 Body keys: ${Object.keys(req.body || {}).join(', ')}\n`;
+
+  fs.appendFileSync(logFile, logEntry);
+
   console.log('🚀 Signup route hit:', req.method);
   console.log('📊 Content-Type:', req.headers['content-type']);
   console.log('📋 Body keys:', Object.keys(req.body || {}));

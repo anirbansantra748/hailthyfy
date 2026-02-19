@@ -7,6 +7,17 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
+
+const logToFile = (message) => {
+  try {
+    const logFile = path.join(__dirname, '../debug_signup.log');
+    const timestamp = new Date().toISOString();
+    fs.appendFileSync(logFile, `[${timestamp}] ${message}\n`);
+  } catch (err) {
+    console.error('Failed to write to log file:', err);
+  }
+};
 
 // ============================
 // Render Pages
@@ -15,6 +26,7 @@ const path = require("path");
 // Handle signup
 exports.registerUser = async (req, res) => {
   try {
+    logToFile('📥 Signup request received in controller');
     console.log('📥 Signup request received');
     console.log('📋 Request body:', req.body);
     console.log('📊 Content-Type:', req.headers['content-type']);
@@ -169,10 +181,12 @@ exports.registerUser = async (req, res) => {
       consents: newUser.consents
     });
 
+    logToFile(`👤 User object prepared for registration: ${newUser.email}`);
     // Use passport-local-mongoose to register user with hashed password
     // Register with email as username per passport-local-mongoose config
     User.register(newUser, password, (err, user) => {
       if (err) {
+        logToFile(`❌ Error registering user: ${err.message}`);
         console.error("❌ Error registering user:", err.message);
         // Handle duplicate key error (E11000)
         if (err.name === 'MongoServerError' && err.code === 11000) {
@@ -188,6 +202,7 @@ exports.registerUser = async (req, res) => {
         }
         return res.redirect("/users/signup");
       }
+      logToFile('✅ Registration successful');
       req.flash("success", "Registration successful. Please log in.");
       res.redirect("/users/login");
     });

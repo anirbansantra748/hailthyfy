@@ -25,7 +25,7 @@ services:
           name: healthfy-mongodb
           property: connectionString
       - key: ML_API_URL
-        value: https://healthfy-ml-service.onrender.com
+        value: http://healthfy-ml-service:8000 # Internal private network URL
       - key: ML_API_KEY
         generateValue: true
       - key: SESSION_SECRET
