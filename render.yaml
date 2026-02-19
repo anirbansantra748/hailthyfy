@@ -4,7 +4,7 @@
 databases:
   - name: healthfy-mongodb
     databaseName: healthfy
-    user: healthfy-user
+    user: healthfy
 
 services:
   # Node.js Main Application
@@ -45,10 +45,6 @@ services:
         sync: false # Set this manually
     domains:
       - healthfy.onrender.com # Your custom domain
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
 
   # Python ML Service
   - type: web
